@@ -1,0 +1,231 @@
+/* ============================================
+   استایل مخصوص پنل ادمین (درخواست‌ها)
+   ============================================ */
+
+.main-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.main-title h1 {
+    font-size: 28px;
+    color: #333;
+    font-weight: bold;
+    display: inline-block;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #667eea;
+}
+
+/* ============================================
+   کارت‌های آمار
+   ============================================ */
+
+.stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 15px;
+    text-align: center;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 14px;
+    margin-top: 8px;
+    opacity: 0.9;
+}
+
+/* ============================================
+   جدول تیکت‌ها
+   ============================================ */
+
+.tickets-table {
+    background: white;
+    border-radius: 15px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.tickets-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.tickets-table th {
+    background: #667eea;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.tickets-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.tickets-table tr:hover {
+    background: #f9f9f9;
+}
+
+/* وضعیت تیکت در جدول */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-new {
+    background: #ffc107;
+    color: #333;
+}
+
+.status-review {
+    background: #17a2b8;
+    color: white;
+}
+
+.status-answered {
+    background: #28a745;
+    color: white;
+}
+
+.status-closed {
+    background: #6c757d;
+    color: white;
+}
+
+/* دکمه‌های عملیات در جدول */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-buttons select {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}
+
+.status-btn-table {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}
+
+.status-btn-table:hover {
+    background: #1e7e34;
+}
+
+.delete-btn-table {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}
+
+.delete-btn-table:hover {
+    background: #c82333;
+}
+
+.refresh-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.refresh-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.3s;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}
+
+.refresh-btn:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.alert {
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.no-requests {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    color: #888;
+}
+
+.no-requests .icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+.tickets-table .date{
+    direction: ltr !important;
+    text-align: center;
+    font-family: monospace;
+    letter-spacing: 1px;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}
