@@ -1,63 +1,98 @@
-/* استایل مدیریت کاربران */
-.main-title { text-align: center; margin-bottom: 30px; }
-.main-title h1 { font-size: 28px; color: #333; border-bottom: 3px solid #667eea; display: inline-block; padding-bottom: 10px; }
-
-.add-card { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.add-card h2 { font-size: 20px; margin-bottom: 20px; border-right: 4px solid #28a745; padding-right: 15px; }
-
-.form-row { display: flex; gap: 15px; flex-wrap: wrap; }
-.form-group { flex: 1; min-width: 180px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px; color: #555; }
-.form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
-
-.btn-add { background: #28a745; color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer; margin-top: 28px; transition: 0.3s;
-    font-family: inherit;}
-.btn-add:hover { background: #1e7e34; }
-
-.users-table { background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.users-table table { width: 100%; border-collapse: collapse; min-width: 700px; }
-.users-table th { background: #667eea; color: white; padding: 15px; text-align: center; font-weight: bold; }
-.users-table td { padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee; }
-.users-table tr:hover { background: #f9f9f9; }
-
-.role-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-.role-admin { background: #dc3545; color: white; }
-.role-user { background: #28a745; color: white; }
-
-.action-buttons { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.edit-btn { background: #ffc107; color: #333; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; }
-.edit-btn:hover { background: #e0a800; }
-.password-btn { background: #17a2b8; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; }
-.password-btn:hover { background: #138496; }
-.delete-btn { background: #dc3545; color: white; border: none; padding: 5px 12px; border-radius: 5px; cursor: pointer; }
-.delete-btn:hover { background: #c82333; }
-
-.users-table .date {
-    direction: ltr !important;
-    text-align: center !important;
-    font-family: monospace !important;
-    letter-spacing: 1px !important;
-    font-family: 'Vazir', 'Tahoma', sans-serif !important;
+/* استایل مدیریت کاربران - فقط چیدمان */
+.main-title {
+    text-align: center;
+    margin-bottom: 30px;
 }
-/* دکمه تنظیم دسترسی */
-.btn-permissions {
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
+
+
+.add-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.add-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    border-right: 4px solid #28a745;
+    padding-right: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
     font-size: 13px;
-    transition: 0.3s;
-    width: 100%;
-    margin-top: 28px;
+    color: #555;
 }
 
-.btn-permissions:hover {
-    background: #5a67d8;
-    transform: translateY(-2px);
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
 }
+
+.users-table {
+    background: white;
+    border-radius: 15px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.users-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.users-table th {
+    background: #4f46e5;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.users-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.users-table tr:hover {
+    background: #f9f9f9;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 /* دسترسی‌ها به صورت لیست افقی */
 .access-grid {
     display: flex;
@@ -96,12 +131,18 @@
     font-size: 14px;
     color: #555;
 }
+
 .modal {
-    display: none; position: fixed; top: 0;
-    left: 0; width: 100%; height: 100%;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0,0,0,0.5);
     justify-content: center;
-    align-items: center; z-index: 1000;
+    align-items: center;
+    z-index: 1000;
 }
 
 .modal-content {
@@ -110,11 +151,12 @@
     border-radius: 15px;
     padding: 25px;
     width: 90%;
-    max-width: 500px;
-    max-height: 85vh;  /* اضافه کن */
-    overflow-y: auto;  /* اضافه کن */
-    margin: 20px auto;  /* اضافه کن */
+
+    max-height: 85vh;
+    overflow-y: auto;
+    margin: 20px auto;
 }
+
 @keyframes modalSlideIn {
     from {
         opacity: 0;
@@ -125,6 +167,7 @@
         transform: translateY(0) scale(1);
     }
 }
+
 /* استایل اسکرول مودال */
 .modal-content::-webkit-scrollbar {
     width: 6px;
@@ -143,23 +186,21 @@
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: #764ba2;
 }
-.modal-buttons { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-.modal-save { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
-.modal-cancel { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
 
-.alert { padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-/* فونت یکسان برای همه دکمه‌های مدیریت کاربران */
-.edit-btn,
-.password-btn,
-.delete-btn,
-.btn-add,
-.modal-save,
-.modal-cancel {
-    font-family: 'Vazir', 'Tahoma', sans-serif !important;
-    font-size: 13px;
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
 }
+
+.alert {
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 /* ============================================
    استایل دسترسی درختی
    ============================================ */

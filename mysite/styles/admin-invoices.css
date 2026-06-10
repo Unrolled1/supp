@@ -1,0 +1,265 @@
+/* ============================================
+   استایل مدیریت فاکتورها
+   ============================================ */
+
+/* جدول فاکتورها */
+.invoices-table {
+    background: white;
+    border-radius: 15px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+.invoices-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.invoices-table th {
+    background: #4f46e5;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+.invoices-table td {
+    padding: 10px 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    color: #334155;
+}
+
+.invoices-table .date {
+    direction: ltr;
+}
+
+.description-cell {
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+/* فرم فاکتور */
+.invoices-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.add-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.add-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    border-right: 4px solid #28a745;
+    padding-right: 15px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #555;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* دکمه‌ها */
+.edit-btn {
+    background: #ffc107;
+    color: #000;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* مودال */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 600px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.modal-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* جستجو */
+.search-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.search-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+.search-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #555;
+}
+
+.search-group input,
+.search-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.btn-search {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-reset-search {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.search-actions {
+    flex: 0.5;
+    min-width: 180px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+/* سلکت‌های تاریخ */
+.date-select-group,
+.search-date-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.date-select-group select,
+.search-date-group select {
+    width: 70px;
+    min-width: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.date-select-group select[name="month"],
+.search-date-month {
+    width: 85px;
+    min-width: 75px;
+}
+
+
+/* فرم ثبت فاکتور - راست چین */
+.invoices-form .date-select-group {
+    justify-content: flex-end;
+}
+
+
+/* سلکت‌های تاریخ جستجو */
+.search-card .date-select-group select {
+    width: 65px;
+    min-width: 55px;
+    padding: 6px 4px;
+    font-size: 12px;
+}
+
+/* دکمه‌های جستجو */
+.search-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}

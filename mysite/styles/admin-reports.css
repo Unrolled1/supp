@@ -1,12 +1,8 @@
 /* ============================================
-   استایل صفحه گزارشات
+   استایل صفحه گزارشات - فقط چیدمان
    ============================================ */
 
-.main-title h1 {
-    font-size: 28px;
-    text-align: center;
-    margin-bottom: 30px;
-}
+
 
 /* کارت فیلتر */
 .filter-card {
@@ -63,40 +59,6 @@
     margin-top: 10px;
 }
 
-.btn-filter {
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Vazir', Tahoma, sans-serif;
-}
-
-.btn-reset {
-    background: #6c757d;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-}
-
-.btn-excel {
-    background: #28a745;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-}
-
-.btn-pdf {
-    background: #dc3545;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-}
-
 /* کارت آمار */
 .stats-card {
     background: white;
@@ -130,10 +92,6 @@
     margin-top: 5px;
 }
 
-.stat-item.review .stat-num { color: #17a2b8; }
-.stat-item.answered .stat-num { color: #28a745; }
-.stat-item.closed .stat-num { color: #6c757d; }
-
 /* جدول گزارشات */
 .reports-table {
     background: white;
@@ -148,12 +106,6 @@
     min-width: 800px;
 }
 
-.reports-table th {
-    background: #667eea;
-    color: white;
-    padding: 12px;
-    text-align: center;
-}
 
 .reports-table td {
     padding: 10px 12px;
@@ -169,19 +121,14 @@
     font-weight: bold;
 }
 
-.status-new { background: #ffc107; color: #333; }
-.status-review { background: #17a2b8; color: white; }
-.status-answered { background: #28a745; color: white; }
-.status-closed { background: #6c757d; color: white; }
-
 .text-center {
     text-align: center;
 }
+
 /* ============================================
    رفع مشکل نمایش آیتم‌های انتخابگر (select dropdown)
    ============================================ */
 
-/* استایل اصلی select ها */
 .filter-group select,
 .date-select {
     background-color: #ffffff !important;
@@ -189,7 +136,6 @@
     border: 1px solid #ddd !important;
 }
 
-/* استایل آیتم‌های داخل select - مهم‌ترین بخش */
 .filter-group select option,
 .date-select option {
     background-color: #ffffff !important;
@@ -199,20 +145,17 @@
     min-height: auto !important;
 }
 
-/* حالت hover روی آیتم‌ها */
 .filter-group select option:hover,
 .date-select option:hover {
     background-color: #667eea !important;
     color: #ffffff !important;
 }
 
-/* برای مرورگرهای مختلف */
 select optgroup option {
     background-color: #ffffff !important;
     color: #000000 !important;
 }
 
-/* اطمینان از عدم سفیدی روی سفیدی */
 select:focus option:checked,
 select:checked {
     background-color: #667eea !important;

@@ -1,8 +1,14 @@
-/* استایل مدیریت برندها - فقط چیدمان */
+/* استایل مدیریت مدل‌ها - فقط چیدمان */
 
 .main-title {
     text-align: center;
     margin-bottom: 30px;
+}
+
+.main-title h1 {
+    font-size: 28px;
+    display: inline-block;
+    padding-bottom: 10px;
 }
 
 .add-card {
@@ -20,33 +26,20 @@
     padding-right: 15px;
 }
 
-.add-card form {
+.form-inline {
     display: flex;
     gap: 15px;
     align-items: flex-end;
-}
-
-.add-card form .form-group {
-    width: 250px;
-    flex: none;
-}
-
-.add-card form .btn-add {
-    margin-top: 0;
-}
-
-.form-row {
-    display: flex;
-    gap: 15px;
     flex-wrap: wrap;
 }
 
-.form-group {
+.form-group-inline {
     flex: 1;
     min-width: 200px;
+    max-width: 300px;
 }
 
-.form-group label {
+.form-group-inline label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
@@ -54,7 +47,7 @@
     color: #555;
 }
 
-.form-group input {
+.form-group-inline input {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -64,7 +57,19 @@
     box-sizing: border-box;
 }
 
-.brands-table {
+.btn-add {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    font-weight: 500;
+    transition: 0.3s;
+    height: 42px;
+    white-space: nowrap;
+}
+
+.models-table {
     background: white;
     border-radius: 15px;
     overflow-x: auto;
@@ -72,25 +77,31 @@
     margin-top: 20px;
 }
 
-.brands-table table {
+.models-table table {
     width: 100%;
     border-collapse: collapse;
     min-width: 500px;
 }
 
-.brands-table th {
+.models-table th {
     padding: 12px;
     text-align: center;
     font-weight: bold;
 }
 
-.brands-table td {
+.models-table td {
     padding: 10px 12px;
     text-align: center;
     border-bottom: 1px solid #eee;
 }
 
-.date {
+.models-table .code {
+    direction: ltr;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.models-table .date {
     direction: ltr;
     text-align: center;
     font-family: monospace;
@@ -101,6 +112,23 @@
     display: flex;
     gap: 8px;
     justify-content: center;
+    flex-wrap: wrap;
+}
+
+.edit-btn {
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.delete-btn {
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
 }
 
 .modal {
@@ -142,7 +170,7 @@
     width: 100%;
     padding: 10px;
     margin: 5px 0 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ddd;  /* اصلاح شد - رنگ از main.css می‌آید */
     border-radius: 8px;
     font-family: 'Vazir', Tahoma, sans-serif;
     font-size: 14px;
@@ -160,8 +188,6 @@
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Vazir', Tahoma, sans-serif;
-    font-weight: 500;
 }
 
 .modal-cancel {
@@ -169,8 +195,6 @@
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Vazir', Tahoma, sans-serif;
-    font-weight: 500;
 }
 
 .alert {

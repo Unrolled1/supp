@@ -80,12 +80,12 @@ function canDeleteTickets() { return hasPermission('tickets_delete'); }
 function canViewTickets() { return canManageTickets() || canEditTickets() || canDeleteTickets(); }
 
 // ============================================
-// کاربران
+// دسترسی‌های فعالیت
 // ============================================
-function canManageUsers() { return hasPermission('users_manage'); }
-function canEditUsers() { return hasPermission('users_edit'); }
-function canDeleteUsers() { return hasPermission('users_delete'); }
-function canViewUsers() { return canManageUsers() || canEditUsers() || canDeleteUsers(); }
+function canManageActivities() { return hasPermission('activities_manage'); }
+function canEditActivities() { return hasPermission('activities_edit'); }
+function canDeleteActivities() { return hasPermission('activities_delete'); }
+function canViewActivities() { return canManageActivities() || canEditActivities() || canDeleteActivities(); }
 
 // ============================================
 // بخش‌ها
@@ -112,6 +112,14 @@ function canDeleteBrands() { return hasPermission('brands_delete'); }
 function canViewBrands() { return canManageBrands() || canEditBrands() || canDeleteBrands(); }
 
 // ============================================
+// دسترسی‌های مدل‌ها
+// ============================================
+function canManageModels() { return hasPermission('models_manage'); }
+function canEditModels() { return hasPermission('models_edit'); }
+function canDeleteModels() { return hasPermission('models_delete'); }
+function canViewModels() { return canManageModels() || canEditModels() || canDeleteModels(); }
+
+// ============================================
 // کالاها
 // ============================================
 function canManageProducts() { return hasPermission('products_manage'); }
@@ -120,10 +128,76 @@ function canDeleteProducts() { return hasPermission('products_delete'); }
 function canViewProducts() { return canManageProducts() || canEditProducts() || canDeleteProducts(); }
 
 // ============================================
-// توابع کمکی برای سایدبار
+// دسترسی‌های اشخاص
 // ============================================
-function canAccessTicketsPage() { return canViewTickets(); }
-function canAccessUsersPage() { return canViewUsers(); }
-function canAccessDepartmentsPage() { return canViewDepartments(); }
-function canAccessTopicsPage() { return canViewTopics(); }
+function canManagePersons() { return hasPermission('persons_manage'); }
+function canEditPersons() { return hasPermission('persons_edit'); }
+function canDeletePersons() { return hasPermission('persons_delete'); }
+function canViewPersons() { return canManagePersons() || canEditPersons() || canDeletePersons(); }
+
+// ============================================
+// کاربران
+// ============================================
+function canManageUsers() { return hasPermission('users_manage'); }
+function canEditUsers() { return hasPermission('users_edit'); }
+function canDeleteUsers() { return hasPermission('users_delete'); }
+function canViewUsers() { return canManageUsers() || canEditUsers() || canDeleteUsers(); }
+
+
+
+// ============================================
+// دسترسی‌های خدمات
+// ============================================
+// دسترسی مشاهده خدمات (برای دیدن صفحه و جدول)
+function canViewServices() { return hasPermission('services_view'); }
+// دسترسی مدیریت خدمات
+function canManageServices() { return hasPermission('services_manage'); }
+// دسترسی ویرایش خدمات
+function canEditServices() { return hasPermission('services_edit'); }
+// دسترسی حذف خدمات
+function canDeleteServices() { return hasPermission('services_delete'); }
+// تابع کمکی برای بررسی هرگونه دسترسی به خدمات (اختیاری)
+function hasAnyServiceAccess() {
+    return canViewServices() || canManageServices() || canEditServices() || canDeleteServices();
+}
+
+// ============================================
+// دسترسی‌های فاکتور
+// ============================================
+function canViewInvoices() { return hasPermission('invoices_view'); }
+function canManageInvoices() { return hasPermission('invoices_manage'); }
+function canEditInvoices() { return hasPermission('invoices_edit'); }
+function canDeleteInvoices() { return hasPermission('invoices_delete'); }
+
+// ============================================
+// دسترسی‌های کالا
+// ============================================
+function canViewGoods() { return hasPermission('goods_view'); }
+function canManageGoods() { return hasPermission('goods_manage'); }
+function canEditGoods() { return hasPermission('goods_edit'); }
+function canDeleteGoods() { return hasPermission('goods_delete'); }
+
+// ============================================
+// دسترسی‌های پرینتر
+// ============================================
+function canViewPrinters() { return hasPermission('printers_view'); }
+function canManagePrinters() { return hasPermission('printers_manage'); }
+function canEditPrinters() { return hasPermission('printers_edit'); }
+function canDeletePrinters() { return hasPermission('printers_delete'); }
+
+// ============================================
+// دسترسی‌های سیستم
+// ============================================
+function canViewSystems() { return hasPermission('systems_view'); }
+function canManageSystems() { return hasPermission('systems_manage'); }
+function canEditSystems() { return hasPermission('systems_edit'); }
+function canDeleteSystems() { return hasPermission('systems_delete'); }
+
+// ============================================
+// دسترسی‌های گزارشات
+// ============================================
+function canViewReports() {return hasPermission('reports_view');}
+
+
+
 ?>

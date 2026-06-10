@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
     <meta charset="UTF-8">
     <title>پنل مدیریت درخواست‌ها</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin.css">
     <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
                 <span>👨‍💼</span>
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
+            <div>
                 <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>

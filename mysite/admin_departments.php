@@ -54,6 +54,7 @@ $departments = $db->query("SELECT * FROM departments ORDER BY name ASC")->fetchA
     <meta charset="UTF-8">
     <title>مدیریت بخش‌ها</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-departments.css">
     <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
@@ -76,13 +77,41 @@ $departments = $db->query("SELECT * FROM departments ORDER BY name ASC")->fetchA
         <?php endif; ?>
 
         <div class="departments-table">
-            <table><thead><tr><th>#</th><th>نام بخش</th><th>توضیحات</th><th>عملیات</th></tr></thead>
-                <tbody><?php $i=1; foreach($departments as $d): ?>
-                    <tr><td><?php echo fa_number($i); ?></td><td><?php echo htmlspecialchars($d['name']); ?></td><td><?php echo htmlspecialchars($d['description']??'-'); ?></td>
-                    <td class="action-buttons">
-                        <?php if(canEditDepartments()): ?><button class="edit-btn" onclick='openEditModal(<?php echo $d['id']; ?>,"<?php echo htmlspecialchars($d['name']); ?>","<?php echo htmlspecialchars($d['description']); ?>")'>✏️ ویرایش</button><?php endif; ?>
-                        <?php if(canDeleteDepartments()): ?><button class="delete-btn" onclick="confirmDelete(<?php echo $d['id']; ?>,'<?php echo htmlspecialchars($d['name']); ?>')">🗑️ حذف</button><?php endif; ?>
-                    </td></tr><?php $i++; endforeach; ?></tbody>
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>نام بخش</th>
+                    <th>توضیحات</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php if (empty($departments)): ?>
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px;">
+                            🏥 هیچ بخشی ثبت نشده است
+                            </td>
+                    </tr>
+                <?php else: ?>
+                    <?php $i = 1; foreach ($departments as $d): ?>
+                        <tr>
+                            <td><?php echo fa_number($i); ?></td>
+                            <td><?php echo htmlspecialchars($d['name']); ?></td>
+                            <td><?php echo htmlspecialchars($d['description'] ?? '-'); ?></td>
+                            <td class="action-buttons">
+                                <?php if (canEditDepartments()): ?>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo $d['id']; ?>, "<?php echo htmlspecialchars($d['name']); ?>", "<?php echo htmlspecialchars($d['description']); ?>")'>✏️ ویرایش</button>
+                                <?php endif; ?>
+                                <?php if (canDeleteDepartments()): ?>
+                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $d['id']; ?>, '<?php echo htmlspecialchars($d['name']); ?>')">🗑️ حذف</button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php $i++; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
             </table>
         </div>
     </div>
@@ -91,9 +120,18 @@ $departments = $db->query("SELECT * FROM departments ORDER BY name ASC")->fetchA
         <form method="post"><input type="hidden" name="id" id="edit_id"><label>نام بخش</label><input type="text" name="name" id="edit_name" required><label>توضیحات</label><input type="text" name="description" id="edit_description">
             <div class="modal-buttons"><button type="submit" name="edit_department" class="modal-save">💾 ذخیره</button><button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button></div></form></div></div>
 <script>
-    function openEditModal(id,n,d){document.getElementById('edit_id').value=id;document.getElementById('edit_name').value=n;document.getElementById('edit_description').value=d||'';document.getElementById('editModal').style.display='flex';}
+    function openEditModal(id,n,d) {
+        document.getElementById('edit_id').value=id;document.getElementById('edit_name').value=n;document.getElementById('edit_description').value=d||'';document.getElementById('editModal').style.display='flex';}
     function closeModal(m){document.getElementById(m).style.display='none';}
-    function confirmDelete(id,n){if(confirm('آیا از حذف بخش "'+n+'" مطمئن هستید؟'))location.href='admin_departments.php?delete_department=1&id='+id;}
+    function confirmDelete(id,n) {
+        if (confirm('آیا از حذف بخش "' + n + '" مطمئن هستید؟')) {
+            var form = document.createElement('form');
+            form.method = 'post';
+            form.innerHTML = '<input type="hidden" name="delete_department" value="1"><input type="hidden" name="id" value="' + id + '">';
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
     function updateClock(){fetch('get_time.php').then(r=>r.json()).then(d=>{let c=document.getElementById('liveClock');if(c)c.innerHTML='📅 '+d.datetime;});}
     setInterval(updateClock,1000);updateClock();
 </script>

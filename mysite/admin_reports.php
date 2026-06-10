@@ -11,6 +11,10 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true 
     header('Location: login.php');
     exit;
 }
+if (!isAdmin() || !canViewReports()) {
+    header('Location: admin.php');
+    exit;
+}
 
 $db = getDB();
 
@@ -97,8 +101,8 @@ $departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORD
     <meta charset="UTF-8">
     <title>گزارشات تیکت‌ها</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-reports.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
     <style>
         .date-group {
             display: flex;

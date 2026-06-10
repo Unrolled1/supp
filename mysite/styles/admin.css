@@ -7,14 +7,7 @@
     margin-bottom: 30px;
 }
 
-.main-title h1 {
-    font-size: 28px;
-    color: #333;
-    font-weight: bold;
-    display: inline-block;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #667eea;
-}
+
 
 /* ============================================
    کارت‌های آمار
@@ -101,26 +94,6 @@
     font-weight: bold;
 }
 
-.status-new {
-    background: #ffc107;
-    color: #333;
-}
-
-.status-review {
-    background: #17a2b8;
-    color: white;
-}
-
-.status-answered {
-    background: #28a745;
-    color: white;
-}
-
-.status-closed {
-    background: #6c757d;
-    color: white;
-}
-
 /* دکمه‌های عملیات در جدول */
 .action-buttons {
     display: flex;
@@ -137,57 +110,9 @@
     font-family: 'Vazir', Tahoma, sans-serif !important;
 }
 
-.status-btn-table {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: 'Vazir', Tahoma, sans-serif !important;
-}
-
-.status-btn-table:hover {
-    background: #1e7e34;
-}
-
-.delete-btn-table {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: 'Vazir', Tahoma, sans-serif !important;
-}
-
-.delete-btn-table:hover {
-    background: #c82333;
-}
-
 .refresh-section {
     text-align: center;
     margin-bottom: 20px;
-}
-
-.refresh-btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: 0.3s;
-    font-family: 'Vazir', Tahoma, sans-serif !important;
-}
-
-.refresh-btn:hover {
-    background: #0056b3;
-    transform: translateY(-2px);
 }
 
 .alert {
@@ -196,18 +121,6 @@
     margin-bottom: 20px;
     text-align: center;
     font-weight: 500;
-}
-
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
 }
 
 .no-requests {
@@ -222,10 +135,10 @@
     font-size: 64px;
     margin-bottom: 20px;
 }
-.tickets-table .date{
+
+.tickets-table .date {
     direction: ltr !important;
     text-align: center;
     font-family: monospace;
     letter-spacing: 1px;
-    font-family: 'Vazir', Tahoma, sans-serif !important;
 }

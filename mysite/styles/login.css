@@ -1,9 +1,16 @@
 /* ============================================
-   استایل مخصوص صفحه لاگین
+   استایل مخصوص صفحه لاگین - فقط چیدمان
    ============================================ */
-
+/* وسط چین کردن صفحه لاگین */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
 .login-container {
-    background: white;
     border-radius: 20px;
     padding: 2.5rem;
     width: 100%;
@@ -26,13 +33,11 @@
 
 .login-container h2 {
     margin-bottom: 0.5rem;
-    color: #333;
     font-size: 28px;
     font-weight: bold;
 }
 
 .login-container .subtitle {
-    color: #666;
     font-size: 14px;
     margin-bottom: 1.5rem;
 }
@@ -41,7 +46,6 @@
     width: 100%;
     padding: 12px 15px;
     margin: 0.5rem 0;
-    border: 1px solid #e0e0e0;
     border-radius: 10px;
     font-size: 15px;
     font-family: 'Vazir', 'Tahoma', sans-serif;
@@ -51,16 +55,12 @@
 
 .login-container input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .login-container button {
     width: 100%;
     padding: 12px;
     margin-top: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
@@ -70,21 +70,11 @@
     transition: all 0.3s ease;
 }
 
-.login-container button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-.login-container button:active {
-    transform: translateY(0);
-}
-
 .login-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid;
     font-size: 12px;
-    color: #888;
 }
 
 .login-footer span {
@@ -93,7 +83,6 @@
 }
 
 .demo-credentials {
-    background: #f8f9fa;
     border-radius: 10px;
     padding: 10px;
     margin-top: 1rem;
@@ -102,9 +91,4 @@
 
 .demo-credentials p {
     margin: 5px 0;
-    color: #555;
-}
-
-.demo-credentials strong {
-    color: #667eea;
 }

@@ -92,6 +92,7 @@ $products = $db->query("
     <meta charset="UTF-8">
     <title>مدیریت کالاها - پنل ادمین</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-products.css">
     <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
@@ -105,7 +106,7 @@ $products = $db->query("
                 <span>👨‍💼</span>
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
+            <div>
                 <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
@@ -140,7 +141,7 @@ $products = $db->query("
                         </select>
                     </div>
                     <div class="form-group">
-                        <button type="submit" name="add_product" class="btn-add">➕ افزودن کالا</button>
+                        <button type="submit" name="add_product" class="btn-add">➕ افزودن </button>
                     </div>
                 </form>
             </div>
@@ -169,7 +170,7 @@ $products = $db->query("
                             <td><?php echo fa_number($row_num); ?></td>
                             <td><?php echo htmlspecialchars($product['name']); ?></td>
                             <td><?php echo htmlspecialchars($product['brand_name'] ?? '-'); ?></td>
-                            <td class="date"><?php echo fa_number(htmlspecialchars($product['created_at'])); ?>}</td>
+                            <td class="date"><?php echo fa_number(htmlspecialchars($product['created_at'])); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditProducts()): ?>
                                     <button class="edit-btn" onclick='openEditModal(<?php echo $product['id']; ?>, <?php echo json_encode($product); ?>)'>✏️ ویرایش</button>

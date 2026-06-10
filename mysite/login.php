@@ -72,7 +72,7 @@ if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) 
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/login.css">
 </head>
-<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+<body>
 <div class="login-container">
     <h2>🔐 ورود به سیستم</h2>
     <?php if ($error): ?>

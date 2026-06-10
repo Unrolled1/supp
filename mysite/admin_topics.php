@@ -51,8 +51,8 @@ $topics = $db->query("SELECT * FROM topics ORDER BY name ASC")->fetchAll();
     <meta charset="UTF-8">
     <title>مدیریت موضوعات</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-topics.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -60,18 +60,24 @@ $topics = $db->query("SELECT * FROM topics ORDER BY name ASC")->fetchAll();
     <div class="main-content">
         <div class="main-header">
             <div class="user-info"><span>👨‍💼</span><span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span></div>
-            <div><span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span><a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a></div>
+            <div><span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?>
+                </span><a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a></div>
         </div>
         <div class="main-title"><h1>📋 مدیریت موضوعات</h1></div>
         <?php if($successMessage): ?><div class="alert alert-success"><?php echo $successMessage; ?></div><?php endif; ?>
 
         <?php if(canEditTopics()): ?>
-            <div class="add-card"><h2>➕ افزودن موضوع جدید</h2>
-                <form method="post"><div class="form-group"><label>نام موضوع</label><input type="text" name="name" required></div>
-                    <button type="submit" name="add_topic" class="btn-add">➕ افزودن</button></form></div>
+            <div class="add-card">
+                <h2>➕ افزودن موضوع جدید</h2>
+                <form method="post"><div class="form-group">
+                        <label>نام موضوع</label>
+                        <input type="text" name="name" required></div>
+                    <button type="submit" name="add_topic" class="btn-add">➕ افزودن</button>
+                </form>
+            </div>
         <?php endif; ?>
 
-        <div class="topics-table"><table><thead><tr><th>#</th><th>نام موضوع</th><th>عملیات</th></tr></thead>
+        <div class="topics-table"><table><thead><tr><th>ردیف</th><th>نام موضوع</th><th>عملیات</th></tr></thead>
                 <tbody><?php $i=1; foreach($topics as $t): ?>
                     <tr><td><?php echo fa_number($i); ?></td><td><?php echo htmlspecialchars($t['name']); ?></td>
                     <td class="action-buttons">

@@ -1,4 +1,4 @@
-/* استایل‌های مدیریت دسترسی‌ها */
+/* استایل‌های مدیریت دسترسی‌ها - فقط چیدمان */
 .permissions-container {
     display: flex;
     gap: 20px;
@@ -72,21 +72,4 @@
 .form-actions {
     text-align: center;
     margin-top: 20px;
-}
-
-.btn-save {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.btn-save:hover {
-    background: #1e7e34;
-    transform: translateY(-2px);
-}
+}f
