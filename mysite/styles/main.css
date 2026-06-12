@@ -356,15 +356,7 @@ input:focus, select:focus, textarea:focus {
    ============================================ */
 
 /* مخفی کردن دکمه‌های اسپینر در select */
-.date-select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-    background-repeat: no-repeat;
-    background-position: left 8px center;
-    padding-left: 28px !important;
-}
+
 
 /* برای مرورگر فایرفاکس */
 .date-select::-ms-expand {
@@ -376,10 +368,6 @@ input:focus, select:focus, textarea:focus {
     border-color: #4f46e5;
 }
 
-/* برای صفحه خدمات */
-.services-form .date-select {
-    width: 90px !important;
-}
 /* ============================================
    هدر در محتوای اصلی (سایدبار)
    ============================================ */
@@ -817,12 +805,26 @@ input:focus, select:focus, textarea:focus {
 /* ============================================
    تنظیم سلکت‌های تاریخ برای همه صفحات
    ============================================ */
-
+/* همه سلکت‌های تاریخ در کل پروژه */
+.date-select {
+    direction: ltr !important;
+    text-align: center !important;
+    background-position: left 10px center !important;
+    padding-left: 30px !important;
+    padding-right: 10px !important;
+    width: 70px;
+    min-width: 60px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+}
 /* کوچک کردن سلکت‌های تاریخ در فرم‌ها */
 .date-select-group select,
 .search-date-group select {
     width: 70px !important;
-    min-width: 60px !important;
+    min-width: 75px !important;
     padding: 6px 8px !important;
     font-size: 12px !important;
 }
@@ -834,14 +836,6 @@ input:focus, select:focus, textarea:focus {
     min-width: 75px !important;
 }
 
-/* فاصله بین سلکت‌ها */
-.date-select-group,
-.search-date-group {
-    gap: 5px !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-}
 
 /* استایل اسلش بین سلکت‌ها */
 .date-select-group span,
@@ -882,11 +876,11 @@ input:focus, select:focus, textarea:focus {
 .search-card .date-select-group,
 .search-date-group {
     display: flex !important;
-    gap: 5px !important;
+    gap: 8px !important;
     flex-wrap: wrap !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    direction: ltr !important;
+    direction: rtl !important;
     font-family: 'Vazir', 'Segoe UI', Arial, sans-serif !important;
 }
 /* رنگ اسلش های پنل ثبت */
@@ -900,4 +894,32 @@ input:focus, select:focus, textarea:focus {
 }
 .search-group {
     color: black;
+}
+.search-card select {
+    background-position: right 10px center !important;
+    background-repeat: no-repeat !important;
+    padding-right: 30px !important;
+    padding-left: 10px !important;
+    direction: rtl !important;
+}
+.invoices-form select option {
+    font-family: 'Vazir', 'Tahoma', sans-serif !important;
+    font-size: 13px !important;
+}
+/* ============================================
+   تنظیم نهایی وسط‌چین و نشانک سلکت‌های تاریخ
+   ============================================ */
+
+.search-date-group select {
+    direction: rtl !important;
+    text-align: center !important;
+    background-position: right 10px center !important;
+    padding-left: 30px !important;
+    padding-right: 10px !important;
+}
+
+/* گزینه‌های داخل سلکت */
+.search-date-group select option {
+    direction: rtl !important;
+    text-align: right !important;
 }

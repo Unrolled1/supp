@@ -74,7 +74,6 @@ if (isset($_POST['edit_service']) && canEditServices()) {
     $serial_number = htmlspecialchars(trim($_POST['serial_number']));
     $computer_code = htmlspecialchars(trim($_POST['computer_code']));
     $description = htmlspecialchars(trim($_POST['description']));
-    $status = $_POST['status'] === 'done' ? 'done' : 'pending';
 
     // تاریخ سرویس
     $service_date = null;
@@ -86,13 +85,12 @@ if (isset($_POST['edit_service']) && canEditServices()) {
         $service_date = date('Y-m-d', $timestamp);
     }
 
-    $updateStmt = $db->prepare("UPDATE service_requests SET service_name = :service_name, department_id = :department_id, brand_id = :brand_id, receiver_person_id = :receiver_person_id, serial_number = :serial_number, service_date = :service_date, computer_code = :computer_code, description = :description, status = :status WHERE id = :id");
+    $updateStmt = $db->prepare("UPDATE service_requests SET service_name = :service_name, department_id = :department_id, brand_id = :brand_id, receiver_person_id = :receiver_person_id, serial_number = :serial_number, service_date = :service_date, computer_code = :computer_code, description = :description WHERE id = :id");
     $updateStmt->execute([
         ':service_name' => $service_name, ':department_id' => $department_id,
         ':brand_id' => $brand_id, ':receiver_person_id' => $receiver_person_id,
         ':serial_number' => $serial_number, ':service_date' => $service_date,
-        ':computer_code' => $computer_code, ':description' => $description,
-        ':status' => $status, ':id' => $service_id
+        ':computer_code' => $computer_code, ':description' => $description
     ]);
 
     $_SESSION['success_message'] = "✅ سرویس با موفقیت ویرایش شد";
@@ -124,7 +122,9 @@ if (isset($_POST['add_service']) && canEditServices()) {
         $service_date = date('Y-m-d', $timestamp);
     }
 
-    $insertStmt = $db->prepare("INSERT INTO service_requests (service_name, department_id, brand_id, receiver_person_id, serial_number, service_date, computer_code, description, status, created_at, created_by) VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_number, :service_date, :computer_code, :description, 'pending', :created_at, :created_by)");
+    $insertStmt = $db->prepare("INSERT INTO service_requests 
+    (service_name, department_id, brand_id, receiver_person_id, serial_number, service_date, computer_code, description, created_at, created_by) 
+VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_number, :service_date, :computer_code, :description, :created_at, :created_by)");
 
     if ($insertStmt->execute([
         ':service_name' => $service_name, ':department_id' => $department_id,
@@ -360,11 +360,13 @@ foreach ($services as $key => $service) {
                 </div>
                 <div class="search-row">
                     <div class="search-group">
-                        <label>وضعیت</label>
-                        <select id="search_status">
-                            <option value="">همه</option>
-                            <option value="pending" <?php echo (isset($_GET['status']) && $_GET['status'] == 'pending') ? 'selected' : ''; ?>>در انتظار</option>
-                            <option value="done" <?php echo (isset($_GET['status']) && $_GET['status'] == 'done') ? 'selected' : ''; ?>>انجام شده</option>
+                        <label>انتخاب سریع</label>
+                        <select id="quick_date_select">
+                            <option value="">-- انتخاب کنید --</option>
+                            <option value="today">📅 روز جاری</option>
+                            <option value="this_week">📅 هفته جاری</option>
+                            <option value="this_month">📅 ماه جاری</option>
+                            <option value="this_year">📅 سال جاری</option>
                         </select>
                     </div>
                     <div class="search-group">
@@ -392,7 +394,7 @@ foreach ($services as $key => $service) {
                 <tr>
                     <th>ردیف</th><th>نام خدمت</th><th>بخش</th><th>برند</th>
                     <th>تحویل گیرنده</th><th>سریال</th><th>تاریخ سرویس</th>
-                    <th>کد رایانه</th><th>توضیحات</th><th>وضعیت</th>
+                    <th>کد رایانه</th><th>توضیحات</th>
                     <th>تاریخ ثبت</th><th>عملیات</th>
                 </tr>
                 </thead>
@@ -416,11 +418,7 @@ foreach ($services as $key => $service) {
                             </td>
                             <td><?php echo htmlspecialchars($service['computer_code'] ?? '-'); ?></td>
                             <td><?php echo nl2br(htmlspecialchars($service['description'] ?? '-')); ?></td>
-                            <td>
-                                <span class="status-badge <?php echo $service['status'] == 'done' ? 'status-done' : 'status-pending'; ?>">
-                                    <?php echo $service['status'] == 'done' ? '✓ انجام شده' : '⏳ در انتظار'; ?>
-                                </span>
-                            </td>
+
                             <td><?php echo fa_number(htmlspecialchars($service['created_at'])); ?></td>
                             <td>
                                 <?php if (canEditServices()): ?>
@@ -502,13 +500,6 @@ foreach ($services as $key => $service) {
                 <div class="form-group">
                     <label>کد رایانه</label>
                     <input type="text" name="computer_code" id="edit_computer_code">
-                </div>
-                <div class="form-group">
-                    <label>وضعیت</label>
-                    <select name="status" id="edit_status">
-                        <option value="pending">در انتظار</option>
-                        <option value="done">انجام شده</option>
-                    </select>
                 </div>
             </div>
 

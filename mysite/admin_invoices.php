@@ -202,7 +202,6 @@ foreach ($invoices as $key => $invoice) {
     <link rel="stylesheet" href="styles/admin-invoices.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 <body>
 <div class="admin-wrapper">
@@ -297,8 +296,6 @@ foreach ($invoices as $key => $invoice) {
                         <label>شماره فاکتور</label>
                         <input type="text" id="search_invoice_number" placeholder="جستجو بر اساس شماره فاکتور..." value="<?php echo htmlspecialchars($_GET['invoice_number'] ?? ''); ?>">
                     </div>
-                </div>
-                <div class="search-row">
                     <div class="search-group">
                         <label>موضوع فاکتور</label>
                         <select id="search_subject" class="search-subject-select">
@@ -310,28 +307,25 @@ foreach ($invoices as $key => $invoice) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                </div>
-                <div class="search-row">
+
                     <div class="search-group">
-                        <label>از تاریخ فاکتور</label>
+                        <label>از تاریخ </label>
                         <div id="search_date_from_container"></div>
                         <input type="hidden" id="search_date_from" value="<?php echo htmlspecialchars($_GET['date_from'] ?? ''); ?>">
                     </div>
                     <div class="search-group">
-                        <label>تا تاریخ فاکتور</label>
+                        <label>تا تاریخ </label>
                         <div id="search_date_to_container"></div>
                         <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_GET['date_to'] ?? ''); ?>">
                     </div>
-                    <div class="search-group">
-                    <div class="search-row">
-                        <div class="search-group search-actions">
-                            <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
-                            <button type="button" id="reset_btn" class="btn-reset-search">🗑️ پاک کردن</button>
-                        </div>
-                    </div>
-                    </div>
-
                 </div>
+                <div class="search-row">
+                    <div class="search-group search-actions">
+                        <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
+                        <button type="button" id="reset_btn" class="btn-reset-search">🗑️ پاک کردن</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -426,7 +420,7 @@ foreach ($invoices as $key => $invoice) {
                     <label>تاریخ فاکتور</label>
                     <div id="edit_date_container"></div>
                 </div>
-            </div>
+
 
             <div class="form-group">
                 <label>توضیحات</label>

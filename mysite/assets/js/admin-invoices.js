@@ -13,15 +13,16 @@ function fa_number(num) {
 // ============================================
 
 function renderDateSelects(containerId, defaultYear = '', defaultMonth = '', defaultDay = '') {
-    let html = '<div class="date-select-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: ltr;">';
-
-    // سال
+    let html = '<div class="date-select-group" style="display: ' +
+        'flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: rtl;">';
+// سال
     html += '<select name="year" class="date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
     html += '<option value="">سال</option>';
-    for (let i = 1390; i <= 1420; i++) {
+    for (let i = 1404; i <= 1420; i++) {
         html += `<option value="${i}" ${defaultYear == i ? 'selected' : ''}>${fa_number(i)}</option>`;
     }
     html += '</select>';
+
 
     // اسلش بین سال و ماه
     html += '<span class="date-separator" style="color: black">/</span>';
@@ -37,14 +38,14 @@ function renderDateSelects(containerId, defaultYear = '', defaultMonth = '', def
 
     // اسلش بین ماه و روز
     html += '<span class="date-separator" style="color: black">/</span>';
-
-    // روز
+// روز
     html += '<select name="day" class="date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
     html += '<option value="">روز</option>';
     for (let i = 1; i <= 31; i++) {
         html += `<option value="${i}" ${defaultDay == i ? 'selected' : ''}>${fa_number(i)}</option>`;
     }
     html += '</select>';
+
 
     html += '</div>';
 
@@ -59,15 +60,16 @@ function renderDateSelects(containerId, defaultYear = '', defaultMonth = '', def
 // ============================================
 
 function renderDateSelectsForEdit(year, month, day) {
-    let html = '<div class="date-select-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: ltr;">';
-
-    // سال
+    let html = '<div class="date-select-group" style="display: ' +
+        'flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: rtl;">';
+// سال
     html += '<select name="year" class="date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
     html += '<option value="">سال</option>';
     for (let i = 1390; i <= 1420; i++) {
         html += `<option value="${i}" ${year == i ? 'selected' : ''}>${fa_number(i)}</option>`;
     }
     html += '</select>';
+
 
     // اسلش بین سال و ماه
     html += '<span class="date-separator">/</span>';
@@ -84,13 +86,14 @@ function renderDateSelectsForEdit(year, month, day) {
     // اسلش بین ماه و روز
     html += '<span class="date-separator">/</span>';
 
-    // روز
+// روز
     html += '<select name="day" class="date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
     html += '<option value="">روز</option>';
     for (let i = 1; i <= 31; i++) {
         html += `<option value="${i}" ${day == i ? 'selected' : ''}>${fa_number(i)}</option>`;
     }
     html += '</select>';
+
 
     html += '</div>';
     return html;
@@ -111,15 +114,17 @@ function renderSearchDateSelects(containerId, inputId, defaultDate = '') {
         }
     }
 
-    let html = '<div class="search-date-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: ltr;">';
+    let html = '<div class="search-date-group" style="display: ' +
+        'flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: rtl;">';
 
-    // روز
-    html += '<select class="search-date-day date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
-    html += '<option value="">روز</option>';
-    for (let i = 1; i <= 31; i++) {
-        html += `<option value="${i}" ${defaultDay == i ? 'selected' : ''}>${fa_number(i)}</option>`;
+    // سال
+    html += '<select class="search-date-year date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
+    html += '<option value="">سال</option>';
+    for (let i = 1404; i <= 1420; i++) {
+        html += `<option value="${i}" ${defaultYear == i ? 'selected' : ''}>${fa_number(i)}</option>`;
     }
     html += '</select>';
+
 
     // اسلش بین روز و ماه
     html += '<span class="date-separator">/</span>';
@@ -136,11 +141,11 @@ function renderSearchDateSelects(containerId, inputId, defaultDate = '') {
     // اسلش بین ماه و سال
     html += '<span class="date-separator">/</span>';
 
-    // سال
-    html += '<select class="search-date-year date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
-    html += '<option value="">سال</option>';
-    for (let i = 1390; i <= 1420; i++) {
-        html += `<option value="${i}" ${defaultYear == i ? 'selected' : ''}>${fa_number(i)}</option>`;
+    // روز
+    html += '<select class="search-date-day date-select" style="padding: 8px; border: 1px solid #ddd; border-radius: 6px;">';
+    html += '<option value="">روز</option>';
+    for (let i = 1; i <= 31; i++) {
+        html += `<option value="${i}" ${defaultDay == i ? 'selected' : ''}>${fa_number(i)}</option>`;
     }
     html += '</select>';
 

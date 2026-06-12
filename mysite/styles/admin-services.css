@@ -123,19 +123,7 @@
     resize: vertical;
 }
 
-/* ----- سلکت‌های تاریخ ----- */
-.date-select-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-}
 
-.date-select-group select {
-    width: auto;
-    min-width: 70px;
-    padding: 10px 12px;
-}
 
 .date-select-group span {
     color: #64748b;
@@ -428,18 +416,9 @@
         flex-direction: row;
     }
 }
-/* گروه سلکت‌های تاریخ - چسبیده به راست */
-.date-select-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end; /* چسبیدن به راست */
-    direction: ltr;
-}
 
 /* برای فرم افزودن سرویس */
-.add-card .date-select-group {
+.add-card  {
     justify-content: flex-end;
 }
 
@@ -470,63 +449,19 @@
 .search-group .date-select-group span {
     margin: 0 2px;
 }
-/* اعمال فونت به سلکت‌های تاریخ جستجو - استفاده از کلاس مشابه فرم ثبت */
-.search-card .date-select-group select,
-.search-date-day,
-.search-date-month,
-.search-date-year,
-#search_date_from_container select,
-#search_date_to_container select,
-.search-card .date-select {
-    font-family: 'Vazir', 'Tahoma', sans-serif !important;
-    font-size: 13px;
-}
 
 /* به option ها هم فونت بده */
-.search-card .date-select-group select option,
-.search-date-day option,
-.search-date-month option,
-.search-date-year option {
+.search-card
+{
     font-family: 'Vazir', 'Tahoma', sans-serif !important;
 }
 /* ============================================
    استایل سلکت‌های تاریخ (عمومی)
    ============================================ */
 
-.date-select-group,
-.search-date-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-}
 
-.date-select,
-.search-date-day,
-.search-date-month,
-.search-date-year {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    min-width: 75px;
-    text-align: center;
-}
 
-.date-select option,
-.search-date-day option,
-.search-date-month option,
-.search-date-year option {
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-}
-
-.date-select-group span,
-.search-date-group span {
+.date-select-group span {
     color: #64748b;
     font-size: 14px;
     font-weight: bold;
@@ -561,8 +496,8 @@
 }
 
 /* تنظیم سلکت‌های تاریخ در یک خط */
-#search_date_from_container .search-date-group,
-#search_date_to_container .search-date-group {
+#search_date_from_container ,
+#search_date_to_container  {
     display: flex !important;
     flex-direction: row !important;
     gap: 4px !important;

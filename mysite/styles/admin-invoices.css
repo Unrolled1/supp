@@ -168,13 +168,14 @@
 .search-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     align-items: flex-end;
 }
 
 .search-group {
     flex: 1;
-    min-width: 180px;
+    min-width: 120px;
+    max-width: 300px;
 }
 
 .search-group label {
@@ -229,7 +230,7 @@
 
 .date-select-group select,
 .search-date-group select {
-    width: 70px;
+    width: 50px;
     min-width: 60px;
     padding: 8px;
     border: 1px solid #ddd;
@@ -262,4 +263,12 @@
     display: flex;
     gap: 10px;
     align-items: flex-end;
+}
+/* پایین آوردن دکمه‌های جستجو */
+.search-card .search-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #eee;
 }

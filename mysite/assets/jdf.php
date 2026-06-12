@@ -188,42 +188,42 @@ function render_date_selects($selected_year = null, $selected_month = null, $sel
     $max_days = get_jalali_month_days($selected_year, $selected_month);
     $days = range(1, $max_days);
 
-    $html = '<div class="date-select-group" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; direction: ltr;">';
+    $html = '<div class="date-select-group">';
 
-    // سال
-    $html .= '<select name="year" class="date-select" style="padding: 6px 8px; border-radius: 6px; border: 1px solid #ddd;">';
+    // سال (چپ‌ترین)
+    $html .= '<select name="year" class="date-select">';
     foreach ($dateLists['years'] as $year) {
         $selected = ($year == $selected_year) ? 'selected' : '';
         $html .= "<option value='{$year}' {$selected}>" . fa_number($year) . "</option>";
     }
     $html .= '</select>';
 
-    // اسلش بین سال و ماه
-    $html .= '<span style="margin: 0 5px; font-size: 16px;">/</span>';
+    $html .= '<span style="margin: 0 5px;">/</span>';
 
-    // ماه
-    $html .= '<select name="month" class="date-select" style="padding: 6px 8px; border-radius: 6px; border: 1px solid #ddd;">';
+    // ماه (وسط)
+    $html .= '<select name="month" class="date-select">';
     foreach ($dateLists['months'] as $num => $name) {
         $selected = ($num == $selected_month) ? 'selected' : '';
         $html .= "<option value='{$num}' {$selected}>{$name}</option>";
     }
     $html .= '</select>';
 
-    // اسلش بین ماه و روز
-    $html .= '<span style="margin: 0 5px; font-size: 16px;">/</span>';
+    $html .= '<span style="margin: 0 5px;">/</span>';
 
-    // روز
-    $html .= '<select name="day" class="date-select" style="padding: 6px 8px; border-radius: 6px; border: 1px solid #ddd;">';
+    // روز (راست‌ترین)
+    $html .= '<select name="day" class="date-select">';
     foreach ($days as $day) {
         $selected = ($day == $selected_day) ? 'selected' : '';
         $html .= "<option value='{$day}' {$selected}>" . fa_number($day) . "</option>";
     }
     $html .= '</select>';
 
+
     $html .= '</div>';
 
     return $html;
-}function combine_date($year, $month, $day) {
+}
+function combine_date($year, $month, $day) {
     return sprintf("%04d-%02d-%02d", $year, $month, $day);
 }
 
