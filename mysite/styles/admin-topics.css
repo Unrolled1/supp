@@ -64,8 +64,7 @@
 }
 
 .add-card form .btn-add {
-    background: #28a745 !important;
-    color: white !important;
+    color: white ;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -77,8 +76,8 @@
     white-space: nowrap;
 }
 
-.add-card form .btn-add:hover {
-    background: #1e7e34 !important;
+.btn-add:hover {
+    background: #059669 ;
     transform: translateY(-2px);
 }
 

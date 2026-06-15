@@ -53,40 +53,25 @@
 }
 
 /* ----- فرم سرویس ----- */
-.services-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+
 .services-table {
     border-radius: 15px;  /* این خط رو بررسی کن */
     overflow: hidden;      /* این خط مهمه برای خمیده شدن گوشه‌ها */
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     margin-top: 20px;
 }
-/* ردیف فرم - فیلدها در کنار هم */
-.form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-end;
-}
 
-/* گروه فرم */
-.form-group {
-    flex: 0 0 auto;
-}
 
-/* عرض فیلدهای مختلف */
+
+/*  جستجو عرض فیلدهای مختلف */
 .form-group:has(select[name="service_name"]) { width: 350px; }
 .form-group:has(select[name="department_id"]) { width: 250px; }
-.form-group:has(select[name="brand_id"]) { width: 250px; }
+.form-group:has(select[name="brand_id"]) { width: 150px; }
 .form-group:has(select[name="receiver_person_id"]) { width: 250px; }
 .form-group:has(input[name="serial_number"]) { width: 200px; }
 .form-group:has(input[name="computer_code"]) { width: 200px; }
 .form-group:has(.date-select-group) { width: 320px; }
 .form-group:has(textarea) { width: 100%; }
-.form-group:last-child { width: 100%; text-align: right; }
 
 /* لیبل‌ها */
 .form-group label {
@@ -102,8 +87,6 @@
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
     border-radius: 8px;
     font-family: 'Vazir', Tahoma, sans-serif;
     font-size: 13px;
@@ -129,25 +112,6 @@
     color: #64748b;
     font-size: 14px;
     font-weight: bold;
-}
-
-/* ----- دکمه ذخیره ----- */
-.btn-add {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Vazir', Tahoma, sans-serif;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.btn-add:hover {
-    background: #218838;
-    transform: translateY(-1px);
 }
 
 /* ----- جدول خدمات ----- */
@@ -247,15 +211,6 @@
     z-index: 1000;
 }
 
-.modal-content {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    width: 90%;
-    max-width: 550px;
-    max-height: 85vh;
-    overflow-y: auto;
-}
 
 .modal-content h3 {
     margin-bottom: 20px;
@@ -283,30 +238,11 @@
     background: #5a6268;
 }
 
-/* مودال ویرایش */
-#editModal .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
 
-#editModal .form-group {
-    flex: 1;
-    min-width: 120px;
-}
-
-/* تنظیم سلکت‌های تاریخ در مودال */
-#editModal .date-select-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
 
 #editModal .date-select {
     width: 85px !important;
     min-width: 70px;
-    text-align: center;
 }
 
 /* ----- بخش جستجو ----- */
@@ -325,47 +261,51 @@
     padding-right: 12px;
 }
 
-.search-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
 
 .search-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: flex-end;
+    overflow-x: auto;
 }
-
 .search-group {
-    flex: 1;
-    min-width: 150px;
+    flex: none;  /* عدم تغییر عرض */
 }
+/* هر فیلد اندازه خودش */
+.service-name-group {
+    width: 330px;
+}
+.search-card input,
+.search-card select {
+    width: 100%;
+    padding: 6px 8px;
+}
+.department-group   { width: 220px; }
+.brand-group        { width: 185px; }
+.receiver-group     { width: 250px; }
+.serial-group       { width: 200px; }
+.computer-group     { width: 150px; }
+.date-group         { width: 120px; }
+
 
 .search-group label {
     display: block;
-    margin-bottom: 6px;
     font-weight: 500;
-    font-size: 13px;
     color: #555;
 }
-
-.search-group input,
-.search-group select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: 'Vazir', Tahoma, sans-serif;
-    font-size: 13px;
-}
-
 .search-actions {
     display: flex;
     gap: 10px;
     align-items: flex-end;
 }
-
+/* کوچک کردن سلکت انتخاب سریع */
+#quick_date_select {
+    width: 110px ;
+    padding: 6px 8px ;
+    font-size: 12px ;
+}
 .btn-search {
     background: #4f46e5;
     color: white;
@@ -422,39 +362,15 @@
     justify-content: flex-end;
 }
 
-/* برای مودال ویرایش */
-#editModal .date-select-group {
-    justify-content: flex-end;
-}
 
 #editModal .date-select {
     width: 80px !important;
-    text-align: center;
-}
-
-/* کاهش عرض سلکت‌های تاریخ در بخش جستجو */
-.search-group .date-select-group {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-
-.search-group .date-select {
-    width: 70px !important;
-    min-width: 60px;
-    padding: 6px 8px;
-    font-size: 12px;
 }
 
 .search-group .date-select-group span {
     margin: 0 2px;
 }
 
-/* به option ها هم فونت بده */
-.search-card
-{
-    font-family: 'Vazir', 'Tahoma', sans-serif !important;
-}
 /* ============================================
    استایل سلکت‌های تاریخ (عمومی)
    ============================================ */
@@ -467,12 +383,6 @@
     font-weight: bold;
 }
 
-.date-select:hover,
-.search-date-day:hover,
-.search-date-month:hover,
-.search-date-year:hover {
-    border-color: #4f46e5;
-}
 
 .date-select:focus,
 .search-date-day:focus,
@@ -482,18 +392,7 @@
     border-color: #4f46e5;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
-/* راه حل قوی‌تر */
-.search-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-end;
-}
 
-.search-group {
-    flex: 1;
-    min-width: 150px;
-}
 
 /* تنظیم سلکت‌های تاریخ در یک خط */
 #search_date_from_container ,
@@ -503,44 +402,7 @@
     gap: 4px !important;
     flex-wrap: nowrap !important;
 }
-/* افزایش عرض مودال ویرایش */
-#editModal .modal-content {
-    max-width: 700px;
-    width: 90%;
-}
 
-/* مرتب کردن اینپوت‌ها در مودال ویرایش */
-#editModal .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-#editModal .form-group {
-    flex: 1;
-    min-width: 150px;
-}
-
-/* عرض بیشتر برای فیلد نام خدمت */
-#editModal .form-group:first-child {
-    flex: 2;
-    min-width: 250px;
-}
-
-/* تنظیم سلکت‌های تاریخ در مودال */
-#editModal .date-select-group {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
-
-#editModal .date-select {
-    width: 85px !important;
-    min-width: 70px;
-    text-align: center;
-}
 
 /* دکمه‌ها در مودال */
 #editModal .modal-buttons {

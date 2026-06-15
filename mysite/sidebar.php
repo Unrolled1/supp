@@ -131,7 +131,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewGoods()): ?>
                         <li>
-                            <a href="admin_goods.php" class="<?php echo $current_page == 'admin_goods.php' ? 'active' : ''; ?>">
+                            <a href="admin_kala.php" class="<?php echo $current_page == 'admin_kala.php' ? 'active' : ''; ?>">
                                 <span class="icon">📦</span>
                                 <span class="text">ثبت کالا</span>
                             </a>

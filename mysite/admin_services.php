@@ -90,7 +90,7 @@ if (isset($_POST['edit_service']) && canEditServices()) {
         ':service_name' => $service_name, ':department_id' => $department_id,
         ':brand_id' => $brand_id, ':receiver_person_id' => $receiver_person_id,
         ':serial_number' => $serial_number, ':service_date' => $service_date,
-        ':computer_code' => $computer_code, ':description' => $description
+        ':computer_code' => $computer_code, ':description' => $description, 'id' => $service_id
     ]);
 
     $_SESSION['success_message'] = "✅ سرویس با موفقیت ویرایش شد";
@@ -328,7 +328,7 @@ foreach ($services as $key => $service) {
             <h2>🔍 جستجوی خدمات</h2>
             <div class="search-form">
                 <div class="search-row">
-                    <div class="search-group">
+                    <div class="service-name-group">
                         <label>نام خدمت</label>
                         <select id="search_name">
                             <option value="">-- همه --</option>
@@ -339,7 +339,7 @@ foreach ($services as $key => $service) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="search-group">
+                    <div class="department-group">
                         <label>بخش</label>
                         <select id="search_department">
                             <option value="">همه بخش‌ها</option>
@@ -348,7 +348,7 @@ foreach ($services as $key => $service) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="search-group">
+                    <div class="brand-group">
                         <label>برند</label>
                         <select id="search_brand">
                             <option value="">همه برندها</option>
@@ -357,9 +357,23 @@ foreach ($services as $key => $service) {
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="receiver-group">
+                        <label>تحویل گیرنده</label>
+                        <select name="receiver_person_id" id="edit_receiver_person_id">
+                            <option value="">-- انتخاب --</option>
+                            <?php foreach ($persons as $person): ?>
+                                <option value="<?php echo $person['id']; ?>"><?php echo htmlspecialchars($person['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="computer-group">
+                        <label>کد رایانه</label>
+                        <input type="text" name="computer_code">
+                    </div>
                 </div>
+
                 <div class="search-row">
-                    <div class="search-group">
+                    <div class="date-group">
                         <label>انتخاب سریع</label>
                         <select id="quick_date_select">
                             <option value="">-- انتخاب کنید --</option>
@@ -392,10 +406,17 @@ foreach ($services as $key => $service) {
             <table>
                 <thead>
                 <tr>
-                    <th>ردیف</th><th>نام خدمت</th><th>بخش</th><th>برند</th>
-                    <th>تحویل گیرنده</th><th>سریال</th><th>تاریخ سرویس</th>
-                    <th>کد رایانه</th><th>توضیحات</th>
-                    <th>تاریخ ثبت</th><th>عملیات</th>
+                    <th>ردیف</th>
+                    <th>نام خدمت</th>
+                    <th>بخش</th>
+                    <th>برند</th>
+                    <th>تحویل گیرنده</th>
+                    <th>سریال</th>
+                    <th>تاریخ سرویس</th>
+                    <th>کد رایانه</th>
+                    <th>توضیحات</th>
+                    <th>تاریخ ثبت</th>
+                    <th>عملیات</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -444,7 +465,7 @@ foreach ($services as $key => $service) {
         <h3>✏️ ویرایش سرویس</h3>
         <form method="post">
             <input type="hidden" name="service_id" id="edit_service_id">
-
+            <div class="form-row">
             <div class="form-group">
                 <label>نام خدمت *</label>
                 <select name="service_name" id="edit_service_name" required>
@@ -454,17 +475,15 @@ foreach ($services as $key => $service) {
                     <?php endforeach; ?>
                 </select>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>بخش</label>
-                    <select name="department_id" id="edit_department_id">
-                        <option value="">-- انتخاب --</option>
-                        <?php foreach ($departments as $dept): ?>
-                            <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            <div class="department-group">
+                <label>بخش</label>
+                <select name="department_id" id="edit_department_id">
+                    <option value="">-- انتخاب --</option>
+                    <?php foreach ($departments as $dept): ?>
+                        <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
                 <div class="form-group">
                     <label>برند</label>
                     <select name="brand_id" id="edit_brand_id">
@@ -477,7 +496,7 @@ foreach ($services as $key => $service) {
             </div>
 
             <div class="form-row">
-                <div class="form-group">
+                <div class="receiver-group">
                     <label>تحویل گیرنده</label>
                     <select name="receiver_person_id" id="edit_receiver_person_id">
                         <option value="">-- انتخاب --</option>
@@ -486,20 +505,20 @@ foreach ($services as $key => $service) {
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="serial-group">
                     <label>سریال</label>
                     <input type="text" name="serial_number" id="edit_serial_number">
+                </div>
+                <div class="computer-group">
+                    <label>کد رایانه</label>
+                    <input type="text" name="computer_code" id="edit_computer_code">
                 </div>
             </div>
 
             <div class="form-row">
-                <div class="form-group">
+                <div class="form-group-group">
                     <label>تاریخ سرویس</label>
                     <div id="edit_date_container"></div>
-                </div>
-                <div class="form-group">
-                    <label>کد رایانه</label>
-                    <input type="text" name="computer_code" id="edit_computer_code">
                 </div>
             </div>
 
@@ -516,7 +535,9 @@ foreach ($services as $key => $service) {
     </div>
 </div>
 
+<script src="assets/js/alljs.js"></script>
 <script src="assets/js/admin-services.js"></script>
+
 
 </body>
 </html>

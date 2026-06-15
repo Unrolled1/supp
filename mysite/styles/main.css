@@ -1,7 +1,6 @@
 /* ============================================
    فونت وزیر (Vazir) - لود از داخل پروژه
    ============================================ */
-
 @font-face {
     font-family: 'Vazir';
     src: url('fonts/Vazir.ttf') format('truetype');
@@ -9,17 +8,14 @@
     font-style: normal;
     font-display: swap;
 }
-
 /* ============================================
    استایل‌های پایه با رنگ‌های جدید
    ============================================ */
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Vazir', Tahoma, sans-serif;
-
 }
 
 body {
@@ -27,174 +23,120 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 20px;
-    font-family: 'Vazir', 'Tahoma', 'Segoe UI', sans-serif !important;
+    font-family: 'Vazir', 'Tahoma', 'Segoe UI', sans-serif;
     font-size: 15px;
-    line-height: 1.6;
     color: #e2e8f0;
     text-align: right;
 }
-
 /* ============================================
    استایل سراسری برای همه دکمه‌ها
    ============================================ */
-
-button,
-.btn,
-.btn-add,
-.edit-btn,
-.delete-btn,
-.password-btn,
-.status-btn,
-.status-btn-table,
-.delete-btn-table,
-.modal-save,
-.modal-cancel,
-.refresh-btn,
-.logout-btn,
-.logout-btn-sidebar,
-.btn-permissions {
-    font-family: 'Vazir', 'Tahoma', sans-serif !important;
+button, .btn, .btn-add, .edit-btn, .delete-btn, .password-btn, .status-btn, .status-btn-table, .delete-btn-table, .modal-save,
+.modal-cancel, .refresh-btn, .logout-btn, .logout-btn-sidebar, .btn-permissions {
+    font-family: 'Vazir', 'Tahoma', sans-serif;
     font-weight: 500;
     transition: all 0.2s ease;
     cursor: pointer;
     border: none;
     border-radius: 8px;
-    padding: 8px 16px !important;
-    font-size: 13px !important;
+    padding: 8px 16px;
+    font-size: 13px;
 }
-
 /* دکمه‌های بزرگتر */
-.btn-add,
-.modal-save {
-    padding: 10px 24px !important;
-    font-size: 14px !important;
+.btn-add, .modal-save {
+    padding: 10px 20px ;
+    font-size: 14px ;
+    margin-top: 10px;
 }
-
 /* دکمه‌های کوچکتر */
-.edit-btn,
-.delete-btn,
-.password-btn {
-    padding: 5px 12px !important;
-    font-size: 12px !important;
+.edit-btn, .delete-btn, .password-btn {
+    padding: 5px 12px ;
+    font-size: 12px ;
 }
-
 /* ============================================
    رنگ‌های مدرن برای دکمه‌ها
    ============================================ */
-
 /* سبز (افزودن، ذخیره، تایید) */
-.btn-add,
-.modal-save,
-.status-btn,
-.status-btn-table {
-    background: #10b981 !important;
-    color: white !important;
+.btn-add, .modal-save, .status-btn, .status-btn-table {
+    background: #10b981 ;
+    color: white ;
 }
-
-.btn-add:hover,
-.modal-save:hover,
-.status-btn:hover,
-.status-btn-table:hover {
+.btn-add:hover, .modal-save:hover, .status-btn:hover, .status-btn-table:hover {
     background: #059669 !important;
     transform: translateY(-1px);
 }
-
 /* آبی (بروزرسانی) */
 .refresh-btn {
     background: #3b82f6 !important;
     color: white !important;
 }
-
 .refresh-btn:hover {
     background: #2563eb !important;
     transform: translateY(-1px);
 }
-
 /* زرد (ویرایش) */
 .edit-btn {
     background: #f59e0b !important;
     color: #1a1a1a !important;
 }
-
 .edit-btn:hover {
     background: #d97706 !important;
     transform: translateY(-1px);
 }
-
 /* قرمز (حذف، خروج) */
-.delete-btn,
-.delete-btn-table,
-.logout-btn,
-.logout-btn-sidebar {
+.delete-btn, .delete-btn-table, .logout-btn, .logout-btn-sidebar {
     background: #ef4444 !important;
     color: white !important;
     text-decoration: none;
 }
-
-.delete-btn:hover,
-.delete-btn-table:hover,
-.logout-btn:hover,
-.logout-btn-sidebar:hover {
+.delete-btn:hover, .delete-btn-table:hover, .logout-btn:hover, .logout-btn-sidebar:hover {
     background: #dc2626 !important;
     transform: translateY(-1px);
 }
-
 /* آبی کم رنگ (تغییر رمز) */
 .password-btn {
     background: #0ea5e9 !important;
     color: white !important;
 }
-
 .password-btn:hover {
     background: #0284c7 !important;
     transform: translateY(-1px);
 }
-
 /* بنفش (تنظیم دسترسی) */
 .btn-permissions {
     background: #8b5cf6 !important;
     color: white !important;
 }
-
 .btn-permissions:hover {
     background: #7c3aed !important;
     transform: translateY(-1px);
 }
-
 /* خاکستری (لغو) */
 .modal-cancel {
     background: #6b7280 !important;
     color: white !important;
 }
-
 .modal-cancel:hover {
     background: #4b5563 !important;
     transform: translateY(-1px);
 }
-
 /* ============================================
    استایل فرم‌ها
    ============================================ */
-
-input, select, textarea,
-.form-group input, .form-group select {
+input, select, textarea, .form-group input, .form-group select {
     font-family: 'Vazir', 'Tahoma', sans-serif;
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
 }
-
 input:focus, select:focus, textarea:focus {
     border-color: #4f46e5;
     outline: none;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
-
-
 /* ============================================
    هدر مشترک (در همه صفحات)
    ============================================ */
-
 .header {
     background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: white;
@@ -208,29 +150,24 @@ input:focus, select:focus, textarea:focus {
     gap: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
-
 .header-left {
     display: flex;
     align-items: center;
     gap: 30px;
     flex-wrap: wrap;
 }
-
 .welcome-box {
     display: flex;
     align-items: center;
     gap: 12px;
 }
-
 .welcome-icon {
     font-size: 28px;
 }
-
 .welcome-name {
     font-size: 18px;
     font-weight: bold;
 }
-
 .logout-btn {
     background: rgba(255,255,255,0.2);
     color: white;
@@ -240,21 +177,17 @@ input:focus, select:focus, textarea:focus {
     transition: 0.3s;
     font-weight: 500;
 }
-
 .logout-btn:hover {
     background: rgba(255,255,255,0.3);
     transform: translateY(-2px);
 }
-
 /* ============================================
    عنوان اصلی
    ============================================ */
-
 .main-title {
     text-align: center;
     margin-bottom: 30px;
 }
-
 .main-title h1 {
     font-size: 28px;
     color: #f1f5f9;
@@ -263,52 +196,70 @@ input:focus, select:focus, textarea:focus {
     padding-bottom: 10px;
     border-bottom: 3px solid #4f46e5;
 }
-
 /* ============================================
    کارت‌ها
    ============================================ */
-
-.add-card,
-.users-table,
-.departments-table,
-.products-table,
-.activities-table,
-.tickets-table,
-.form-box,
-.tickets-box {
+.add-card, .users-table, .departments-table, .products-table, .activities-table, .tickets-table, .form-box, .tickets-box {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
-
-.add-card h2 {
-    color: #1e293b;
-    font-size: 20px;
-    border-right: 4px solid #10b981;
+.add-card{
+    padding: 25px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
-
+.search-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.form-row{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: flex-end;
+    color: #555;
+    margin-bottom: 10px;
+}
+.form-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #555;
+}
+.form-row input,
+.form-row select,
+.form-row textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 13px;
+    padding: 6px 8px;
+}
+.add-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    border-right: 4px solid #28a745;
+    padding-right: 15px;
+    color: black;
+}
 /* ============================================
    جدول‌ها (یکسان برای همه)
    ============================================ */
-
 /* هدر همه جدول‌ها */
-.services-table th,
-.reports-table th,
-.persons-table th,
-.users-table th,
-.departments-table th,
-.products-table th,
-.activities-table th,
-.tickets-table th,
-.brands-table th,
-.models-table th {
+.services-table th, .reports-table th, .persons-table th, .users-table th, .departments-table th, .products-table th, .activities-table th,
+.tickets-table th, .brands-table th, .models-table th {
     background: #4f46e5;
     color: white;
     padding: 12px;
     text-align: center;
 }
-
 /* سلول‌های همه جدول‌ها */
 .services-table td,
 .reports-table td,
@@ -492,13 +443,15 @@ input:focus, select:focus, textarea:focus {
     background: white;
     border-radius: 16px;
     padding: 25px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 85vh;
+    width: 50%;
+    height: auto;
     overflow-y: auto;
     margin: 20px auto;
 }
-
+.modal-content .form-row{
+    display: flex;
+    flex-wrap: wrap;
+}
 .modal-content h3 {
     margin-bottom: 20px;
     font-size: 20px;
@@ -808,7 +761,6 @@ input:focus, select:focus, textarea:focus {
 /* همه سلکت‌های تاریخ در کل پروژه */
 .date-select {
     direction: ltr !important;
-    text-align: center !important;
     background-position: left 10px center !important;
     padding-left: 30px !important;
     padding-right: 10px !important;
@@ -820,10 +772,24 @@ input:focus, select:focus, textarea:focus {
     cursor: pointer;
     font-size: 13px;
 }
+.date-select:hover,
+.search-date-day:hover,
+.search-date-month:hover,
+.search-date-year:hover {
+    border-color: #4f46e5;
+}
+.search-group input,
+.search-group select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    font-size: 13px;
+}
 /* کوچک کردن سلکت‌های تاریخ در فرم‌ها */
 .date-select-group select,
 .search-date-group select {
-    width: 70px !important;
+    width: 80px !important;
     min-width: 75px !important;
     padding: 6px 8px !important;
     font-size: 12px !important;
@@ -832,8 +798,8 @@ input:focus, select:focus, textarea:focus {
 /* سلکت ماه (متنش بلندتره) */
 .date-select-group select[name="month"],
 .search-date-month {
-    width: 85px !important;
-    min-width: 75px !important;
+    width: 90px !important;
+    min-width: 80px !important;
 }
 
 
@@ -845,44 +811,20 @@ input:focus, select:focus, textarea:focus {
     color: #64748b !important;
 }
 
+/* تنظیم سلکت‌های تاریخ در مودال */
+ .date-select-group {
+    direction: ltr;
+}
+
 /* برای فرم ثبت خدمات */
 .services-form .date-select-group select,
 .invoices-form .date-select-group select {
     width: 70px !important;
 }
-
-/* برای جستجو */
-.search-card .date-select-group select {
-    width: 65px !important;
-    min-width: 55px !important;
-    padding: 6px 4px !important;
-}
-/* ============================================
-   راست‌چین کردن سلکت‌های تاریخ در همه فرم‌ها
-   ============================================ */
-
-/* فرم ثبت فاکتور */
-.invoices-form .date-select-group,
-.services-form .date-select-group {
-    display: flex !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    direction: ltr !important;
+.date-select-group:hover{
+    border-color: #4f46e5;
 }
 
-/* جستجو */
-.search-card .date-select-group,
-.search-date-group {
-    display: flex !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    direction: rtl !important;
-    font-family: 'Vazir', 'Segoe UI', Arial, sans-serif !important;
-}
 /* رنگ اسلش های پنل ثبت */
 
 .date-separator {
@@ -892,15 +834,29 @@ input:focus, select:focus, textarea:focus {
     font-weight: bold !important;
     background: transparent !important;
 }
+/*تمام پنل جستجو*/
+
+.search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+}
+.search-row input,select{
+    width: 100%;
+    padding: 6px 8px;
+}
 .search-group {
     color: black;
+    margin-top: 15px;
+}
+.search-group label{
+
 }
 .search-card select {
     background-position: right 10px center !important;
     background-repeat: no-repeat !important;
-    padding-right: 30px !important;
     padding-left: 10px !important;
-    direction: rtl !important;
 }
 .invoices-form select option {
     font-family: 'Vazir', 'Tahoma', sans-serif !important;
@@ -922,4 +878,8 @@ input:focus, select:focus, textarea:focus {
 .search-date-group select option {
     direction: rtl !important;
     text-align: right !important;
+}
+.search-card label{
+    color: #374151;
+    font-size: 13px;
 }

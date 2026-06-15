@@ -63,7 +63,8 @@ if (isset($_POST['edit_invoice']) && canEditInvoices()) {
     $company_name = htmlspecialchars(trim($_POST['company_name']));
     $invoice_number = htmlspecialchars(trim($_POST['invoice_number']));
     $subject = htmlspecialchars(trim($_POST['subject']));
-    $amount = filter_var($_POST['amount'], FILTER_VALIDATE_FLOAT);
+    $amount = str_replace(',', '', $_POST['amount']);
+    $amount = (int)$amount;
     $description = htmlspecialchars(trim($_POST['description']));
 
     // تاریخ فاکتور
@@ -101,7 +102,8 @@ if (isset($_POST['add_invoice']) && canEditInvoices()) {
     $company_name = htmlspecialchars(trim($_POST['company_name']));
     $invoice_number = htmlspecialchars(trim($_POST['invoice_number']));
     $subject = htmlspecialchars(trim($_POST['subject']));
-    $amount = filter_var($_POST['amount'], FILTER_VALIDATE_FLOAT);
+    $amount = str_replace(',', '', $_POST['amount']);
+    $amount = (int)$amount;
     $description = htmlspecialchars(trim($_POST['description']));
     $jalaliDate = jdate('Y-m-d');
 
@@ -115,7 +117,8 @@ if (isset($_POST['add_invoice']) && canEditInvoices()) {
         $invoice_date = date('Y-m-d', $timestamp);
     }
 
-    $insertStmt = $db->prepare("INSERT INTO invoices (company_name, invoice_number, subject, amount, invoice_date, description, created_at, created_by) VALUES (:company_name, :invoice_number, :subject, :amount, :invoice_date, :description, :created_at, :created_by)");
+    $insertStmt = $db->prepare("INSERT INTO invoices (company_name, invoice_number, subject, amount, invoice_date, description, created_at, created_by) 
+VALUES (:company_name, :invoice_number, :subject, :amount, :invoice_date, :description, :created_at, :created_by)");
 
     if ($insertStmt->execute([
         ':company_name' => $company_name,
@@ -236,18 +239,15 @@ foreach ($invoices as $key => $invoice) {
                 <h2>➕ ثبت فاکتور جدید</h2>
                 <form method="post" class="invoices-form">
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="company_name">
                             <label>نام شرکت *</label>
                             <input type="text" name="company_name" required>
                         </div>
-                        <div class="form-group">
+                        <div class="invoice_number">
                             <label>شماره فاکتور *</label>
                             <input type="text" name="invoice_number" required>
                         </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
+                        <div class="subject">
                             <label>موضوع فاکتور *</label>
                             <select name="subject" required>
                                 <option value="">-- انتخاب کنید --</option>
@@ -258,22 +258,21 @@ foreach ($invoices as $key => $invoice) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="amount">
                             <label>مبلغ فاکتور *</label>
-                            <input type="number" name="amount" step="0.01" required>
+                            <input type="text" id="amount" name="amount" step="0.01" required>
                         </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
                             <label>تاریخ فاکتور</label>
                             <?php echo render_date_selects(null, null, null); ?>
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-row">
+                        <div class="form-group">
                         <label>توضیحات</label>
                         <textarea name="description" rows="3"></textarea>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -288,15 +287,15 @@ foreach ($invoices as $key => $invoice) {
             <h2>🔍 جستجوی فاکتورها</h2>
             <div class="search-form">
                 <div class="search-row">
-                    <div class="search-group">
+                    <div class="company_name">
                         <label>نام شرکت</label>
-                        <input type="text" id="search_company_name" placeholder="جستجو بر اساس نام شرکت..." value="<?php echo htmlspecialchars($_GET['company_name'] ?? ''); ?>">
+                        <input type="text" id="search_company_name" value="<?php echo htmlspecialchars($_GET['company_name'] ?? ''); ?>">
                     </div>
-                    <div class="search-group">
+                    <div class="invoice_number">
                         <label>شماره فاکتور</label>
-                        <input type="text" id="search_invoice_number" placeholder="جستجو بر اساس شماره فاکتور..." value="<?php echo htmlspecialchars($_GET['invoice_number'] ?? ''); ?>">
+                        <input type="text" id="search_invoice_number" value="<?php echo htmlspecialchars($_GET['invoice_number'] ?? ''); ?>">
                     </div>
-                    <div class="search-group">
+                    <div class="subject">
                         <label>موضوع فاکتور</label>
                         <select id="search_subject" class="search-subject-select">
                             <option value="">-- همه --</option>
@@ -307,7 +306,16 @@ foreach ($invoices as $key => $invoice) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-
+                    <div class="date-group">
+                        <label>انتخاب سریع</label>
+                        <select id="quick_date_select">
+                            <option value="">-- انتخاب کنید --</option>
+                            <option value="today">📅 روز جاری</option>
+                            <option value="this_week">📅 هفته جاری</option>
+                            <option value="this_month">📅 ماه جاری</option>
+                            <option value="this_year">📅 سال جاری</option>
+                        </select>
+                    </div>
                     <div class="search-group">
                         <label>از تاریخ </label>
                         <div id="search_date_from_container"></div>
@@ -356,7 +364,7 @@ foreach ($invoices as $key => $invoice) {
                             <td><?php echo htmlspecialchars($invoice['company_name']); ?></td>
                             <td><?php echo htmlspecialchars($invoice['invoice_number']); ?></td>
                             <td><?php echo htmlspecialchars($invoice['subject'] ?? '-'); ?></td>
-                            <td><?php echo fa_number(number_format($invoice['amount'], 0)) . ' تومان'; ?></td>
+                            <td><?php echo fa_number(number_format($invoice['amount'], 0)) . ' ریال'; ?></td>
                             <td class="date"><?php echo fa_number($invoice['invoice_date_jalali'] ?? $invoice['invoice_date'] ?? '-'); ?></td>
                             <td class="description-cell"><?php echo nl2br(htmlspecialchars($invoice['description'] ?? '-')); ?></td>
                             <td class="date"><?php echo fa_number(htmlspecialchars($invoice['created_at'])); ?></td>
@@ -387,18 +395,18 @@ foreach ($invoices as $key => $invoice) {
             <input type="hidden" name="invoice_id" id="edit_invoice_id">
 
             <div class="form-row">
+
                 <div class="form-group">
                     <label>نام شرکت *</label>
                     <input type="text" name="company_name" id="edit_company_name" required>
                 </div>
+
                 <div class="form-group">
                     <label>شماره فاکتور *</label>
                     <input type="text" name="invoice_number" id="edit_invoice_number" required>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
+                <div class="subject">
                     <label>موضوع فاکتور *</label>
                     <select name="subject" id="edit_subject" required>
                         <option value="">-- انتخاب کنید --</option>
@@ -409,9 +417,10 @@ foreach ($invoices as $key => $invoice) {
                         <?php endforeach; ?>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>مبلغ فاکتور *</label>
-                    <input type="number" name="amount" id="edit_amount" step="0.01" required>
+                    <input type="text" name="amount" id="edit_amount" step="0.01" required>
                 </div>
             </div>
 
@@ -420,7 +429,6 @@ foreach ($invoices as $key => $invoice) {
                     <label>تاریخ فاکتور</label>
                     <div id="edit_date_container"></div>
                 </div>
-
 
             <div class="form-group">
                 <label>توضیحات</label>
@@ -431,10 +439,12 @@ foreach ($invoices as $key => $invoice) {
                 <button type="submit" name="edit_invoice" class="btn-add">💾 ذخیره</button>
                 <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
+            </div>
         </form>
     </div>
 </div>
 
+<script src="assets/js/alljs.js"></script>
 <script src="assets/js/admin-invoices.js"></script>
 </body>
 </html>

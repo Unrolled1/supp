@@ -85,18 +85,6 @@ function now()
     return jdate('Y-m-d');
 }
 
-function get_current_time_json()
-{
-    return json_encode([
-        'datetime' => now(),
-        'date' => jdate('Y-m-d'),
-        'time' => jdate('H:i:s'),
-        'hour' => jdate('H'),
-        'minute' => jdate('i'),
-        'second' => jdate('s')
-    ]);
-}
-
 // تبدیل اعداد انگلیسی به فارسی
 function fa_number($number) {
     $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
@@ -120,26 +108,6 @@ function get_jalali_month_days($year, $month) {
             $year % 33 == 26 || $year % 33 == 30);
         return $is_leap ? 30 : 29;
     }
-}
-function get_jalali_date_array($timestamp = null) {
-    if ($timestamp === null) {
-        $timestamp = time();
-    }
-
-    $gregorian_year = date("Y", $timestamp);
-    $gregorian_month = date("m", $timestamp);
-    $gregorian_day = date("d", $timestamp);
-
-    list($year, $month, $day) = gregorian_to_jalali($gregorian_year, $gregorian_month, $gregorian_day);
-
-    return [
-        'year' => $year,
-        'month' => $month,
-        'day' => $day,
-        'hour' => date("H", $timestamp),
-        'minute' => date("i", $timestamp),
-        'second' => date("s", $timestamp)
-    ];
 }
 
 function get_date_lists() {
@@ -223,16 +191,7 @@ function render_date_selects($selected_year = null, $selected_month = null, $sel
 
     return $html;
 }
-function combine_date($year, $month, $day) {
-    return sprintf("%04d-%02d-%02d", $year, $month, $day);
-}
 
-function validate_date($year, $month, $day) {
-    if (!checkdate($month, $day, $year)) {
-        return false;
-    }
-    return true;
-}
 // ============================================
 // تبدیل تاریخ شمسی به تایم‌استامپ (برای ذخیره در دیتابیس)
 // ============================================
