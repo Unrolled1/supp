@@ -2,7 +2,6 @@
 session_start();
 require_once 'db.php';
 require_once 'assets/jdf.php';
-require_once 'assets/numbers.php';
 require_once 'functions.php';
 
 date_default_timezone_set('Asia/Tehran');
@@ -274,7 +273,7 @@ $departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORD
         </div>
 
         <!-- جدول نتایج -->
-        <div class="reports-table">
+        <div class="reports-table data-table">
             <table>
                 <thead>
                 <tr>

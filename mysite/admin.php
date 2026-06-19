@@ -68,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -113,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
             <div class="alert alert-error"><?php echo $errorMessage; ?></div>
         <?php endif; ?>
 
-        <div class="tickets-table">
+        <div class="tickets-table data-table">
             <table>
                 <thead>
                 <tr>

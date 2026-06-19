@@ -1,0 +1,25 @@
+/*سایز فیلد ها*/
+.pc-id{width: 200px;}
+.property-id{width: 200px;}
+.services-group   { width: 250px; }
+.department-group        { width: 200px; }
+.brand-group     { width: 250px; }
+.serial-group     { width: 250px; }
+.date-group         { width: 120px; }
+/* اینپوت‌ها و سلکت‌ها */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    border-radius: 8px;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    font-size: 13px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.date-select-group span {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: bold;
+}

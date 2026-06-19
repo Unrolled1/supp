@@ -59,9 +59,7 @@
 }
 
 .tickets-table table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
+
 }
 
 .tickets-table th {

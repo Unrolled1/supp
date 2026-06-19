@@ -262,9 +262,13 @@ foreach ($invoices as $key => $invoice) {
                             <label>مبلغ فاکتور *</label>
                             <input type="text" id="amount" name="amount" step="0.01" required>
                         </div>
+
+                    </div>
+
+                    <div class="form-row">
                         <div class="form-group">
                             <label>تاریخ فاکتور</label>
-                            <?php echo render_date_selects(null, null, null); ?>
+                            <div id="invoice_date_container"></div>
                         </div>
                     </div>
 
@@ -306,6 +310,8 @@ foreach ($invoices as $key => $invoice) {
                             <?php endforeach; ?>
                         </select>
                     </div>
+                </div>
+                    <div class="search-row">
                     <div class="date-group">
                         <label>انتخاب سریع</label>
                         <select id="quick_date_select">
@@ -326,7 +332,8 @@ foreach ($invoices as $key => $invoice) {
                         <div id="search_date_to_container"></div>
                         <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_GET['date_to'] ?? ''); ?>">
                     </div>
-                </div>
+                    </div>
+
                 <div class="search-row">
                     <div class="search-group search-actions">
                         <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
@@ -338,8 +345,8 @@ foreach ($invoices as $key => $invoice) {
         </div>
 
         <!-- جدول فاکتورها -->
-        <div class="invoices-table">
-            <table style="width: 100%; border-collapse: collapse;">
+        <div class="invoices-table data-table">
+            <table>
                 <thead>
                 <tr>
                     <th>ردیف</th>
@@ -371,10 +378,10 @@ foreach ($invoices as $key => $invoice) {
                             <td><?php echo htmlspecialchars($invoice['creator_name'] ?? '-'); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditInvoices()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($invoice); ?>)'>✏️ ویرایش</button>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($invoice); ?>)'>✏️</button>
                                 <?php endif; ?>
                                 <?php if (canDeleteInvoices()): ?>
-                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['company_name']); ?>')">🗑️ حذف</button>
+                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['company_name']); ?>')">🗑️</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -429,22 +436,25 @@ foreach ($invoices as $key => $invoice) {
                     <label>تاریخ فاکتور</label>
                     <div id="edit_date_container"></div>
                 </div>
-
-            <div class="form-group">
-                <label>توضیحات</label>
-                <textarea name="description" id="edit_description" rows="3"></textarea>
             </div>
-
+            <div class="form-row">
+                <div class="form-group">
+                    <label>توضیحات</label>
+                    <textarea name="description" id="edit_description" rows="3"></textarea>
+            </div>
+            </div>
             <div class="modal-buttons">
                 <button type="submit" name="edit_invoice" class="btn-add">💾 ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
-            </div>
+
+
+
         </form>
     </div>
 </div>
 
-<script src="assets/js/alljs.js"></script>
-<script src="assets/js/admin-invoices.js"></script>
+<script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
+<script src="assets/js/admin-invoices.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

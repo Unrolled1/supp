@@ -1,118 +1,4 @@
-// ============================================
-// ریست کردن سلکت‌های تاریخ در فرم افزودن
 
-// رندر سلکت‌های تاریخ برای مودال ویرایش
-function renderDateSelectsForEdit(year, month, day) {
-    let html = '<div class="date-select-group">';
-
-    // سال (چپ‌ترین)
-    html += '<select name="year" class="date-select">';
-    html += '<option value="">سال</option>';
-    for (let i = 1390; i <= 1420; i++) {
-        const selected = (year == i) ? 'selected' : '';
-        html += `<option value="${i}" ${selected}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '<span>/</span>';
-
-// ماه (وسط)
-    html += '<select name="month" class="date-select">';
-    html += '<option value="">ماه</option>';
-    const months = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
-    for (let i = 1; i <= 12; i++) {
-        const selected = (month == i) ? 'selected' : '';
-        html += `<option value="${i}" ${selected}>${months[i-1]}</option>`;
-    }
-    html += '</select>';
-
-    html += '<span>/</span>';
-
-// روز (راست‌ترین)
-    html += '<select name="day" class="date-select">';
-    html += '<option value="">روز</option>';
-    for (let i = 1; i <= 31; i++) {
-        const selected = (day == i) ? 'selected' : '';
-        html += `<option value="${i}" ${selected}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '</div>';
-    return html;
-}
-
-// رندر سلکت‌های تاریخ برای بخش جستجو
-function renderSearchDateSelects(containerId, inputId, defaultDate = '') {
-    let defaultYear = '', defaultMonth = '', defaultDay = '';
-
-    if (defaultDate) {
-        const parts = defaultDate.split('-');
-        if (parts.length === 3) {
-            defaultYear = parts[0];
-            defaultMonth = parts[1];
-            defaultDay = parts[2];
-        }
-    }
-
-    let html = '<div class="date-select-group">';
-// سال
-    html += '<select class="search-date-year date-select">';
-    html += '<option value="">سال</option>';
-    for (let i = 1404; i <= 1410; i++) {
-        html += `<option value="${i}" ${defaultYear == i ? 'selected' : ''}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '<span>/</span>';
-
-    // ماه
-    const months = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
-    html += '<select class="search-date-month date-select">';
-    html += '<option value="">ماه</option>';
-    for (let i = 1; i <= 12; i++) {
-        html += `<option value="${i}" ${defaultMonth == i ? 'selected' : ''}>${months[i-1]}</option>`;
-    }
-    html += '</select>';
-
-    html += '<span>/</span>';
-
-    // روز
-    html += '<select class="search-date-day date-select">';
-    html += '<option value="">روز</option>';
-    for (let i = 1; i <= 31; i++) {
-        html += `<option value="${i}" ${defaultDay == i ? 'selected' : ''}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '</div>';
-
-    const container = document.getElementById(containerId);
-    if (container) {
-        container.innerHTML = html;
-    }
-
-    const daySelect = document.querySelector(`#${containerId} .search-date-day`);
-    const monthSelect = document.querySelector(`#${containerId} .search-date-month`);
-    const yearSelect = document.querySelector(`#${containerId} .search-date-year`);
-
-    function updateHidden() {
-        const day = daySelect ? daySelect.value : '';
-        const month = monthSelect ? monthSelect.value : '';
-        const year = yearSelect ? yearSelect.value : '';
-        const hiddenInput = document.getElementById(inputId);
-        if (hiddenInput && day && month && year) {
-            hiddenInput.value = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        } else if (hiddenInput) {
-            hiddenInput.value = '';
-        }
-    }
-
-    if (daySelect) daySelect.addEventListener('change', updateHidden);
-    if (monthSelect) monthSelect.addEventListener('change', updateHidden);
-    if (yearSelect) yearSelect.addEventListener('change', updateHidden);
-
-    updateHidden();
-}
 
 // ============================================
 // 3. توابع مودال ویرایش
@@ -174,8 +60,10 @@ function confirmDelete(id, name) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const row = document.querySelector(`tr:has(button[onclick*="confirmDelete(${id}, "])`);
-                        if (row) {
+                        const btn = document.querySelector(`button[data-id="${id}"]`);
+
+                        if (btn) {
+                            const row = btn.closest('tr');
                             row.remove();
                             updateRowNumbers();
                         }
@@ -200,7 +88,15 @@ function confirmDelete(id, name) {
         }
     });
 }
-
+function updateRowNumbers() {
+    const rows = document.querySelectorAll('.services-table tbody tr');
+    rows.forEach((row, index) => {
+        const firstCell = row.querySelector('td:first-child');
+        if (firstCell) {
+            firstCell.textContent = fa_number(index + 1);
+        }
+    });
+}
 // 7. توابع جستجو
 // ============================================
 
@@ -275,8 +171,8 @@ window.onclick = function(event) {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    const today=toJalali(new Date());
+    renderDateSelects('service_date_container',today.year,today.month,today.day);
     initSearch();
     initQuickDateSelect();
-    setInterval(updateClock, 1000);
-    updateClock();
 });

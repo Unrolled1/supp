@@ -308,16 +308,16 @@ foreach ($services as $key => $service) {
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>تاریخ سرویس</label>
-                            <?php echo render_date_selects(null, null, null); ?>
+                            <label>تاریخ </label>
+                            <div id="service_date_container"></div>
                         </div>
                     </div>
-
+                    <div class="form-row">
                     <div class="form-group">
                         <label>توضیحات</label>
                         <textarea name="description" rows="3"></textarea>
                     </div>
-
+                    </div>
                     <button type="submit" name="add_service" class="btn-add">💾 ذخیره سرویس</button>
                 </form>
             </div>
@@ -393,16 +393,17 @@ foreach ($services as $key => $service) {
                         <div id="search_date_to_container"></div>
                         <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_GET['date_to'] ?? ''); ?>">
                     </div>
-                    <div class="search-group search-actions">
-                        <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
-                        <button type="button" id="reset_btn" class="btn-reset-search">🗑️ پاک کردن</button>
-                    </div>
+
+                </div>
+                <div class="search-group search-actions">
+                    <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
+                    <button type="button" id="reset_btn" class="btn-reset-search">🗑️ پاک کردن</button>
                 </div>
             </div>
         </div>
 
         <!-- جدول خدمات -->
-        <div class="services-table">
+        <div class="services-table data-table">
             <table>
                 <thead>
                 <tr>
@@ -443,11 +444,19 @@ foreach ($services as $key => $service) {
                             <td><?php echo fa_number(htmlspecialchars($service['created_at'])); ?></td>
                             <td>
                                 <?php if (canEditServices()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($service); ?>)'>✏️ ویرایش</button>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($service); ?>)'>✏️</button>
                                 <?php endif; ?>
+
                                 <?php if (canDeleteServices()): ?>
-                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $service['id']; ?>, '<?php echo htmlspecialchars($service['service_name']); ?>')">🗑️ حذف</button>
+                                    <button
+                                            class="delete-btn"
+                                            data-id="<?php echo $service['id']; ?>"
+                                            onclick="confirmDelete(<?php echo $service['id']; ?>,
+                                                    '<?php echo htmlspecialchars($service['service_name']); ?>')">
+                                        🗑️
+                                    </button>
                                 <?php endif; ?>
+
                             </td>
                         </tr>
                         <?php $row_num++; ?>
@@ -517,27 +526,27 @@ foreach ($services as $key => $service) {
 
             <div class="form-row">
                 <div class="form-group-group">
-                    <label>تاریخ سرویس</label>
+                    <label>تاریخ </label>
                     <div id="edit_date_container"></div>
                 </div>
             </div>
-
+            <div class="form-row">
             <div class="form-group">
                 <label>توضیحات</label>
                 <textarea name="description" id="edit_description" rows="3"></textarea>
             </div>
+            </div>
 
             <div class="modal-buttons">
                 <button type="submit" name="edit_service" class="btn-add">💾 ذخیره</button>
-                <button type="button" onclick="closeModal('editModal')">لغو</button>
+                <button type="button" onclick="closeModal('editModal')" class="btn-cancel">لغو</button>
             </div>
         </form>
     </div>
 </div>
 
-<script src="assets/js/alljs.js"></script>
-<script src="assets/js/admin-services.js"></script>
-
+<script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
+<script src="assets/js/admin-services.js?v=<?php echo time(); ?>"></script>
 
 </body>
 </html>

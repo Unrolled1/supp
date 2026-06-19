@@ -137,8 +137,20 @@ function confirmDelete(id, name) {
         }
     });
 }
+function updateRowNumbers() {
+    const rows = document.querySelectorAll('.invoices-table tbody tr');
+    rows.forEach((row, index) => {
+        const firstCell = row.querySelector('td:first-child');
+        if (firstCell) {
+            firstCell.textContent = fa_number(index + 1);
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
+    const today=toJalali(new Date());
+    renderDateSelects('invoice_date_container',today.year,today.month,today.day);
+    initSearch();
     amountFormat('amount');
     amountFormat('edit_amount');
 });

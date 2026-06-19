@@ -38,12 +38,22 @@ if (isset($_POST['delete_kala']) && canDeleteProducts()) {
 
     if ($kala_id) {
         $deleteStmt = $db->prepare("DELETE FROM kala WHERE id = :id");
-        if ($deleteStmt->execute([':id' => $kala_id])) {
-            $_SESSION['success_message'] = "✅ کالا با موفقیت حذف شد";
-        } else {
-            $_SESSION['error_message'] = "❌ خطا در حذف کالا";
+        $deleteStmt->execute([':id' => $kala_id]);
+
+        if (
+            !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+        ) {
+            ob_clean();
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'id' => $kala_id
+            ]);
+            exit;
         }
     }
+
     header('Location: admin_kala.php');
     exit;
 }
@@ -99,7 +109,8 @@ if (isset($_POST['add_kala']) && canEditProducts()) {
     $serial_number = htmlspecialchars(trim($_POST['serial_number']));
     $jalaliDate = jdate('Y-m-d');
 
-    $insertStmt = $db->prepare("INSERT INTO kala (computer_code, property_code, name, department_id, receiver_person_id, quantity, brand_id, serial_number, created_at, created_by) VALUES (:computer_code, :property_code, :name, :department_id, :receiver_person_id, :quantity, :brand_id, :serial_number, :created_at, :created_by)");
+    $insertStmt = $db->prepare("INSERT INTO kala (computer_code, property_code, name, department_id, receiver_person_id, quantity, brand_id, serial_number, created_at, created_by) 
+VALUES (:computer_code, :property_code, :name, :department_id, :receiver_person_id, :quantity, :brand_id, :serial_number, :created_at, :created_by)");
 
     if ($insertStmt->execute([
         ':computer_code' => $computer_code,
@@ -147,6 +158,15 @@ if (isset($_GET['department']) && !empty($_GET['department'])) {
 if (isset($_GET['brand']) && !empty($_GET['brand'])) {
     $where[] = "brand_id = :brand";
     $params[':brand'] = filter_var($_GET['brand'], FILTER_VALIDATE_INT);
+}
+if (isset($_GET['date_from']) && !empty($_GET['date_from'])) {
+    $where[] = "k.created_at >= :date_from";
+    $params[':date_from'] = $_GET['date_from'];
+}
+
+if (isset($_GET['date_to']) && !empty($_GET['date_to'])) {
+    $where[] = "k.created_at <= :date_to";
+    $params[':date_to'] = $_GET['date_to'];
 }
 
 $whereClause = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
@@ -267,12 +287,18 @@ $kalas = $kalas->fetchAll();
                             </select>
                         </div>
                     </div>
-<div class="form-row">
-    <div class="date-select-group">
-        <label>تاریخ فاکتور</label>
-        <?php echo render_date_selects(null, null, null); ?>
-    </div>
-</div>
+                    <div class="form-row">
+                    <div class="date-select-group">
+                      <label>تاریخ</label>
+                        <div id="kala_date_container"></div>
+                    </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>توضیحات</label>
+                            <textarea name="description" rows="3"></textarea>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <button type="submit" name="add_kala" class="btn-add">💾 ذخیره کالا</button>
                     </div>
@@ -297,8 +323,6 @@ $kalas = $kalas->fetchAll();
                         <label>کد اموال</label>
                         <input type="text" id="search_property_code" placeholder="کد اموال..." value="<?php echo htmlspecialchars($_GET['property_code'] ?? ''); ?>">
                     </div>
-                </div>
-                <div class="search-row">
                     <div class="department-group">
                         <label>بخش</label>
                         <select id="search_department">
@@ -317,16 +341,40 @@ $kalas = $kalas->fetchAll();
                             <?php endforeach; ?>
                         </select>
                     </div>
+                </div>
+                <div class="search-row">
+                <div class="date-group">
+                    <label>انتخاب سریع</label>
+                    <select id="quick_date_select">
+                        <option value="">-- انتخاب کنید --</option>
+                        <option value="today">📅 روز جاری</option>
+                        <option value="this_week">📅 هفته جاری</option>
+                        <option value="this_month">📅 ماه جاری</option>
+                        <option value="this_year">📅 سال جاری</option>
+                    </select>
+                </div>
+
+                <div class="search-group">
+                    <label>از تاریخ </label>
+                    <div id="search_date_from_container"></div>
+                    <input type="hidden" id="search_date_from" value="<?php echo htmlspecialchars($_GET['date_from'] ?? ''); ?>">
+                </div>
+                <div class="search-group">
+                    <label>تا تاریخ </label>
+                    <div id="search_date_to_container"></div>
+                    <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_GET['date_to'] ?? ''); ?>">
+                </div>
+                </div>
                     <div class="search-group search-actions">
                         <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
                         <button type="button" id="reset_btn" class="btn-reset-search">🗑️ پاک کردن</button>
                     </div>
-                </div>
+
             </div>
         </div>
 
         <!-- جدول کالاها -->
-        <div class="kala-table">
+        <div class="kala-table data-table">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                 <tr>
@@ -363,10 +411,10 @@ $kalas = $kalas->fetchAll();
                             <td><?php echo htmlspecialchars($kala['creator_name'] ?? '-'); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditProducts()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($kala); ?>)'>✏️ ویرایش</button>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($kala); ?>)'>✏️</button>
                                 <?php endif; ?>
                                 <?php if (canDeleteProducts()): ?>
-                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $kala['id']; ?>, '<?php echo htmlspecialchars($kala['name']); ?>')">🗑️ حذف</button>
+                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $kala['id']; ?>, '<?php echo htmlspecialchars($kala['name']); ?>')">🗑️</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -399,9 +447,7 @@ $kalas = $kalas->fetchAll();
                     <label>کد اموال</label>
                     <input type="text" name="property_code" id="edit_property_code">
                 </div>
-            </div>
 
-            <div class="form-row">
                 <div class="department-group">
                     <label>بخش</label>
                     <select name="department_id" id="edit_department_id">
@@ -420,18 +466,20 @@ $kalas = $kalas->fetchAll();
                         <?php endforeach; ?>
                     </select>
                 </div>
+            </div>
+
+            <div class="form-row">
+
                 <div class="amount-group">
                     <label>تعداد</label>
                     <input type="number" name="quantity" id="edit_quantity" min="1">
                 </div>
-            </div>
 
-            <div class="form-row">
                 <div class="serial-group">
                     <label>سریال</label>
                     <input type="text" name="serial_number" id="edit_serial_number">
                 </div>
-                <div class="receiver-group-group">
+                <div class="receiver-group">
                     <label>تحویل گیرنده</label>
                     <select name="receiver_person_id" id="edit_receiver_person_id">
                         <option value="">-- انتخاب --</option>
@@ -441,17 +489,28 @@ $kalas = $kalas->fetchAll();
                     </select>
                 </div>
             </div>
-
+            <div class="form-row">
+                <div class="form-group">
+                    <label>تاریخ</label>
+                    <div id="edit_date_container"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>توضیحات</label>
+                    <textarea name="description" id="edit_description" rows="3"></textarea>
+                </div>
+            </div>
             <div class="modal-buttons">
                 <button type="submit" name="edit_kala" class="btn-add">💾 ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
         </form>
     </div>
 </div>
 
-<script src="assets/js/alljs.js"></script>
-<script src="assets/js/admin-kala.js"></script>
+<script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
+<script src="assets/js/admin-kala.js?v=<?php echo time(); ?>"></script>
 
 </body>
 </html>

@@ -19,7 +19,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php endif; ?>
 
         <!-- منوی تعاریف -->
-        <?php if (canViewPersons() || canViewModels() || canViewUsers() || canViewDepartments() || canViewTopics() || canViewBrands() || canViewProducts() || canViewActivities()): ?>
+        <?php if (canViewPersons() || canViewModels() || canViewUsers() || canViewDepartments()
+            || canViewTopics() || canViewBrands() || canViewProducts() || canViewActivities()): ?>
             <li class="has-submenu">
                 <a href="javascript:void(0)" class="submenu-toggle">
                     <span class="icon">⚙️</span>

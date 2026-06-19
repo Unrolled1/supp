@@ -1,5 +1,5 @@
 // ============================================
-// کدهای اختصاصی مدیریت کالاها
+// فایل مدیریت پرینترها
 // ============================================
 
 // ============================================
@@ -45,17 +45,16 @@ function renderDateSelectsForEdit(year, month, day) {
     html += '</div>';
     return html;
 }
-
 // ============================================
-// جستجو
+// توابع جستجو
 // ============================================
 
 function initSearch() {
+
     const searchBtn = document.getElementById('search_btn');
     const resetBtn = document.getElementById('reset_btn');
 
     const urlParams = new URLSearchParams(window.location.search);
-
     // مقداردهی سلکت‌های تاریخ
     const dateFrom = urlParams.get('date_from') || '';
     const dateTo = urlParams.get('date_to') || '';
@@ -64,9 +63,9 @@ function initSearch() {
     renderSearchDateSelects('search_date_to_container', 'search_date_to', dateTo);
     // پر کردن فیلدهای جستجو از URL
     const fields = {
-        'search_name': 'name',
         'search_computer_code': 'computer_code',
         'search_property_code': 'property_code',
+        'search_activity': 'activity',
         'search_department': 'department',
         'search_brand': 'brand'
     };
@@ -78,59 +77,56 @@ function initSearch() {
     }
 
     if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
+        searchBtn.addEventListener('click', function () {
             const params = new URLSearchParams();
 
-            // فیلدهای متنی
-            const fields = {
-                'search_name': 'name',
-                'search_computer_code': 'computer_code',
-                'search_property_code': 'property_code',
-                'search_department': 'department',
-                'search_brand': 'brand'
-            };
+            const computerCode = document.getElementById('search_computer_code')?.value;
+            const propertyCode = document.getElementById('search_property_code')?.value;
+            const activity = document.getElementById('search_activity')?.value;
+            const department = document.getElementById('search_department')?.value;
+            const brand = document.getElementById('search_brand')?.value;
 
-            for (const [id, param] of Object.entries(fields)) {
-                const el = document.getElementById(id);
-                if (el && el.value) {
-                    params.set(param, el.value);
-                }
-            }
-            // تاریخ‌ها
+            // دریافت مقادیر تاریخ از فیلدهای مخفی
             const dateFrom = document.getElementById('search_date_from')?.value;
             const dateTo = document.getElementById('search_date_to')?.value;
+
+            if (computerCode) params.set('computer_code', computerCode);
+            if (propertyCode) params.set('property_code', propertyCode);
+            if (activity) params.set('activity', activity);
+            if (department) params.set('department', department);
+            if (brand) params.set('brand', brand);
             if (dateFrom) params.set('date_from', dateFrom);
             if (dateTo) params.set('date_to', dateTo);
 
-            window.location.href = 'admin_kala.php?' + params.toString();
+            window.location.href = 'admin_printers.php?' + params.toString();
         });
     }
 
     if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            window.location.href = 'admin_kala.php';
+        resetBtn.addEventListener('click', function () {
+            window.location.href = 'admin_printers.php';
         });
     }
+
 }
-
 // ============================================
-// ویرایش
+// توابع مودال ویرایش
 // ============================================
-function openEditModal(kala) {
-    document.getElementById('edit_kala_id').value = kala.id;
-    document.getElementById('edit_name').value = kala.name;
-    document.getElementById('edit_computer_code').value = kala.computer_code || '';
-    document.getElementById('edit_property_code').value = kala.property_code || '';
-    document.getElementById('edit_department_id').value = kala.department_id || '';
-    document.getElementById('edit_brand_id').value = kala.brand_id || '';
-    document.getElementById('edit_quantity').value = kala.quantity || 1;
-    document.getElementById('edit_serial_number').value = kala.serial_number || '';
-    document.getElementById('edit_receiver_person_id').value = kala.receiver_person_id || '';
 
-    // تاریخ ثبت
+function openEditModal(printer) {
+    document.getElementById('edit_printer_id').value = printer.id;
+    document.getElementById('edit_computer_code').value = printer.computer_code || '';
+    document.getElementById('edit_property_code').value = printer.property_code || '';
+    document.getElementById('edit_activity_id').value = printer.activity_id || '';
+    document.getElementById('edit_department_id').value = printer.department_id || '';
+    document.getElementById('edit_brand_id').value = printer.brand_id || '';
+    document.getElementById('edit_serial_number').value = printer.serial_number || '';
+    document.getElementById('edit_description').value = printer.description || '';
+
+// تاریخ ثبت
     let year = '', month = '', day = '';
-    if (kala.created_at) {
-        const parts = kala.created_at.split('-');
+    if (printer.created_at) {
+        const parts = printer.created_at.split('-');
         if (parts.length === 3) {
             year = parts[0];
             month = parseInt(parts[1]);
@@ -145,76 +141,66 @@ function openEditModal(kala) {
 
     document.getElementById('editModal').style.display = 'flex';
 }
+//حذف
+function confirmDelete(id, serial) {
 
-// ============================================
-// حذف
-// ============================================
-function confirmDelete(id, name) {
     Swal.fire({
         title: 'آیا مطمئن هستید؟',
-        text: 'کالا "' + name + '" حذف خواهد شد!',
+        text: 'پرینتر "' + serial + '" حذف خواهد شد!',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'بله، حذف شود',
-        cancelButtonText: 'لغو',
-        reverseButtons: true
+        cancelButtonText: 'لغو'
     }).then((result) => {
+
         if (result.isConfirmed) {
-            fetch('admin_kala.php', {
+
+            fetch('admin_printers.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: 'delete_kala=1&kala_id=' + id
+                body: 'delete_printer=1&printer_id=' + id
             })
                 .then(response => response.json())
                 .then(data => {
+
                     if (data.success) {
-                        const button = document.querySelector(`button[onclick*="confirmDelete(${id}"]`);
+
+                        const button = document.querySelector(
+                            `button[onclick*="confirmDelete(${id}"]`
+                        );
+
                         const row = button ? button.closest('tr') : null;
+
                         if (row) {
                             row.remove();
                             updateRowNumbers();
                         }
+
                         Swal.fire({
                             title: 'حذف شد!',
-                            text: 'کالا با موفقیت حذف شد.',
+                            text: 'پرینتر با موفقیت حذف شد.',
                             icon: 'success',
-                            confirmButtonColor: '#28a745',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        title: 'خطا!',
-                        text: 'مشکلی در حذف کالا رخ داد.',
-                        icon: 'error',
-                        confirmButtonColor: '#dc3545'
-                    });
                 });
         }
     });
 }
-function updateRowNumbers() {
-    const rows = document.querySelectorAll('.kala-table tbody tr');
-    rows.forEach((row, index) => {
-        const firstCell = row.querySelector('td:first-child');
-        if (firstCell) {
-            firstCell.textContent = fa_number(index + 1);
-        }
-    });
-}
+
 // ============================================
-// مقداردهی اولیه (اختصاصی)
+// راه‌اندازی اولیه
 // ============================================
+
 document.addEventListener('DOMContentLoaded', function() {
     const today=toJalali(new Date());
-    renderDateSelects('kala_date_container',today.year,today.month,today.day);
+    renderDateSelects('printer_date_container',today.year,today.month,today.day);
     initSearch();
     initQuickDateSelect();
 });

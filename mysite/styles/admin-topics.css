@@ -95,14 +95,6 @@
     min-width: 800px;
 }
 
-.topics-table th {
-    background: #4f46e5;
-    color: white;
-    padding: 12px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-}
 
 .topics-table td {
     color: black;

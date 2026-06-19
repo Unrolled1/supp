@@ -125,7 +125,7 @@ $persons = $db->query("SELECT * FROM persons ORDER BY name ASC")->fetchAll();
             </div>
         <?php endif; ?>
 
-        <div class="persons-table">
+        <div class="persons-table data-table">
             <table>
                 <thead>
             <tr>

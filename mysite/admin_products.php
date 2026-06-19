@@ -94,7 +94,6 @@ $products = $db->query("
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-products.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -147,7 +146,7 @@ $products = $db->query("
             </div>
         <?php endif; ?>
 
-        <div class="products-table">
+        <div class="products-table data-table">
             <table>
                 <thead>
                 <tr>

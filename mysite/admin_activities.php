@@ -84,7 +84,6 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-activities.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -126,7 +125,7 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
         </div>
 
         <!-- جدول فعالیت‌ها -->
-        <div class="activities-table">
+        <div class="activities-table data-table">
             <table>
                 <thead>
                 <tr>

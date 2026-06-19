@@ -31,7 +31,29 @@ body {
 /* ============================================
    استایل سراسری برای همه دکمه‌ها
    ============================================ */
-button, .btn, .btn-add, .edit-btn, .delete-btn, .password-btn, .status-btn, .status-btn-table, .delete-btn-table, .modal-save,
+.modal-buttons .btn-add,
+ .btn-cancel {
+    min-width: 120px;
+    height: 42px;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+.btn-cancel {
+    background: #6b7280 ;
+    color: white ;
+    min-width: 120px;
+    height: 42px;
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+.btn-cancel:hover {
+    background: #4b5563 ;
+    transform: translateY(-1px);
+}
+
+.btn-cancel,.btn-add, .edit-btn, .delete-btn, .password-btn, .status-btn, .status-btn-table, .delete-btn-table, .modal-save,
 .modal-cancel, .refresh-btn, .logout-btn, .logout-btn-sidebar, .btn-permissions {
     font-family: 'Vazir', 'Tahoma', sans-serif;
     font-weight: 500;
@@ -39,8 +61,25 @@ button, .btn, .btn-add, .edit-btn, .delete-btn, .password-btn, .status-btn, .sta
     cursor: pointer;
     border: none;
     border-radius: 8px;
-    padding: 8px 16px;
     font-size: 13px;
+}
+
+.btn-search {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-reset-search {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 /* دکمه‌های بزرگتر */
 .btn-add, .modal-save {
@@ -112,14 +151,7 @@ button, .btn, .btn-add, .edit-btn, .delete-btn, .password-btn, .status-btn, .sta
     transform: translateY(-1px);
 }
 /* خاکستری (لغو) */
-.modal-cancel {
-    background: #6b7280 !important;
-    color: white !important;
-}
-.modal-cancel:hover {
-    background: #4b5563 !important;
-    transform: translateY(-1px);
-}
+
 /* ============================================
    استایل فرم‌ها
    ============================================ */
@@ -128,6 +160,7 @@ input, select, textarea, .form-group input, .form-group select {
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
+    font-size: 12px ;
 }
 input:focus, select:focus, textarea:focus {
     border-color: #4f46e5;
@@ -224,7 +257,9 @@ input:focus, select:focus, textarea:focus {
     gap: 15px;
     align-items: flex-end;
     color: #555;
-    margin-bottom: 10px;
+}
+.form-group:has(textarea){
+    width: 100%;
 }
 .form-row label {
     display: block;
@@ -242,6 +277,9 @@ input:focus, select:focus, textarea:focus {
     font-size: 13px;
     padding: 6px 8px;
 }
+.form-group label{
+    color: #555;
+}
 .add-card h2 {
     font-size: 20px;
     margin-bottom: 20px;
@@ -252,45 +290,35 @@ input:focus, select:focus, textarea:focus {
 /* ============================================
    جدول‌ها (یکسان برای همه)
    ============================================ */
+.data-table{
+    background: white;
+    border-radius: 15px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.data-table table{
+    width:  100%;
+    border-collapse:collapse;
+}
 /* هدر همه جدول‌ها */
-.services-table th, .reports-table th, .persons-table th, .users-table th, .departments-table th, .products-table th, .activities-table th,
-.tickets-table th, .brands-table th, .models-table th {
-    background: #4f46e5;
+.data-table th {
+    background: #667eea;
     color: white;
     padding: 12px;
     text-align: center;
 }
 /* سلول‌های همه جدول‌ها */
-.services-table td,
-.reports-table td,
-.persons-table td,
-.users-table td,
-.departments-table td,
-.products-table td,
-.activities-table td,
-.tickets-table td,
-.brands-table td,
-.models-table td {
+.data-table td {
     background: white;
     padding: 10px 12px;
     text-align: center;
     border-bottom: 1px solid #eee;
     color: #334155;
 }
-
-/* هاور ردیف‌های همه جدول‌ها */
-.services-table tr:hover,
-.reports-table tr:hover,
-.persons-table tr:hover,
-.users-table tr:hover,
-.departments-table tr:hover,
-.products-table tr:hover,
-.activities-table tr:hover,
-.tickets-table tr:hover,
-.brands-table tr:hover,
-.models-table tr:hover {
+.data-table tr:hover{
     background: rgba(79, 70, 229, 0.05);
 }
+
 /* ============================================
    استایل تاریخ در همه جدول‌ها
    ============================================ */
@@ -447,10 +475,6 @@ input:focus, select:focus, textarea:focus {
     height: auto;
     overflow-y: auto;
     margin: 20px auto;
-}
-.modal-content .form-row{
-    display: flex;
-    flex-wrap: wrap;
 }
 .modal-content h3 {
     margin-bottom: 20px;
@@ -795,12 +819,6 @@ input:focus, select:focus, textarea:focus {
     font-size: 12px !important;
 }
 
-/* سلکت ماه (متنش بلندتره) */
-.date-select-group select[name="month"],
-.search-date-month {
-    width: 90px !important;
-    min-width: 80px !important;
-}
 
 
 /* استایل اسلش بین سلکت‌ها */
@@ -835,32 +853,28 @@ input:focus, select:focus, textarea:focus {
     background: transparent !important;
 }
 /*تمام پنل جستجو*/
-
-.search-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: flex-end;
+.search-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:flex-end;
 }
-.search-row input,select{
-    width: 100%;
+
+.search-row select,
+.search-row input {
+    width:  100%;
     padding: 6px 8px;
 }
-.search-group {
-    color: black;
-    margin-top: 15px;
-}
-.search-group label{
-
-}
-.search-card select {
-    background-position: right 10px center !important;
-    background-repeat: no-repeat !important;
-    padding-left: 10px !important;
-}
 .invoices-form select option {
-    font-family: 'Vazir', 'Tahoma', sans-serif !important;
-    font-size: 13px !important;
+    font-family: 'Vazir', 'Tahoma', sans-serif ;
+    font-size: 13px ;
+}
+.search-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 5px;
+    gap: 10px;
+    border-top: 1px solid #eee;
 }
 /* ============================================
    تنظیم نهایی وسط‌چین و نشانک سلکت‌های تاریخ

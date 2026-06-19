@@ -91,7 +91,6 @@ $brands = $db->query("SELECT * FROM brands ORDER BY name ASC")->fetchAll();
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-brands.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -135,7 +134,7 @@ $brands = $db->query("SELECT * FROM brands ORDER BY name ASC")->fetchAll();
             </div>
         <?php endif; ?>
 
-        <div class="brands-table">
+        <div class="brands-table data-table">
             <table>
                 <thead>
                 <tr>

@@ -77,7 +77,7 @@ $topics = $db->query("SELECT * FROM topics ORDER BY name ASC")->fetchAll();
             </div>
         <?php endif; ?>
 
-        <div class="topics-table"><table><thead><tr><th>ردیف</th><th>نام موضوع</th><th>عملیات</th></tr></thead>
+        <div class="topics-table data-table"><table><thead><tr><th>ردیف</th><th>نام موضوع</th><th>عملیات</th></tr></thead>
                 <tbody><?php $i=1; foreach($topics as $t): ?>
                     <tr><td><?php echo fa_number($i); ?></td><td><?php echo htmlspecialchars($t['name']); ?></td>
                     <td class="action-buttons">

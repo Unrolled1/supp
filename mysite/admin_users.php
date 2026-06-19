@@ -314,7 +314,7 @@ foreach ($users as $user) {
         </div>
 
         <!-- جدول کاربران -->
-        <div class="users-table">
+        <div class="users-table data-table">
             <table>
                 <thead>
                 <tr>

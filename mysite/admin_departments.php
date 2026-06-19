@@ -56,7 +56,6 @@ $departments = $db->query("SELECT * FROM departments ORDER BY name ASC")->fetchA
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/admin-departments.css">
-    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -76,7 +75,7 @@ $departments = $db->query("SELECT * FROM departments ORDER BY name ASC")->fetchA
                     <div class="form-group"><button type="submit" name="add_department" class="btn-add">➕ افزودن</button></div></form></div>
         <?php endif; ?>
 
-        <div class="departments-table">
+        <div class="departments-table data-table">
             <table>
                 <thead>
                 <tr>

@@ -41,7 +41,6 @@
     background: white;
     border-radius: 15px;
     padding: 25px;
-    margin-bottom: 30px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
@@ -60,8 +59,6 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     margin-top: 20px;
 }
-
-
 
 /*  جستجو عرض فیلدهای مختلف */
 .form-group:has(select[name="service_name"]) { width: 350px; }
@@ -82,17 +79,6 @@
     color: #555;
 }
 
-/* اینپوت‌ها و سلکت‌ها */
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    border-radius: 8px;
-    font-family: 'Vazir', Tahoma, sans-serif;
-    font-size: 13px;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-}
 
 .form-group input:focus,
 .form-group select:focus,
@@ -105,8 +91,6 @@
 .form-group textarea {
     resize: vertical;
 }
-
-
 
 .date-select-group span {
     color: #64748b;
@@ -217,12 +201,6 @@
     text-align: center;
 }
 
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    justify-content: center;
-}
 
 .modal-cancel {
     background: #6c757d;
@@ -246,13 +224,7 @@
 }
 
 /* ----- بخش جستجو ----- */
-.search-card {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
+
 
 .search-card h2 {
     font-size: 18px;
@@ -260,27 +232,9 @@
     border-right: 4px solid #667eea;
     padding-right: 12px;
 }
-
-
-.search-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 10px;
-    align-items: flex-end;
-    overflow-x: auto;
-}
-.search-group {
-    flex: none;  /* عدم تغییر عرض */
-}
 /* هر فیلد اندازه خودش */
 .service-name-group {
     width: 330px;
-}
-.search-card input,
-.search-card select {
-    width: 100%;
-    padding: 6px 8px;
 }
 .department-group   { width: 220px; }
 .brand-group        { width: 185px; }
@@ -294,17 +248,6 @@
     display: block;
     font-weight: 500;
     color: #555;
-}
-.search-actions {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-}
-/* کوچک کردن سلکت انتخاب سریع */
-#quick_date_select {
-    width: 110px ;
-    padding: 6px 8px ;
-    font-size: 12px ;
 }
 .btn-search {
     background: #4f46e5;
@@ -357,10 +300,6 @@
     }
 }
 
-/* برای فرم افزودن سرویس */
-.add-card  {
-    justify-content: flex-end;
-}
 
 
 #editModal .date-select {
@@ -403,22 +342,15 @@
     flex-wrap: nowrap !important;
 }
 
-
-/* دکمه‌ها در مودال */
-#editModal .modal-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 25px;
-}
-
-#editModal .btn-add {
+/*#editModal .btn-add {
     min-width: 120px;
 }
 
-#editModal .modal-cancel {
+#editModal .btn-cancel {
+    height: 42px;
     min-width: 100px;
-}
+}*/
+
 /* ============================================
    استایل مودال ویرایش کاربر
    ============================================ */

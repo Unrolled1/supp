@@ -17,12 +17,7 @@
     min-width: 800px;
 }
 
-.invoices-table th {
-    background: #4f46e5;
-    color: white;
-    padding: 12px;
-    text-align: center;
-}
+
 
 .invoices-table td {
     padding: 10px 12px;
@@ -49,9 +44,7 @@
 .form-group {
     flex: 0 0 auto;
 }
-.form-group:has(textarea){
-    width: 100%;
-}
+
 
 
 .btn-add {
@@ -96,22 +89,6 @@
 }
 
 
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    justify-content: center;
-}
-
-.modal-cancel {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
 /* جستجو */
 .search-row input,select{
 
@@ -120,12 +97,6 @@
 .invoice_number        { width: 200px; }
 .subject     { width: 250px; }
 .date-group{width: 120px;}
-
-.search-group {
-    flex: 1;
-    min-width: 120px;
-    max-width: 300px;
-}
 
 .search-group label {
     display: block;
@@ -142,23 +113,7 @@
     border-radius: 8px;
 }
 
-.btn-search {
-    background: #4f46e5;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-}
 
-.btn-reset-search {
-    background: #6b7280;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-}
 
 .search-actions {
     flex: 0.5;
@@ -199,12 +154,4 @@
     display: flex;
     gap: 10px;
     align-items: flex-end;
-}
-/* پایین آوردن دکمه‌های جستجو */
-.search-card .search-actions {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 5px;
-    padding-top: 5px;
-    border-top: 1px solid #eee;
 }

@@ -125,7 +125,7 @@ $models = $db->query("SELECT * FROM models ORDER BY name ASC")->fetchAll();
             </div>
         <?php endif; ?>
 
-        <div class="models-table">
+        <div class="models-table data-table">
             <table>
                 <thead>
                 <tr>

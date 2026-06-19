@@ -10,7 +10,6 @@
 
 .products-table { background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 20px; }
 .products-table table { width: 100%; border-collapse: collapse; min-width: 500px; }
-.products-table th { background: #4f46e5; color: white; padding: 12px; text-align: center; font-weight: bold; }
 .products-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #eee; }
 
 .date { direction: ltr; text-align: center; font-family: monospace; letter-spacing: 1px; }
