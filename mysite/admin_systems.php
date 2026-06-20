@@ -131,7 +131,6 @@ if (isset($_POST['add_component']) && canEditSystems()) {
     $componentType = $_POST['component_type'];
     $brand_id = filter_var($_POST['brand_id'], FILTER_VALIDATE_INT);
     $model_id = filter_var($_POST['model_id'], FILTER_VALIDATE_INT);
-    $description = htmlspecialchars(trim($_POST['description'] ?? ''));
     $jalaliDate = jdate('Y-m-d');
 
     $tableMap = [
@@ -146,11 +145,10 @@ if (isset($_POST['add_component']) && canEditSystems()) {
     $table = $tableMap[$componentType];
 
     // فیلدهای پایه
-    $fields = ['brand_id', 'model_id', 'description', 'created_at'];
+    $fields = ['brand_id', 'model_id',  'created_at'];
     $values = [
         ':brand_id' => $brand_id,
         ':model_id' => $model_id,
-        ':description' => $description,
         ':created_at' => $jalaliDate
     ];
 
@@ -174,6 +172,7 @@ if (isset($_POST['add_component']) && canEditSystems()) {
             $fields[] = 'property_code';
             $values[':property_code'] = htmlspecialchars(trim($_POST['monitor_property_code'] ?? ''));
             break;
+
     }
 
     // ساخت کوئری
@@ -230,7 +229,7 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
         $motherboard_id = !empty($_POST['motherboard_id']) ? filter_var($_POST['motherboard_id'], FILTER_VALIDATE_INT) : null;
         $power_id = !empty($_POST['power_id']) ? filter_var($_POST['power_id'], FILTER_VALIDATE_INT) : null;
         $monitor_id = !empty($_POST['monitor_id']) ? filter_var($_POST['monitor_id'], FILTER_VALIDATE_INT) : null;
-        $description = htmlspecialchars(trim($_POST['description']));
+
 
         // بروزرسانی سیستم
         $updateStmt = $db->prepare("
@@ -242,8 +241,7 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
                 cpu_id = :cpu_id,
                 motherboard_id = :motherboard_id,
                 power_id = :power_id,
-                monitor_id = :monitor_id,
-                description = :description
+                monitor_id = :monitor_id
             WHERE id = :id
         ");
 
@@ -256,7 +254,7 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
             ':motherboard_id' => $motherboard_id,
             ':power_id' => $power_id,
             ':monitor_id' => $monitor_id,
-            ':description' => $description,
+
             ':id' => $system_id
         ]);
 
@@ -269,15 +267,13 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
         while (isset($_POST["ram_id_$ramIndex"])) {
             $ram_id = filter_var($_POST["ram_id_$ramIndex"], FILTER_VALIDATE_INT);
             if ($ram_id) {
-                $is_primary = isset($_POST["ram_primary_$ramIndex"]) ? 1 : 0;
                 $ramStmt = $db->prepare("
-                    INSERT INTO system_rams (system_id, ram_id, is_primary, created_at, created_by)
-                    VALUES (:system_id, :ram_id, :is_primary, :created_at, :created_by)
+                    INSERT INTO system_rams (system_id, ram_id,  created_at, created_by)
+                    VALUES (:system_id, :ram_id,  :created_at, :created_by)
                 ");
                 $ramStmt->execute([
                     ':system_id' => $system_id,
                     ':ram_id' => $ram_id,
-                    ':is_primary' => $is_primary,
                     ':created_at' => jdate('Y-m-d'),
                     ':created_by' => $_SESSION['user_id']
                 ]);
@@ -294,15 +290,14 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
         while (isset($_POST["storage_id_$storageIndex"])) {
             $storage_id = filter_var($_POST["storage_id_$storageIndex"], FILTER_VALIDATE_INT);
             if ($storage_id) {
-                $is_primary = isset($_POST["storage_primary_$storageIndex"]) ? 1 : 0;
+
                 $storageStmt = $db->prepare("
-                    INSERT INTO system_storages (system_id, storage_id, is_primary, created_at, created_by)
-                    VALUES (:system_id, :storage_id, :is_primary, :created_at, :created_by)
+                    INSERT INTO system_storages (system_id, storage_id,  created_at, created_by)
+                    VALUES (:system_id, :storage_id,  :created_at, :created_by)
                 ");
                 $storageStmt->execute([
                     ':system_id' => $system_id,
                     ':storage_id' => $storage_id,
-                    ':is_primary' => $is_primary,
                     ':created_at' => jdate('Y-m-d'),
                     ':created_by' => $_SESSION['user_id']
                 ]);
@@ -320,18 +315,17 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
             $ip_address = trim($_POST["ip_address_$ipIndex"]);
             if (!empty($ip_address)) {
                 $network_type = $_POST["ip_network_$ipIndex"] ?? 'LAN';
-                $is_primary = isset($_POST["ip_primary_$ipIndex"]) ? 1 : 0;
+
                 $ip_description = htmlspecialchars(trim($_POST["ip_description_$ipIndex"] ?? ''));
 
                 $ipStmt = $db->prepare("
-                    INSERT INTO system_ips (system_id, ip_address, network_type, is_primary, description, created_at, created_by)
-                    VALUES (:system_id, :ip_address, :network_type, :is_primary, :description, :created_at, :created_by)
+                    INSERT INTO system_ips (system_id, ip_address, network_type,  description, created_at, created_by)
+                    VALUES (:system_id, :ip_address, :network_type,  :description, :created_at, :created_by)
                 ");
                 $ipStmt->execute([
                     ':system_id' => $system_id,
                     ':ip_address' => $ip_address,
                     ':network_type' => $network_type,
-                    ':is_primary' => $is_primary,
                     ':description' => $ip_description,
                     ':created_at' => jdate('Y-m-d'),
                     ':created_by' => $_SESSION['user_id']
@@ -349,15 +343,14 @@ if (isset($_POST['edit_system']) && canEditSystems()) {
         while (isset($_POST["peripheral_id_$periphIndex"])) {
             $peripheral_id = filter_var($_POST["peripheral_id_$periphIndex"], FILTER_VALIDATE_INT);
             if ($peripheral_id) {
-                $is_default = isset($_POST["peripheral_default_$periphIndex"]) ? 1 : 0;
+
                 $periphStmt = $db->prepare("
-                    INSERT INTO system_peripherals (system_id, peripheral_id, is_default, created_at, created_by)
-                    VALUES (:system_id, :peripheral_id, :is_default, :created_at, :created_by)
+                    INSERT INTO system_peripherals (system_id, peripheral_id,  created_at, created_by)
+                    VALUES (:system_id, :peripheral_id,  :created_at, :created_by)
                 ");
                 $periphStmt->execute([
                     ':system_id' => $system_id,
                     ':peripheral_id' => $peripheral_id,
-                    ':is_default' => $is_default,
                     ':created_at' => jdate('Y-m-d'),
                     ':created_by' => $_SESSION['user_id']
                 ]);
@@ -393,19 +386,17 @@ if (isset($_POST['add_system']) && canEditSystems()) {
         $motherboard_id = !empty($_POST['motherboard_id']) ? filter_var($_POST['motherboard_id'], FILTER_VALIDATE_INT) : null;
         $power_id = !empty($_POST['power_id']) ? filter_var($_POST['power_id'], FILTER_VALIDATE_INT) : null;
         $monitor_id = !empty($_POST['monitor_id']) ? filter_var($_POST['monitor_id'], FILTER_VALIDATE_INT) : null;
-        $description = htmlspecialchars(trim($_POST['description']));
         $jalaliDate = jdate('Y-m-d');
 
         // ثبت سیستم
         $insertStmt = $db->prepare("
             INSERT INTO systems (
-                computer_code, property_code, name, department_id,
-                cpu_id, motherboard_id, power_id, monitor_id,
-                description, created_at, created_by
+                computer_code, property_code, name, department_id,cpu_id, motherboard_id, power_id, monitor_id,
+                 created_at, created_by
             ) VALUES (
                 :computer_code, :property_code, :name, :department_id,
                 :cpu_id, :motherboard_id, :power_id, :monitor_id,
-                :description, :created_at, :created_by
+                 :created_at, :created_by
             )
         ");
 
@@ -418,7 +409,6 @@ if (isset($_POST['add_system']) && canEditSystems()) {
             ':motherboard_id' => $motherboard_id,
             ':power_id' => $power_id,
             ':monitor_id' => $monitor_id,
-            ':description' => $description,
             ':created_at' => $jalaliDate,
             ':created_by' => $_SESSION['user_id']
         ]);
@@ -430,15 +420,14 @@ if (isset($_POST['add_system']) && canEditSystems()) {
         while (isset($_POST["ram_id_$ramIndex"])) {
             $ram_id = filter_var($_POST["ram_id_$ramIndex"], FILTER_VALIDATE_INT);
             if ($ram_id) {
-                $is_primary = isset($_POST["ram_primary_$ramIndex"]) ? 1 : 0;
+
                 $ramStmt = $db->prepare("
-                    INSERT INTO system_rams (system_id, ram_id, is_primary, created_at, created_by)
-                    VALUES (:system_id, :ram_id, :is_primary, :created_at, :created_by)
+                    INSERT INTO system_rams (system_id, ram_id,  created_at, created_by)
+                    VALUES (:system_id, :ram_id,  :created_at, :created_by)
                 ");
                 $ramStmt->execute([
                     ':system_id' => $system_id,
                     ':ram_id' => $ram_id,
-                    ':is_primary' => $is_primary,
                     ':created_at' => $jalaliDate,
                     ':created_by' => $_SESSION['user_id']
                 ]);
@@ -451,15 +440,14 @@ if (isset($_POST['add_system']) && canEditSystems()) {
         while (isset($_POST["storage_id_$storageIndex"])) {
             $storage_id = filter_var($_POST["storage_id_$storageIndex"], FILTER_VALIDATE_INT);
             if ($storage_id) {
-                $is_primary = isset($_POST["storage_primary_$storageIndex"]) ? 1 : 0;
+
                 $storageStmt = $db->prepare("
-                    INSERT INTO system_storages (system_id, storage_id, is_primary, created_at, created_by)
-                    VALUES (:system_id, :storage_id, :is_primary, :created_at, :created_by)
+                    INSERT INTO system_storages (system_id, storage_id,  created_at, created_by)
+                    VALUES (:system_id, :storage_id,  :created_at, :created_by)
                 ");
                 $storageStmt->execute([
                     ':system_id' => $system_id,
                     ':storage_id' => $storage_id,
-                    ':is_primary' => $is_primary,
                     ':created_at' => $jalaliDate,
                     ':created_by' => $_SESSION['user_id']
                 ]);
@@ -473,18 +461,17 @@ if (isset($_POST['add_system']) && canEditSystems()) {
             $ip_address = trim($_POST["ip_address_$ipIndex"]);
             if (!empty($ip_address)) {
                 $network_type = $_POST["ip_network_$ipIndex"] ?? 'LAN';
-                $is_primary = isset($_POST["ip_primary_$ipIndex"]) ? 1 : 0;
+
                 $ip_description = htmlspecialchars(trim($_POST["ip_description_$ipIndex"] ?? ''));
 
                 $ipStmt = $db->prepare("
-                    INSERT INTO system_ips (system_id, ip_address, network_type, is_primary, description, created_at, created_by)
-                    VALUES (:system_id, :ip_address, :network_type, :is_primary, :description, :created_at, :created_by)
+                    INSERT INTO system_ips (system_id, ip_address, network_type,  description, created_at, created_by)
+                    VALUES (:system_id, :ip_address, :network_type, :description, :created_at, :created_by)
                 ");
                 $ipStmt->execute([
                     ':system_id' => $system_id,
                     ':ip_address' => $ip_address,
                     ':network_type' => $network_type,
-                    ':is_primary' => $is_primary,
                     ':description' => $ip_description,
                     ':created_at' => $jalaliDate,
                     ':created_by' => $_SESSION['user_id']
@@ -498,15 +485,14 @@ if (isset($_POST['add_system']) && canEditSystems()) {
         while (isset($_POST["peripheral_id_$periphIndex"])) {
             $peripheral_id = filter_var($_POST["peripheral_id_$periphIndex"], FILTER_VALIDATE_INT);
             if ($peripheral_id) {
-                $is_default = isset($_POST["peripheral_default_$periphIndex"]) ? 1 : 0;
+
                 $periphStmt = $db->prepare("
-                    INSERT INTO system_peripherals (system_id, peripheral_id, is_default, created_at, created_by)
-                    VALUES (:system_id, :peripheral_id, :is_default, :created_at, :created_by)
+                    INSERT INTO system_peripherals (system_id, peripheral_id, created_at, created_by)
+                    VALUES (:system_id, :peripheral_id, :created_at, :created_by)
                 ");
                 $periphStmt->execute([
                     ':system_id' => $system_id,
                     ':peripheral_id' => $peripheral_id,
-                    ':is_default' => $is_default,
                     ':created_at' => $jalaliDate,
                     ':created_by' => $_SESSION['user_id']
                 ]);
@@ -565,23 +551,19 @@ $systems = $db->prepare("
         -- CPU
         cpu_b.name as cpu_brand,
         cpu_m.name as cpu_model,
-        cpu.description as cpu_description,
         
         -- مادربرد
         mb_b.name as motherboard_brand,
         mb_m.name as motherboard_model,
-        mb.description as motherboard_description,
         
         -- پاور
         p_b.name as power_brand,
         p_m.name as power_model,
-        p.description as power_description,
         
         -- مانیتور
         mon_b.name as monitor_brand,
         mon_m.name as monitor_model,
         mon.property_code as monitor_property_code,
-        mon.description as monitor_description,
         
         u.fullname as creator_name
         
@@ -627,7 +609,7 @@ foreach ($systems as $key => $system) {
         LEFT JOIN models rm ON r.model_id = rm.id
         LEFT JOIN brands rb ON rm.brand_id = rb.id
         WHERE sr.system_id = :system_id
-        ORDER BY sr.is_primary DESC, sr.id ASC
+        ORDER BY sr.id DESC
     ");
     $ramStmt->execute([':system_id' => $system['id']]);
     $systems[$key]['rams'] = $ramStmt->fetchAll();
@@ -644,7 +626,7 @@ foreach ($systems as $key => $system) {
         LEFT JOIN models sm ON st.model_id = sm.id
         LEFT JOIN brands sb ON sm.brand_id = sb.id
         WHERE ss.system_id = :system_id
-        ORDER BY ss.is_primary DESC, ss.id ASC
+        ORDER BY ss.id DESC
     ");
     $storageStmt->execute([':system_id' => $system['id']]);
     $systems[$key]['storages'] = $storageStmt->fetchAll();
@@ -653,7 +635,7 @@ foreach ($systems as $key => $system) {
     $ipStmt = $db->prepare("
         SELECT * FROM system_ips 
         WHERE system_id = :system_id 
-        ORDER BY is_primary DESC, id ASC
+        ORDER BY id DESC
     ");
     $ipStmt->execute([':system_id' => $system['id']]);
     $systems[$key]['ips'] = $ipStmt->fetchAll();
@@ -726,15 +708,20 @@ foreach ($systems as $key => $system) {
 
                     <!-- اطلاعات اصلی -->
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="pc-id">
                             <label>کد رایانه *</label>
                             <input type="text" name="computer_code" required>
                         </div>
-                        <div class="form-group">
+                        <div class="property-id">
                             <label>کد اموال</label>
                             <input type="text" name="property_code">
                         </div>
-                        <div class="form-group">
+                        <div class="computer-group">
+                            <label>نام سیستم *</label>
+                            <input type="text" name="name" required>
+                        </div>
+
+                        <div class="department-group">
                             <label>بخش</label>
                             <select name="department_id">
                                 <option value="">-- انتخاب --</option>
@@ -743,84 +730,96 @@ foreach ($systems as $key => $system) {
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>نام سیستم *</label>
-                            <input type="text" name="name" required>
-                        </div>
+
                     </div>
 
+                    <!-- ============================================ -->
+                    <!-- CPU -->
+                    <!-- ============================================ -->
                     <div class="form-row">
                         <div class="form-group">
                             <label>پردازنده (CPU)</label>
-                            <div class="btn-cpu">
+                            <div style="display: flex; gap: 8px;">
                                 <select name="cpu_id" id="cpu_id" style="flex: 1;">
-                                <option value="">-- انتخاب --</option>
-                                <?php foreach ($cpus as $cpu): ?>
-                                    <option value="<?php echo $cpu['id']; ?>">
-                                        <?php echo htmlspecialchars($cpu['brand_name'] . ' ' . $cpu['model_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($cpus as $cpu): ?>
+                                        <option value="<?php echo $cpu['id']; ?>">
+                                            <?php echo htmlspecialchars($cpu['brand_name'] . ' ' . $cpu['model_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                                 <button type="button" class="btn-add-quick" onclick="openComponentModal('cpu')" title="افزودن CPU جدید">➕</button>
-                        </div>
+                            </div>
                         </div>
 
+                        <!-- مادربرد -->
                         <div class="form-group">
                             <label>مادربرد</label>
-                            <div class="btn-motherboard">
+                            <div style="display: flex; gap: 8px;">
                                 <select name="motherboard_id" id="motherboard_id" style="flex: 1;">
-                                <option value="">-- انتخاب --</option>
-                                <?php foreach ($motherboards as $mb): ?>
-                                    <option value="<?php echo $mb['id']; ?>">
-                                        <?php echo htmlspecialchars($mb['brand_name'] . ' ' . $mb['model_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <button type="button" class="btn-add-quick" onclick="openComponentModal('motherboard')" title="افزودن مادربرد جدید">➕</button>
-                        </div>
-                        </div>
-                        <div class="form-group">
-                            <label>پاور</label>
-                            <select name="power_id">
-                                <option value="">-- انتخاب --</option>
-                                <?php foreach ($powers as $power): ?>
-                                    <option value="<?php echo $power['id']; ?>">
-                                        <?php echo htmlspecialchars($power['brand_name'] . ' ' . $power['model_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>مانیتور</label>
-                            <select name="monitor_id">
-                                <option value="">-- انتخاب --</option>
-                                <?php foreach ($monitors as $monitor): ?>
-                                    <option value="<?php echo $monitor['id']; ?>">
-                                        <?php echo htmlspecialchars($monitor['brand_name'] . ' ' . $monitor['model_name']); ?>
-                                        <?php if ($monitor['property_code']): ?>
-                                            (<?php echo htmlspecialchars($monitor['property_code']); ?>)
-                                        <?php endif; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($motherboards as $mb): ?>
+                                        <option value="<?php echo $mb['id']; ?>">
+                                            <?php echo htmlspecialchars($mb['brand_name'] . ' ' . $mb['model_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('motherboard')" title="افزودن مادربرد جدید">➕</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-row">
+                        <!-- پاور -->
+                        <div class="form-group">
+                            <label>پاور</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="power_id" id="power_id" style="flex: 1;">
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($powers as $power): ?>
+                                        <option value="<?php echo $power['id']; ?>">
+                                            <?php echo htmlspecialchars($power['brand_name'] . ' ' . $power['model_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('power')" title="افزودن پاور جدید">➕</button>
+                            </div>
+                        </div>
 
+                        <!-- مانیتور -->
+                        <div class="form-group">
+                            <label>مانیتور</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="monitor_id" id="monitor_id" style="flex: 1;">
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($monitors as $monitor): ?>
+                                        <option value="<?php echo $monitor['id']; ?>">
+                                            <?php echo htmlspecialchars($monitor['brand_name'] . ' ' . $monitor['model_name']); ?>
+                                            <?php if ($monitor['property_code']): ?>
+                                                (<?php echo htmlspecialchars($monitor['property_code']); ?>)
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('monitor')" title="افزودن مانیتور جدید">➕</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- ============================================ -->
                     <!-- رم‌ها (چندگانه) -->
                     <!-- ============================================ -->
-                    <div class="form-row">
-                        <div class="form-group full-width">
-                            <label>🧠 رم‌ها</label>
+
+                    <!-- رم‌ها و هاردها کنار هم -->
+                    <div class="ram-hard-wrapper">
+
+                        <!-- بخش رم -->
+                        <div class="ram-section">
+                            <label class="section-label">🧠 رم‌ها</label>
                             <div id="rams_container">
-                                <div class="ram-row form-row" data-row="0">
-                                    <div class="form-group">
-                                        <label>رم</label>
-                                        <select name="ram_id_0">
+                                <div class="ram-row" data-row="0">
+                                    <div class="ram-select-wrapper">
+                                        <select name="ram_id_0" class="ram-select">
                                             <option value="">-- انتخاب --</option>
                                             <?php foreach ($rams as $ram): ?>
                                                 <option value="<?php echo $ram['id']; ?>">
@@ -828,31 +827,24 @@ foreach ($systems as $key => $system) {
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+                                        <!-- دکمه افزودن سریع کنار سلکت رم -->
+                                        <button type="button" class="btn-add-quick" onclick="openComponentModal('ram')" title="افزودن رم جدید">➕</button>
                                     </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <input type="checkbox" name="ram_primary_0" value="1">
-                                            اصلی
-                                        </label>
-                                        <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)" style="display: none;">🗑️</button>
+                                    <div class="ram-remove-wrapper">
+                                        <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)">🗑️</button>
                                     </div>
                                 </div>
                             </div>
                             <button type="button" class="btn-add-row" onclick="addRamRow()">➕ افزودن رم</button>
                         </div>
-                    </div>
 
-                    <!-- ============================================ -->
-                    <!-- هاردها (چندگانه) -->
-                    <!-- ============================================ -->
-                    <div class="form-row">
-                        <div class="form-group full-width">
-                            <label>💾 هاردها</label>
+                        <!-- بخش هارد -->
+                        <div class="hard-section">
+                            <label class="section-label">💾 هاردها</label>
                             <div id="storages_container">
-                                <div class="storage-row form-row" data-row="0">
-                                    <div class="form-group">
-                                        <label>هارد</label>
-                                        <select name="storage_id_0">
+                                <div class="storage-row" data-row="0">
+                                    <div class="storage-select-wrapper">
+                                        <select name="storage_id_0" class="storage-select">
                                             <option value="">-- انتخاب --</option>
                                             <?php foreach ($storages as $storage): ?>
                                                 <option value="<?php echo $storage['id']; ?>">
@@ -860,13 +852,10 @@ foreach ($systems as $key => $system) {
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+                                        <button type="button" class="btn-add-quick" onclick="openComponentModal('storage')" title="افزودن هارد جدید">➕</button>
                                     </div>
-                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                                        <label>
-                                            <input type="checkbox" name="storage_primary_0" value="1">
-                                            اصلی
-                                        </label>
-                                        <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)" style="display: none;">🗑️</button>
+                                    <div class="storage-remove-wrapper">
+                                        <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)">🗑️</button>
                                     </div>
                                 </div>
                             </div>
@@ -884,7 +873,7 @@ foreach ($systems as $key => $system) {
                                 <div class="ip-row form-row" data-row="0">
                                     <div class="form-group">
                                         <label>آدرس IP</label>
-                                        <input type="text" name="ip_address_0" placeholder="مثلاً: 192.168.1.100">
+                                        <input type="text" name="ip_address_0">
                                     </div>
                                     <div class="form-group">
                                         <label>شبکه</label>
@@ -897,10 +886,6 @@ foreach ($systems as $key => $system) {
                                         </select>
                                     </div>
                                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                                        <label>
-                                            <input type="checkbox" name="ip_primary_0" value="1">
-                                            اصلی
-                                        </label>
                                         <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)" style="display: none;">🗑️</button>
                                     </div>
                                 </div>
@@ -919,39 +904,38 @@ foreach ($systems as $key => $system) {
                                 <div class="peripheral-row form-row" data-row="0">
                                     <div class="form-group">
                                         <label>تجهیز</label>
-                                        <select name="peripheral_id_0">
-                                            <option value="">-- انتخاب --</option>
-                                            <?php foreach ($peripheralTypes as $type): ?>
-                                                <optgroup label="<?php echo $type['icon'] . ' ' . $type['name']; ?>">
-                                                    <?php
-                                                    $periphStmt = $db->prepare("
-                                                    SELECT p.*, m.name as model_name, b.name as brand_name
-                                                    FROM peripherals p
-                                                    LEFT JOIN models m ON p.model_id = m.id
-                                                    LEFT JOIN brands b ON m.brand_id = b.id
-                                                    WHERE p.type_id = :type_id
-                                                    ORDER BY b.name, m.name
-                                                ");
-                                                    $periphStmt->execute([':type_id' => $type['id']]);
-                                                    $periphs = $periphStmt->fetchAll();
-                                                    foreach ($periphs as $periph):
-                                                        ?>
-                                                        <option value="<?php echo $periph['id']; ?>">
-                                                            <?php echo htmlspecialchars($periph['brand_name'] . ' ' . $periph['model_name']); ?>
-                                                            <?php if ($periph['property_code']): ?>
-                                                                (<?php echo htmlspecialchars($periph['property_code']); ?>)
-                                                            <?php endif; ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </optgroup>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <div style="display: flex; gap: 8px;">
+                                            <select name="peripheral_id_0" class="peripheral-select" style="flex: 1;">
+                                                 <option value="">-- انتخاب --</option>
+                                                <?php foreach ($peripheralTypes as $type): ?>
+                                                    <optgroup label="<?php echo $type['icon'] . ' ' . $type['name']; ?>">
+                                                        <?php
+                                                        $periphStmt = $db->prepare("
+                                                SELECT p.*, m.name as model_name, b.name as brand_name
+                                                FROM peripherals p
+                                                LEFT JOIN models m ON p.model_id = m.id
+                                                LEFT JOIN brands b ON m.brand_id = b.id
+                                                WHERE p.type_id = :type_id
+                                                ORDER BY b.name, m.name
+                                            ");
+                                                        $periphStmt->execute([':type_id' => $type['id']]);
+                                                        $periphs = $periphStmt->fetchAll();
+                                                        foreach ($periphs as $periph):
+                                                            ?>
+                                                            <option value="<?php echo $periph['id']; ?>">
+                                                                <?php echo htmlspecialchars($periph['brand_name'] . ' ' . $periph['model_name']); ?>
+                                                                <?php if ($periph['property_code']): ?>
+                                                                    (<?php echo htmlspecialchars($periph['property_code']); ?>)
+                                                                <?php endif; ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </optgroup>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید">➕</button>
+                                        </div>
                                     </div>
                                     <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                                        <label>
-                                            <input type="checkbox" name="peripheral_default_0" value="1">
-                                            پیش‌فرض
-                                        </label>
                                         <button type="button" class="btn-remove-peripheral" onclick="removePeripheralRow(this)" style="display: none;">🗑️</button>
                                     </div>
                                 </div>
@@ -960,12 +944,6 @@ foreach ($systems as $key => $system) {
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>توضیحات</label>
-                            <textarea name="description" rows="3"></textarea>
-                        </div>
-                    </div>
 
                     <div class="form-group">
                         <button type="submit" name="add_system" class="btn-add">💾 ذخیره سیستم</button>
@@ -974,7 +952,7 @@ foreach ($systems as $key => $system) {
             </div>
         <?php endif; ?>
         <!-- ============================================ -->
-        <!-- مودال افزودن قطعه جدید (عمومی) -->
+        <!-- مودال افزودن قطعه جدید -->
         <!-- ============================================ -->
         <div id="componentModal" class="modal">
             <div class="modal-content" style="max-width: 550px;">
@@ -1065,13 +1043,6 @@ foreach ($systems as $key => $system) {
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>توضیحات</label>
-                            <textarea name="description" rows="2" placeholder="توضیحات تکمیلی..."></textarea>
-                        </div>
-                    </div>
-
                     <div class="modal-buttons">
                         <button type="button" class="btn-add" onclick="saveComponent()">💾 ذخیره</button>
                         <button type="button" class="btn-cancel" onclick="closeModal('componentModal')">لغو</button>
@@ -1083,8 +1054,8 @@ foreach ($systems as $key => $system) {
         <!-- بخش جستجو -->
         <!-- ============================================ -->
         <div class="search-card">
-            <h2>🔍 جستجوی سیستم‌ها</h2>
-            <div class="search-form">
+             <h2>🔍 جستجوی سیستم‌ها</h2>
+             <div class="search-form">
                 <div class="search-row">
                     <div class="form-group">
                         <label>کد رایانه</label>
@@ -1115,8 +1086,8 @@ foreach ($systems as $key => $system) {
             </div>
         </div>
 
-        <!-- ============================================ -->
-        <!-- جدول سیستم‌ها -->
+         <!-- ============================================ -->
+         <!-- جدول سیستم‌ها -->
         <!-- ============================================ -->
         <div class="systems-table data-table">
             <table>
@@ -1148,7 +1119,7 @@ foreach ($systems as $key => $system) {
                         <tr>
                             <td><?php echo fa_number($row_num); ?></td>
 
-                            <!-- کد رایانه -->
+                             <!-- کد رایانه -->
                             <td>
                                 <strong><?php echo htmlspecialchars($system['computer_code'] ?? '-'); ?></strong>
                                 <?php if ($system['property_code']): ?>
@@ -1156,13 +1127,13 @@ foreach ($systems as $key => $system) {
                                 <?php endif; ?>
                             </td>
 
-                            <!-- نام سیستم -->
+                             <!-- نام سیستم -->
                             <td><?php echo htmlspecialchars($system['name'] ?? '-'); ?></td>
 
-                            <!-- بخش -->
+                             <!-- بخش -->
                             <td><?php echo htmlspecialchars($system['department_name'] ?? '-'); ?></td>
 
-                            <!-- CPU -->
+                             <!-- CPU -->
                             <td>
                                 <?php if ($system['cpu_brand'] && $system['cpu_model']): ?>
                                     <strong><?php echo htmlspecialchars($system['cpu_brand']); ?></strong>
@@ -1182,7 +1153,7 @@ foreach ($systems as $key => $system) {
                                 <?php endif; ?>
                             </td>
 
-                            <!-- رم -->
+                             <!-- رم -->
                             <td>
                                 <?php if (!empty($system['rams'])): ?>
                                     <?php foreach ($system['rams'] as $ram): ?>
@@ -1192,9 +1163,6 @@ foreach ($systems as $key => $system) {
                                             <?php if ($ram['capacity']): ?>
                                                 <small>(<?php echo htmlspecialchars($ram['capacity']); ?>)</small>
                                             <?php endif; ?>
-                                            <?php if ($ram['is_primary']): ?>
-                                                <span class="badge badge-primary">اصلی</span>
-                                            <?php endif; ?>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -1202,7 +1170,7 @@ foreach ($systems as $key => $system) {
                                 <?php endif; ?>
                             </td>
 
-                            <!-- هارد -->
+                             <!-- هارد -->
                             <td>
                                 <?php if (!empty($system['storages'])): ?>
                                     <?php foreach ($system['storages'] as $storage): ?>
@@ -1212,64 +1180,57 @@ foreach ($systems as $key => $system) {
                                             <?php if ($storage['capacity']): ?>
                                                 <small>(<?php echo htmlspecialchars($storage['capacity']); ?>)</small>
                                             <?php endif; ?>
-                                            <?php if ($storage['is_primary']): ?>
-                                                <span class="badge badge-primary">اصلی</span>
-                                            <?php endif; ?>
-                                        </div>
+                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <span class="badge badge-secondary">-</span>
+                                     <span class="badge badge-secondary">-</span>
                                 <?php endif; ?>
                             </td>
 
-                            <!-- پاور -->
+                             <!-- پاور -->
                             <td>
                                 <?php if ($system['power_brand'] && $system['power_model']): ?>
-                                    <strong><?php echo htmlspecialchars($system['power_brand']); ?></strong>
-                                    <br><small><?php echo htmlspecialchars($system['power_model']); ?></small>
+                                     <strong><?php echo htmlspecialchars($system['power_brand']); ?></strong>
+                                     <br><small><?php echo htmlspecialchars($system['power_model']); ?></small>
                                 <?php else: ?>
-                                    <span class="badge badge-secondary">-</span>
+                                     <span class="badge badge-secondary">-</span>
                                 <?php endif; ?>
                             </td>
 
-                            <!-- مانیتور -->
+                             <!-- مانیتور -->
                             <td>
                                 <?php if ($system['monitor_brand'] && $system['monitor_model']): ?>
-                                    <strong><?php echo htmlspecialchars($system['monitor_brand']); ?></strong>
-                                    <br><small><?php echo htmlspecialchars($system['monitor_model']); ?></small>
+                                     <strong><?php echo htmlspecialchars($system['monitor_brand']); ?></strong>
+                                     <br><small><?php echo htmlspecialchars($system['monitor_model']); ?></small>
                                     <?php if ($system['monitor_property_code']): ?>
                                         <br><small class="text-muted">اموال: <?php echo htmlspecialchars($system['monitor_property_code']); ?></small>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <span class="badge badge-secondary">-</span>
                                 <?php endif; ?>
-                            </td>
+                             </td>
 
                             <!-- IP -->
                             <td>
                                 <?php if (!empty($system['ips'])): ?>
-                                    <?php foreach ($system['ips'] as $ip): ?>
+                                     <?php foreach ($system['ips'] as $ip): ?>
                                         <div class="item-small">
                                             <span class="ip-address"><?php echo htmlspecialchars($ip['ip_address']); ?></span>
-                                            <?php if ($ip['is_primary']): ?>
-                                                <span class="badge badge-primary">اصلی</span>
-                                            <?php endif; ?>
-                                            <br><small class="text-muted"><?php echo htmlspecialchars($ip['network_type']); ?></small>
+                                             <br><small class="text-muted"><?php echo htmlspecialchars($ip['network_type']); ?></small>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <span class="badge badge-secondary">-</span>
+                                     <span class="badge badge-secondary">-</span>
                                 <?php endif; ?>
                             </td>
 
                             <!-- تجهیزات جانبی -->
-                            <td>
+                             <td>
                                 <?php if (!empty($system['peripherals'])): ?>
                                     <?php foreach ($system['peripherals'] as $periph): ?>
-                                        <span class="badge badge-info"
+                                         <span class="badge badge-info"
                                               title="<?php echo htmlspecialchars($periph['type_name'] . ': ' . ($periph['brand_name'] ?? '') . ' ' . ($periph['model_name'] ?? '')); ?>">
                                             <?php echo $periph['type_icon']; ?>
-                                            <?php if ($periph['is_default']): ?>⭐<?php endif; ?>
                                         </span>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -1277,16 +1238,15 @@ foreach ($systems as $key => $system) {
                                 <?php endif; ?>
                             </td>
 
-                            <!-- تاریخ -->
-                            <td class="date">
+                             <!-- تاریخ -->
+                             <td class="date">
                                 <?php echo fa_number(htmlspecialchars($system['created_at'] ?? '-')); ?>
                                 <br><small><?php echo htmlspecialchars($system['creator_name'] ?? '-'); ?></small>
                             </td>
 
                             <!-- عملیات -->
-                            <td class="action-buttons">
-                                <?php if (canEditSystems()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($system); ?>)' title="ویرایش">✏️</button>
+                             <td class="action-buttons">
+                                <?php if (canEditSystems()): ?> <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($system); ?>)' title="ویرایش">✏️</button>
                                 <?php endif; ?>
                                 <?php if (canDeleteSystems()): ?>
                                     <button class="delete-btn" onclick="confirmDelete(<?php echo $system['id']; ?>, '<?php echo htmlspecialchars($system['name']); ?>')" title="حذف">🗑️</button>
@@ -1305,7 +1265,7 @@ foreach ($systems as $key => $system) {
 <!-- ============================================ -->
 <!-- مودال ویرایش سیستم -->
 <!-- ============================================ -->
-<div id="editModal" class="modal">
+ <div id="editModal" class="modal">
     <div class="modal-content" style="max-width: 800px;">
         <h3>✏️ ویرایش سیستم</h3>
         <form method="post" id="editForm">
@@ -1339,7 +1299,7 @@ foreach ($systems as $key => $system) {
                 </div>
                 <div class="form-group">
                     <label>پردازنده (CPU)</label>
-                    <select name="cpu_id" id="edit_cpu_id">
+                     <select name="cpu_id" id="edit_cpu_id">
                         <option value="">-- انتخاب --</option>
                         <?php foreach ($cpus as $cpu): ?>
                             <option value="<?php echo $cpu['id']; ?>">
@@ -1349,7 +1309,7 @@ foreach ($systems as $key => $system) {
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>مادربرد</label>
+                     <label>مادربرد</label>
                     <select name="motherboard_id" id="edit_motherboard_id">
                         <option value="">-- انتخاب --</option>
                         <?php foreach ($motherboards as $mb): ?>
@@ -1378,14 +1338,14 @@ foreach ($systems as $key => $system) {
                     <select name="monitor_id" id="edit_monitor_id">
                         <option value="">-- انتخاب --</option>
                         <?php foreach ($monitors as $monitor): ?>
-                            <option value="<?php echo $monitor['id']; ?>">
+                             <option value="<?php echo $monitor['id']; ?>">
                                 <?php echo htmlspecialchars($monitor['brand_name'] . ' ' . $monitor['model_name']); ?>
                                 <?php if ($monitor['property_code']): ?>
                                     (<?php echo htmlspecialchars($monitor['property_code']); ?>)
                                 <?php endif; ?>
-                            </option>
+                             </option>
                         <?php endforeach; ?>
-                    </select>
+                     </select>
                 </div>
             </div>
 
@@ -1425,18 +1385,11 @@ foreach ($systems as $key => $system) {
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>توضیحات</label>
-                    <textarea name="description" id="edit_description" rows="3"></textarea>
-                </div>
-            </div>
-
             <div class="modal-buttons">
                 <button type="submit" class="btn-add">💾 ذخیره</button>
                 <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
-        </form>
+         </form>
     </div>
 </div>
 

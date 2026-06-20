@@ -19,7 +19,7 @@
 /* ============================================
    ردیف‌های چندگانه (رم، هارد، IP، تجهیزات)
    ============================================ */
-
+.department-group{width: 200px;}
 .ram-row,
 .storage-row,
 .ip-row,
@@ -431,4 +431,150 @@
     display: flex;
     gap: 8px;
     flex: 1;
+}
+/* ============================================
+   ردیف رم و هارد کنار هم
+   ============================================ */
+
+.ram-hard-wrapper {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.ram-hard-wrapper .ram-section,
+.ram-hard-wrapper .hard-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.ram-hard-wrapper .section-label {
+    display: block;
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #555;
+}
+
+/* ============================================
+   ردیف‌های رم و هارد
+   ============================================ */
+
+.ram-row,
+.storage-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: #f8fafc;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.ram-row:hover,
+.storage-row:hover {
+    border-color: #4f46e5;
+    background: #f1f5f9;
+}
+
+.ram-row .ram-select-wrapper,
+.storage-row .storage-select-wrapper {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 200px;
+}
+
+.ram-row .ram-select,
+.storage-row .storage-select {
+    flex: 1;
+    min-width: 150px;
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    height: 32px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    font-size: 13px;
+    background: white;
+}
+
+.ram-row .ram-select:focus,
+.storage-row .storage-select:focus {
+    border-color: #4f46e5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.ram-row .ram-remove-wrapper,
+.storage-row .storage-remove-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+/* ============================================
+   دکمه حذف
+   ============================================ */
+
+.btn-remove-ram,
+.btn-remove-storage {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: none;
+}
+
+.btn-remove-ram:hover,
+.btn-remove-storage:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+
+.btn-remove-ram.show,
+.btn-remove-storage.show {
+    display: inline-block;
+}
+
+/* ============================================
+   دکمه افزودن
+   ============================================ */
+
+.btn-add-row {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+}
+
+.btn-add-row:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   ریسپانسیو
+   ============================================ */
+
+@media (max-width: 768px) {
+    .ram-hard-wrapper .ram-section,
+    .ram-hard-wrapper .hard-section {
+        flex: 0 0 100%;
+        min-width: unset;
+    }
 }

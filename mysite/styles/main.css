@@ -258,9 +258,29 @@ input:focus, select:focus, textarea:focus {
     align-items: flex-end;
     color: #555;
 }
+/*.ram-hard-row{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 15px;
+    align-items: flex-end;
+    color: #555;
+    margin-top: 5px;
+}
+.ram-hard-row > div {
+    flex: 1;
+    min-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .ram-hard-row > div {
+        flex: 0 0 100%;
+        min-width: unset;
+    }
+}
 .form-group:has(textarea){
     width: 100%;
-}
+}*/
 .form-row label {
     display: block;
     margin-bottom: 8px;

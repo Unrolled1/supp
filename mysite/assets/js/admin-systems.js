@@ -65,23 +65,36 @@ function addRamRow() {
     const rowCount = container.querySelectorAll('.ram-row').length;
 
     const newRow = document.createElement('div');
-    newRow.className = 'ram-row form-row';
+    newRow.className = 'ram-row';
     newRow.dataset.row = rowCount;
+    newRow.style.cssText = 'display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
 
-    const firstRow = container.querySelector('.ram-row');
-    const html = firstRow.innerHTML
-        .replace(/ram_id_0/g, `ram_id_${rowCount}`)
-        .replace(/ram_primary_0/g, `ram_primary_${rowCount}`);
-
-    newRow.innerHTML = html;
-    container.appendChild(newRow);
-
-    const removeBtn = newRow.querySelector('.btn-remove-ram');
-    if (removeBtn) {
-        removeBtn.style.display = 'inline-block';
+    // گرفتن همه آپشن‌ها از سلکت اول (به جز آپشن خالی)
+    const firstSelect = document.querySelector('select[name="ram_id_0"]');
+    let optionsHTML = '';
+    if (firstSelect) {
+        const allOptions = firstSelect.querySelectorAll('option');
+        allOptions.forEach(opt => {
+            // فقط آپشن‌هایی که مقدار ندارن رو رد کن (آپشن خالی)
+            if (opt.value !== '') {
+                optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
+            }
+        });
     }
-}
 
+    newRow.innerHTML = `
+        <div style="flex: 1; min-width: 150px;">
+            <select name="ram_id_${rowCount}" class="ram-select" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; height: 32px;">
+                <option value="">-- انتخاب --</option>
+                ${optionsHTML}
+            </select>
+        </div>
+        <div style="flex: 0 0 auto;">
+            <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;">🗑️</button>
+        </div>
+    `;
+    container.appendChild(newRow);
+}
 function removeRamRow(btn) {
     const row = btn.closest('.ram-row');
     const container = document.getElementById('rams_container');
@@ -124,23 +137,34 @@ function addStorageRow() {
     const rowCount = container.querySelectorAll('.storage-row').length;
 
     const newRow = document.createElement('div');
-    newRow.className = 'storage-row form-row';
+    newRow.className = 'storage-row';
     newRow.dataset.row = rowCount;
+    newRow.style.cssText = 'display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
 
-    const firstRow = container.querySelector('.storage-row');
-    const html = firstRow.innerHTML
-        .replace(/storage_id_0/g, `storage_id_${rowCount}`)
-        .replace(/storage_primary_0/g, `storage_primary_${rowCount}`);
-
-    newRow.innerHTML = html;
-    container.appendChild(newRow);
-
-    const removeBtn = newRow.querySelector('.btn-remove-storage');
-    if (removeBtn) {
-        removeBtn.style.display = 'inline-block';
+    const firstSelect = document.querySelector('select[name="storage_id_0"]');
+    let optionsHTML = '';
+    if (firstSelect) {
+        const allOptions = firstSelect.querySelectorAll('option');
+        allOptions.forEach(opt => {
+            if (opt.value !== '') {
+                optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
+            }
+        });
     }
-}
 
+    newRow.innerHTML = `
+        <div style="flex: 1; min-width: 150px;">
+            <select name="storage_id_${rowCount}" class="storage-select" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; height: 32px;">
+                <option value="">-- انتخاب --</option>
+                ${optionsHTML}
+            </select>
+        </div>
+        <div style="flex: 0 0 auto;">
+            <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;">🗑️</button>
+        </div>
+    `;
+    container.appendChild(newRow);
+}
 function removeStorageRow(btn) {
     const row = btn.closest('.storage-row');
     const container = document.getElementById('storages_container');
@@ -154,7 +178,6 @@ function removeStorageRow(btn) {
         });
         return;
     }
-
     Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این هارد حذف خواهد شد!',
@@ -171,10 +194,10 @@ function removeStorageRow(btn) {
         }
     });
 }
-
 // ============================================
 // مدیریت IPها (افزودن در فرم ثبت)
 // ============================================
+
 
 let ipCounter = 1;
 
@@ -352,10 +375,7 @@ function loadEditRams(rams) {
                 </select>
             </div>
             <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                <label>
-                    <input type="checkbox" name="edit_ram_primary_${index}" value="1" ${ram.is_primary ? 'checked' : ''}>
-                    اصلی
-                </label>
+                
                 <button type="button" class="btn-remove-ram" onclick="removeEditRamRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
             </div>
         `;
@@ -397,10 +417,7 @@ function loadEditStorages(storages) {
                 </select>
             </div>
             <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                <label>
-                    <input type="checkbox" name="edit_storage_primary_${index}" value="1" ${storage.is_primary ? 'checked' : ''}>
-                    اصلی
-                </label>
+                
                 <button type="button" class="btn-remove-storage" onclick="removeEditStorageRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
             </div>
         `;
@@ -441,10 +458,7 @@ function loadEditIps(ips) {
                 </select>
             </div>
             <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                <label>
-                    <input type="checkbox" name="edit_ip_primary_${index}" value="1" ${ip.is_primary ? 'checked' : ''}>
-                    اصلی
-                </label>
+               
                 <button type="button" class="btn-remove-ip" onclick="removeEditIpRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
             </div>
         `;
@@ -478,10 +492,7 @@ function loadEditPeripherals(peripherals) {
                 </select>
             </div>
             <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                <label>
-                    <input type="checkbox" name="edit_peripheral_default_${index}" value="1" ${periph.is_default ? 'checked' : ''}>
-                    پیش‌فرض
-                </label>
+               
                 <button type="button" class="btn-remove-peripheral" onclick="removeEditPeripheralRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
             </div>
         `;
@@ -558,10 +569,6 @@ function getDefaultRowHtml(type, index) {
                     </select>
                 </div>
                 <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <label>
-                        <input type="checkbox" name="edit_ram_primary_${index}" value="1">
-                        اصلی
-                    </label>
                     <button type="button" class="btn-remove-ram" onclick="removeEditRamRow(this)" style="display: inline-block;">🗑️</button>
                 </div>
             `;
@@ -575,10 +582,6 @@ function getDefaultRowHtml(type, index) {
                     </select>
                 </div>
                 <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <label>
-                        <input type="checkbox" name="edit_storage_primary_${index}" value="1">
-                        اصلی
-                    </label>
                     <button type="button" class="btn-remove-storage" onclick="removeEditStorageRow(this)" style="display: inline-block;">🗑️</button>
                 </div>
             `;
@@ -599,10 +602,7 @@ function getDefaultRowHtml(type, index) {
                     </select>
                 </div>
                 <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <label>
-                        <input type="checkbox" name="edit_ip_primary_${index}" value="1">
-                        اصلی
-                    </label>
+                  
                     <button type="button" class="btn-remove-ip" onclick="removeEditIpRow(this)" style="display: inline-block;">🗑️</button>
                 </div>
             `;
@@ -616,10 +616,6 @@ function getDefaultRowHtml(type, index) {
                     </select>
                 </div>
                 <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <label>
-                        <input type="checkbox" name="edit_peripheral_default_${index}" value="1">
-                        پیش‌فرض
-                    </label>
                     <button type="button" class="btn-remove-peripheral" onclick="removeEditPeripheralRow(this)" style="display: inline-block;">🗑️</button>
                 </div>
             `;
@@ -810,7 +806,6 @@ function openEditModal(system) {
     document.getElementById('edit_motherboard_id').value = system.motherboard_id || '';
     document.getElementById('edit_power_id').value = system.power_id || '';
     document.getElementById('edit_monitor_id').value = system.monitor_id || '';
-    document.getElementById('edit_description').value = system.description || '';
 
     // بارگذاری همه داده‌ها
     loadEditData(system.id);

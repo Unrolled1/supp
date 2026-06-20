@@ -29,7 +29,7 @@ switch ($type) {
             LEFT JOIN models rm ON r.model_id = rm.id
             LEFT JOIN brands rb ON rm.brand_id = rb.id
             WHERE sr.system_id = :system_id
-            ORDER BY sr.is_primary DESC, sr.id ASC
+            ORDER BY sr.id DESC
         ");
         $stmt->execute([':system_id' => $system_id]);
         $response = $stmt->fetchAll();
@@ -48,7 +48,7 @@ switch ($type) {
             LEFT JOIN models sm ON st.model_id = sm.id
             LEFT JOIN brands sb ON sm.brand_id = sb.id
             WHERE ss.system_id = :system_id
-            ORDER BY ss.is_primary DESC, ss.id ASC
+            ORDER BY ss.id DESC
         ");
         $stmt->execute([':system_id' => $system_id]);
         $response = $stmt->fetchAll();
@@ -59,7 +59,7 @@ switch ($type) {
         $stmt = $db->prepare("
             SELECT * FROM system_ips 
             WHERE system_id = :system_id 
-            ORDER BY is_primary DESC, id ASC
+            ORDER BY id DESC
         ");
         $stmt->execute([':system_id' => $system_id]);
         $response = $stmt->fetchAll();
@@ -100,7 +100,7 @@ switch ($type) {
             LEFT JOIN models rm ON r.model_id = rm.id
             LEFT JOIN brands rb ON rm.brand_id = rb.id
             WHERE sr.system_id = :system_id
-            ORDER BY sr.is_primary DESC, sr.id ASC
+            ORDER BY sr.id DESC
         ");
         $rams->execute([':system_id' => $system_id]);
         $response['rams'] = $rams->fetchAll();
@@ -116,7 +116,7 @@ switch ($type) {
             LEFT JOIN models sm ON st.model_id = sm.id
             LEFT JOIN brands sb ON sm.brand_id = sb.id
             WHERE ss.system_id = :system_id
-            ORDER BY ss.is_primary DESC, ss.id ASC
+            ORDER BY ss.id DESC
         ");
         $storages->execute([':system_id' => $system_id]);
         $response['storages'] = $storages->fetchAll();
@@ -124,7 +124,7 @@ switch ($type) {
         $ips = $db->prepare("
             SELECT * FROM system_ips 
             WHERE system_id = :system_id 
-            ORDER BY is_primary DESC, id ASC
+            ORDER BY id DESC
         ");
         $ips->execute([':system_id' => $system_id]);
         $response['ips'] = $ips->fetchAll();

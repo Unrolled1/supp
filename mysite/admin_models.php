@@ -20,30 +20,59 @@ $db = getDB();
 $successMessage = '';
 $errorMessage = '';
 
+// ============================================
+// گرفتن لیست برندها برای سلکت
+// ============================================
+
+$brands = $db->query("SELECT id, name FROM brands ORDER BY name ASC")->fetchAll();
+
+// ============================================
 // حذف مدل
+// ============================================
+
 if (isset($_POST['delete_model']) && canDeleteModels()) {
     $model_id = $_POST['model_id'];
 
-    $deleteStmt = $db->prepare("DELETE FROM models WHERE id = :id");
-    if ($deleteStmt->execute([':id' => $model_id])) {
-        $successMessage = "✅ مدل با موفقیت حذف شد";
+    // بررسی استفاده در جداول دیگر
+    $tables = ['cpus', 'motherboards', 'rams', 'storages', 'powers', 'monitors', 'peripherals'];
+    $used = false;
+    foreach ($tables as $table) {
+        $checkStmt = $db->prepare("SELECT COUNT(*) FROM $table WHERE model_id = :model_id");
+        $checkStmt->execute([':model_id' => $model_id]);
+        if ($checkStmt->fetchColumn() > 0) {
+            $used = true;
+            break;
+        }
+    }
+
+    if ($used) {
+        $errorMessage = "❌ این مدل در قطعات استفاده شده است. ابتدا قطعات را تغییر دهید.";
     } else {
-        $errorMessage = "❌ خطا در حذف مدل";
+        $deleteStmt = $db->prepare("DELETE FROM models WHERE id = :id");
+        if ($deleteStmt->execute([':id' => $model_id])) {
+            $successMessage = "✅ مدل با موفقیت حذف شد";
+        } else {
+            $errorMessage = "❌ خطا در حذف مدل";
+        }
     }
     header('Location: admin_models.php');
     exit;
 }
 
+// ============================================
 // ویرایش مدل
+// ============================================
+
 if (isset($_POST['edit_model']) && canEditModels()) {
     $model_id = $_POST['model_id'];
     $name = htmlspecialchars($_POST['name']);
+    $brand_id = !empty($_POST['brand_id']) ? filter_var($_POST['brand_id'], FILTER_VALIDATE_INT) : null;
 
     if (empty($name)) {
         $errorMessage = "❌ نام مدل الزامی است";
     } else {
-        $updateStmt = $db->prepare("UPDATE models SET name = :name WHERE id = :id");
-        if ($updateStmt->execute([':name' => $name, ':id' => $model_id])) {
+        $updateStmt = $db->prepare("UPDATE models SET name = :name, brand_id = :brand_id WHERE id = :id");
+        if ($updateStmt->execute([':name' => $name, ':brand_id' => $brand_id, ':id' => $model_id])) {
             $successMessage = "✅ مدل با موفقیت ویرایش شد";
         } else {
             $errorMessage = "❌ خطا در ویرایش مدل";
@@ -53,16 +82,20 @@ if (isset($_POST['edit_model']) && canEditModels()) {
     exit;
 }
 
+// ============================================
 // افزودن مدل جدید
+// ============================================
+
 if (isset($_POST['add_model']) && canEditModels()) {
     $name = htmlspecialchars($_POST['name']);
+    $brand_id = !empty($_POST['brand_id']) ? filter_var($_POST['brand_id'], FILTER_VALIDATE_INT) : null;
 
     if (empty($name)) {
         $errorMessage = "❌ نام مدل الزامی است";
     } else {
-        $insertStmt = $db->prepare("INSERT INTO models (name, created_at) VALUES (:name, :created_at)");
+        $insertStmt = $db->prepare("INSERT INTO models (name, brand_id, created_at) VALUES (:name, :brand_id, :created_at)");
         $jalaliDate = now();
-        if ($insertStmt->execute([':name' => $name, ':created_at' => $jalaliDate])) {
+        if ($insertStmt->execute([':name' => $name, ':brand_id' => $brand_id, ':created_at' => $jalaliDate])) {
             $successMessage = "✅ مدل با موفقیت اضافه شد";
         } else {
             $errorMessage = "❌ خطا در افزودن مدل";
@@ -72,8 +105,16 @@ if (isset($_POST['add_model']) && canEditModels()) {
     exit;
 }
 
-// گرفتن لیست مدل‌ها
-$models = $db->query("SELECT * FROM models ORDER BY name ASC")->fetchAll();
+// ============================================
+// گرفتن لیست مدل‌ها با اطلاعات برند
+// ============================================
+
+$models = $db->query("
+    SELECT m.*, b.name as brand_name 
+    FROM models m
+    LEFT JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -112,25 +153,43 @@ $models = $db->query("SELECT * FROM models ORDER BY name ASC")->fetchAll();
             <div class="alert alert-error"><?php echo $errorMessage; ?></div>
         <?php endif; ?>
 
+        <!-- ============================================ -->
+        <!-- فرم افزودن مدل -->
+        <!-- ============================================ -->
         <?php if (canEditModels()): ?>
             <div class="add-card">
                 <h2>➕ افزودن مدل جدید</h2>
-                <form method="post" class="form-inline">
-                    <div class="form-group-inline">
+                <form method="post" class="form-row">
+                    <div class="form-group">
                         <label>نام مدل</label>
                         <input type="text" name="name" required>
                     </div>
-                    <button type="submit" name="add_model" class="btn-add">➕ افزودن</button>
+                    <div class="form-group">
+                        <label>برند</label>
+                        <select name="brand_id">
+                            <option value="">-- بدون برند --</option>
+                            <?php foreach ($brands as $brand): ?>
+                                <option value="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" name="add_model" class="btn-add">➕ افزودن</button>
+                    </div>
                 </form>
             </div>
         <?php endif; ?>
 
+        <!-- ============================================ -->
+        <!-- جدول مدل‌ها -->
+        <!-- ============================================ -->
         <div class="models-table data-table">
             <table>
                 <thead>
                 <tr>
                     <th>ردیف</th>
                     <th>نام مدل</th>
+                    <th>برند</th>
                     <th>تاریخ ثبت</th>
                     <th>عملیات</th>
                 </tr>
@@ -138,20 +197,21 @@ $models = $db->query("SELECT * FROM models ORDER BY name ASC")->fetchAll();
                 <tbody>
                 <?php if (empty($models)): ?>
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px;">📦 هیچ مدلی ثبت نشده است</td>
+                        <td colspan="5" style="text-align: center; padding: 40px;">📦 هیچ مدلی ثبت نشده است</td>
                     </tr>
                 <?php else: ?>
                     <?php $row_num = 1; foreach ($models as $model): ?>
                         <tr>
                             <td><?php echo fa_number($row_num); ?></td>
                             <td><?php echo htmlspecialchars($model['name']); ?></td>
+                            <td><?php echo htmlspecialchars($model['brand_name'] ?? '-'); ?></td>
                             <td class="date"><?php echo fa_number(htmlspecialchars($model['created_at'])); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditModels()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo $model['id']; ?>, "<?php echo htmlspecialchars($model['name']); ?>")'>✏️ ویرایش</button>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($model); ?>)'>✏️</button>
                                 <?php endif; ?>
                                 <?php if (canDeleteModels()): ?>
-                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $model['id']; ?>, '<?php echo htmlspecialchars($model['name']); ?>')">🗑️ حذف</button>
+                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $model['id']; ?>, '<?php echo htmlspecialchars($model['name']); ?>')">🗑️</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -164,37 +224,67 @@ $models = $db->query("SELECT * FROM models ORDER BY name ASC")->fetchAll();
     </div>
 </div>
 
+<!-- ============================================ -->
 <!-- مودال ویرایش مدل -->
+<!-- ============================================ -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>✏️ ویرایش مدل</h3>
         <form method="post">
             <input type="hidden" name="model_id" id="edit_model_id">
-            <label>نام مدل</label>
-            <input type="text" name="name" id="edit_name" required>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>نام مدل</label>
+                    <input type="text" name="name" id="edit_name" required>
+                </div>
+                <div class="form-group">
+                    <label>برند</label>
+                    <select name="brand_id" id="edit_brand_id">
+                        <option value="">-- بدون برند --</option>
+                        <?php foreach ($brands as $brand): ?>
+                            <option value="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
             <div class="modal-buttons">
-                <button type="submit" name="edit_model" class="modal-save">💾 ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
+                <button type="submit" name="edit_model" class="btn-add">💾 ذخیره</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    function openEditModal(id, name) {
-        document.getElementById('edit_model_id').value = id;
-        document.getElementById('edit_name').value = name;
+    function openEditModal(model) {
+        document.getElementById('edit_model_id').value = model.id;
+        document.getElementById('edit_name').value = model.name || '';
+        document.getElementById('edit_brand_id').value = model.brand_id || '';
         document.getElementById('editModal').style.display = 'flex';
     }
 
     function confirmDelete(id, name) {
-        if (confirm('آیا از حذف مدل "' + name + '" مطمئن هستید؟')) {
-            var form = document.createElement('form');
-            form.method = 'post';
-            form.innerHTML = '<input type="hidden" name="delete_model" value="1"><input type="hidden" name="model_id" value="' + id + '">';
-            document.body.appendChild(form);
-            form.submit();
-        }
+        Swal.fire({
+            title: 'آیا مطمئن هستید؟',
+            text: 'مدل "' + name + '" حذف خواهد شد!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'بله، حذف شود',
+            cancelButtonText: 'لغو',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var form = document.createElement('form');
+                form.method = 'post';
+                form.innerHTML = '<input type="hidden" name="delete_model" value="1"><input type="hidden" name="model_id" value="' + id + '">';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     function closeModal(modalId) {
@@ -216,5 +306,7 @@ $models = $db->query("SELECT * FROM models ORDER BY name ASC")->fetchAll();
     setInterval(updateClock, 1000);
     updateClock();
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
