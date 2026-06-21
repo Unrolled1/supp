@@ -213,6 +213,66 @@ if (isset($_POST['add_component']) && canEditSystems()) {
     exit;
 }
 // ============================================
+// پردازش افزودن تجهیز جانبی جدید (AJAX)
+// ============================================
+
+if (isset($_POST['add_peripheral']) && canEditSystems()) {
+    $type_id = filter_var($_POST['type_id'], FILTER_VALIDATE_INT);
+    $brand_id = !empty($_POST['brand_id']) ? filter_var($_POST['brand_id'], FILTER_VALIDATE_INT) : null;
+    $model_id = !empty($_POST['model_id']) ? filter_var($_POST['model_id'], FILTER_VALIDATE_INT) : null;
+    $computer_code = htmlspecialchars(trim($_POST['computer_code'] ?? ''));
+    $property_code = htmlspecialchars(trim($_POST['property_code'] ?? ''));
+    $connection_type = htmlspecialchars(trim($_POST['connection_type'] ?? 'USB'));
+    $jalaliDate = jdate('Y-m-d');
+
+    // ثبت در جدول peripherals (بدون serial_number و description)
+    $stmt = $db->prepare("
+        INSERT INTO peripherals (
+            type_id, brand_id, model_id, computer_code, property_code, connection_type, created_at, created_by
+        ) VALUES (
+            :type_id, :brand_id, :model_id, :computer_code, :property_code, :connection_type, :created_at, :created_by
+        )
+    ");
+
+    $stmt->execute([
+        ':type_id' => $type_id,
+        ':brand_id' => $brand_id,
+        ':model_id' => $model_id,
+        ':computer_code' => $computer_code,
+        ':property_code' => $property_code,
+        ':connection_type' => $connection_type,
+        ':created_at' => $jalaliDate,
+        ':created_by' => $_SESSION['user_id']
+    ]);
+
+    $peripheral_id = $db->lastInsertId();
+
+    // دریافت نام برای نمایش
+    $infoStmt = $db->prepare("
+        SELECT pt.name as type_name, pt.icon, b.name as brand_name, m.name as model_name
+        FROM peripherals p
+        LEFT JOIN peripheral_types pt ON p.type_id = pt.id
+        LEFT JOIN brands b ON p.brand_id = b.id
+        LEFT JOIN models m ON p.model_id = m.id
+        WHERE p.id = :id
+    ");
+    $infoStmt->execute([':id' => $peripheral_id]);
+    $info = $infoStmt->fetch();
+
+    $displayName = ($info['icon'] ?? '') . ' ' . ($info['brand_name'] ?? '') . ' ' . ($info['model_name'] ?? '');
+    if ($property_code) {
+        $displayName .= ' (' . $property_code . ')';
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => true,
+        'id' => $peripheral_id,
+        'display_name' => $displayName
+    ]);
+    exit;
+}
+// ============================================
 // پردازش فرم ویرایش
 // ============================================
 
@@ -644,8 +704,8 @@ foreach ($systems as $key => $system) {
     $periphStmt = $db->prepare("
         SELECT 
             sp.*,
-            p.computer_code, p.property_code, p.serial_number,
-            pt.name as type_name, pt.icon as type_icon,
+            p.computer_code, p.property_code,
+            pt.name as type_name,
             pm.name as model_name,
             pb.name as brand_name
         FROM system_peripherals sp
@@ -733,12 +793,9 @@ foreach ($systems as $key => $system) {
 
                     </div>
 
-                    <!-- ============================================ -->
-                    <!-- CPU -->
-                    <!-- ============================================ -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label>پردازنده (CPU)</label>
+                            <label>CPU</label>
                             <div style="display: flex; gap: 8px;">
                                 <select name="cpu_id" id="cpu_id" style="flex: 1;">
                                     <option value="">-- انتخاب --</option>
@@ -767,9 +824,7 @@ foreach ($systems as $key => $system) {
                                 <button type="button" class="btn-add-quick" onclick="openComponentModal('motherboard')" title="افزودن مادربرد جدید">➕</button>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-row">
                         <!-- پاور -->
                         <div class="form-group">
                             <label>پاور</label>
@@ -785,7 +840,6 @@ foreach ($systems as $key => $system) {
                                 <button type="button" class="btn-add-quick" onclick="openComponentModal('power')" title="افزودن پاور جدید">➕</button>
                             </div>
                         </div>
-
                         <!-- مانیتور -->
                         <div class="form-group">
                             <label>مانیتور</label>
@@ -806,18 +860,14 @@ foreach ($systems as $key => $system) {
                         </div>
                     </div>
 
-                    <!-- ============================================ -->
-                    <!-- رم‌ها (چندگانه) -->
-                    <!-- ============================================ -->
-
                     <!-- رم‌ها و هاردها کنار هم -->
                     <div class="ram-hard-wrapper">
 
                         <!-- بخش رم -->
                         <div class="ram-section">
-                            <label class="section-label">🧠 رم‌ها</label>
                             <div id="rams_container">
                                 <div class="ram-row" data-row="0">
+                                    <label class="section-label">🧠 رم‌ها</label>
                                     <div class="ram-select-wrapper">
                                         <select name="ram_id_0" class="ram-select">
                                             <option value="">-- انتخاب --</option>
@@ -840,9 +890,10 @@ foreach ($systems as $key => $system) {
 
                         <!-- بخش هارد -->
                         <div class="hard-section">
-                            <label class="section-label">💾 هاردها</label>
+
                             <div id="storages_container">
                                 <div class="storage-row" data-row="0">
+                                    <label class="section-label">💾 هاردها</label>
                                     <div class="storage-select-wrapper">
                                         <select name="storage_id_0" class="storage-select">
                                             <option value="">-- انتخاب --</option>
@@ -863,20 +914,18 @@ foreach ($systems as $key => $system) {
                         </div>
                     </div>
 
-                    <!-- ============================================ -->
-                    <!-- IPها (چندگانه) -->
-                    <!-- ============================================ -->
-                    <div class="form-row">
-                        <div class="form-group full-width">
-                            <label>🌐 IPها</label>
+
+                    <div class="ip-peripheral-wrapper">
+
+                        <!-- بخش IPها -->
+                        <div class="ip-section">
                             <div id="ips_container">
-                                <div class="ip-row form-row" data-row="0">
-                                    <div class="form-group">
-                                        <label>آدرس IP</label>
+                                <div class="ip-row" data-row="0">
+                                    <div class="ip-select-wrapper">
+                                        <label class="section-label">🌐 IPها</label>
                                         <input type="text" name="ip_address_0">
                                     </div>
-                                    <div class="form-group">
-                                        <label>شبکه</label>
+                                    <div class="ip-network-wrapper">
                                         <select name="ip_network_0">
                                             <option value="LAN">LAN</option>
                                             <option value="WAN">WAN</option>
@@ -885,57 +934,51 @@ foreach ($systems as $key => $system) {
                                             <option value="Other">سایر</option>
                                         </select>
                                     </div>
-                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="ip-remove-wrapper">
                                         <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)" style="display: none;">🗑️</button>
                                     </div>
                                 </div>
                             </div>
                             <button type="button" class="btn-add-row" onclick="addIpRow()">➕ افزودن IP</button>
                         </div>
-                    </div>
 
-                    <!-- ============================================ -->
-                    <!-- تجهیزات جانبی (چندگانه) -->
-                    <!-- ============================================ -->
-                    <div class="form-row">
-                        <div class="form-group full-width">
-                            <label>🔌 تجهیزات جانبی</label>
+                        <!-- بخش تجهیزات جانبی -->
+                        <div class="peripheral-section">
                             <div id="peripherals_container">
-                                <div class="peripheral-row form-row" data-row="0">
-                                    <div class="form-group">
-                                        <label>تجهیز</label>
-                                        <div style="display: flex; gap: 8px;">
-                                            <select name="peripheral_id_0" class="peripheral-select" style="flex: 1;">
-                                                 <option value="">-- انتخاب --</option>
-                                                <?php foreach ($peripheralTypes as $type): ?>
-                                                    <optgroup label="<?php echo $type['icon'] . ' ' . $type['name']; ?>">
-                                                        <?php
-                                                        $periphStmt = $db->prepare("
-                                                SELECT p.*, m.name as model_name, b.name as brand_name
-                                                FROM peripherals p
-                                                LEFT JOIN models m ON p.model_id = m.id
-                                                LEFT JOIN brands b ON m.brand_id = b.id
-                                                WHERE p.type_id = :type_id
-                                                ORDER BY b.name, m.name
-                                            ");
-                                                        $periphStmt->execute([':type_id' => $type['id']]);
-                                                        $periphs = $periphStmt->fetchAll();
-                                                        foreach ($periphs as $periph):
-                                                            ?>
-                                                            <option value="<?php echo $periph['id']; ?>">
-                                                                <?php echo htmlspecialchars($periph['brand_name'] . ' ' . $periph['model_name']); ?>
-                                                                <?php if ($periph['property_code']): ?>
-                                                                    (<?php echo htmlspecialchars($periph['property_code']); ?>)
-                                                                <?php endif; ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </optgroup>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید">➕</button>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                                <div class="peripheral-row" data-row="0">
+                                    <div class="peripheral-select-wrapper">
+                                        <label class="section-label">🔌 تجهیزات جانبی</label>
+
+                                        <select name="peripheral_id_0" class="peripheral-select" style="flex: 1;">
+                                            <option value="">-- انتخاب --</option>
+                                            <?php foreach ($peripheralTypes as $type): ?>
+                                                <optgroup label="<?php echo $type['icon'] . ' ' . $type['name']; ?>">
+                                                    <?php
+                                                    $periphStmt = $db->prepare("
+                                    SELECT p.*, m.name as model_name, b.name as brand_name
+                                    FROM peripherals p
+                                    LEFT JOIN models m ON p.model_id = m.id
+                                    LEFT JOIN brands b ON m.brand_id = b.id
+                                    WHERE p.type_id = :type_id
+                                    ORDER BY b.name, m.name
+                                ");
+                                                    $periphStmt->execute([':type_id' => $type['id']]);
+                                                    $periphs = $periphStmt->fetchAll();
+                                                    foreach ($periphs as $periph):
+                                                        ?>
+                                                        <option value="<?php echo $periph['id']; ?>">
+                                                            <?php echo htmlspecialchars($periph['brand_name'] . ' ' . $periph['model_name']); ?>
+                                                            <?php if ($periph['property_code']): ?>
+                                                                (<?php echo htmlspecialchars($periph['property_code']); ?>)
+                                                            <?php endif; ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </optgroup>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید">➕</button>
+                                </div>
+                                    <div class="peripheral-remove-wrapper">
                                         <button type="button" class="btn-remove-peripheral" onclick="removePeripheralRow(this)" style="display: none;">🗑️</button>
                                     </div>
                                 </div>
@@ -943,7 +986,6 @@ foreach ($systems as $key => $system) {
                             <button type="button" class="btn-add-row" onclick="addPeripheralRow()">➕ افزودن تجهیز جانبی</button>
                         </div>
                     </div>
-
 
                     <div class="form-group">
                         <button type="submit" name="add_system" class="btn-add">💾 ذخیره سیستم</button>
@@ -1043,9 +1085,118 @@ foreach ($systems as $key => $system) {
                         </div>
                     </div>
 
+                    <!-- فیلدهای اختصاصی تجهیزات جانبی -->
+                    <div id="peripheral_fields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>نوع تجهیز *</label>
+                                <select name="peripheral_type_id" required>
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($peripheralTypes as $type): ?>
+                                        <option value="<?php echo $type['id']; ?>"><?php echo $type['icon'] . ' ' . $type['name']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>کد رایانه</label>
+                                <input type="text" name="peripheral_computer_code" placeholder="کد رایانه">
+                            </div>
+                            <div class="form-group">
+                                <label>کد اموال</label>
+                                <input type="text" name="peripheral_property_code" placeholder="کد اموال">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>سریال</label>
+                                <input type="text" name="peripheral_serial_number" placeholder="شماره سریال">
+                            </div>
+                            <div class="form-group">
+                                <label>نوع اتصال</label>
+                                <select name="peripheral_connection_type">
+                                    <option value="USB">USB</option>
+                                    <option value="Network">Network</option>
+                                    <option value="Other">سایر</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="modal-buttons">
                         <button type="button" class="btn-add" onclick="saveComponent()">💾 ذخیره</button>
                         <button type="button" class="btn-cancel" onclick="closeModal('componentModal')">لغو</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- ============================================ -->
+        <!-- مودال افزودن تجهیز جانبی جدید -->
+        <!-- ============================================ -->
+        <div id="peripheralModal" class="modal">
+            <div class="modal-content" style="max-width: 550px;">
+                <h3>➕ افزودن دستگاه جانبی جدید</h3>
+                <form id="peripheralForm">
+                    <input type="hidden" name="add_peripheral" value="1">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>نوع دستگاه *</label>
+                            <select name="type_id" required>
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($peripheralTypes as $type): ?>
+                                    <option value="<?php echo $type['id']; ?>"><?php echo $type['name']; ?> </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>برند</label>
+                            <select name="brand_id">
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($brands as $brand): ?>
+                                    <option value="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>مدل</label>
+                            <select name="model_id">
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($models as $model): ?>
+                                    <option value="<?php echo $model['id']; ?>"><?php echo htmlspecialchars($model['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>کد رایانه</label>
+                            <input type="text" name="computer_code" placeholder="کد رایانه">
+                        </div>
+                        <div class="form-group">
+                            <label>کد اموال</label>
+                            <input type="text" name="property_code" placeholder="کد اموال">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>نوع اتصال</label>
+                            <select name="connection_type">
+                                <option value="USB">USB</option>
+                                <option value="Network">Network</option>
+                                <option value="Wireless">Wireless</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-add" onclick="savePeripheral()">💾 ذخیره</button>
+                        <button type="button" class="btn-cancel" onclick="closeModal('peripheralModal')">لغو</button>
                     </div>
                 </form>
             </div>

@@ -206,25 +206,30 @@ function addIpRow() {
     const rowCount = container.querySelectorAll('.ip-row').length;
 
     const newRow = document.createElement('div');
-    newRow.className = 'ip-row form-row';
+    newRow.className = 'ip-row';
     newRow.dataset.row = rowCount;
+    newRow.style.cssText = 'display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
 
-    const firstRow = container.querySelector('.ip-row');
-    const html = firstRow.innerHTML
-        .replace(/ip_address_0/g, `ip_address_${rowCount}`)
-        .replace(/ip_network_0/g, `ip_network_${rowCount}`)
-        .replace(/ip_primary_0/g, `ip_primary_${rowCount}`);
-
-    newRow.innerHTML = html;
+    newRow.innerHTML = `
+        <div class="ip-select-wrapper">
+            <!-- حذف oninput="formatIP(this)" -->
+            <input type="text" name="ip_address_${rowCount}">
+        </div>
+        <div class="ip-network-wrapper">
+            <select name="ip_network_${rowCount}">
+                <option value="LAN">LAN</option>
+                <option value="WAN">WAN</option>
+                <option value="VPN">VPN</option>
+                <option value="WiFi">WiFi</option>
+                <option value="Other">سایر</option>
+            </select>
+        </div>
+        <div class="ip-remove-wrapper">
+            <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;">🗑️</button>
+        </div>
+    `;
     container.appendChild(newRow);
-
-    const removeBtn = newRow.querySelector('.btn-remove-ip');
-    if (removeBtn) {
-        removeBtn.style.display = 'inline-block';
-    }
-}
-
-function removeIpRow(btn) {
+}function removeIpRow(btn) {
     const row = btn.closest('.ip-row');
     const container = document.getElementById('ips_container');
 
@@ -266,23 +271,31 @@ function addPeripheralRow() {
     const rowCount = container.querySelectorAll('.peripheral-row').length;
 
     const newRow = document.createElement('div');
-    newRow.className = 'peripheral-row form-row';
+    newRow.className = 'peripheral-row';
     newRow.dataset.row = rowCount;
+    newRow.style.cssText = 'display: flex; gap: 10px; align-items: flex-end; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
 
-    const firstRow = container.querySelector('.peripheral-row');
-    const html = firstRow.innerHTML
-        .replace(/peripheral_id_0/g, `peripheral_id_${rowCount}`)
-        .replace(/peripheral_default_0/g, `peripheral_default_${rowCount}`);
+    const firstSelect = document.querySelector('select[name="peripheral_id_0"]');
+    const optionsHTML = firstSelect ? firstSelect.innerHTML : '';
 
-    newRow.innerHTML = html;
+    newRow.innerHTML = `
+        <div class="peripheral-select-wrapper" style="flex: 1; min-width: 180px;">
+            <label class="peripheral-label" style="display: block; font-size: 12px; font-weight: 500; color: #475569; margin-bottom: 4px;">تجهیزات جانبی</label>
+            <div style="display: flex; gap: 8px; width: 100%;">
+                <select name="peripheral_id_${rowCount}" class="peripheral-select" style="flex: 1; min-width: 120px; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; height: 32px; font-family: 'Vazir', 'Tahoma', sans-serif; font-size: 13px; background: white;">
+                    <option value="">-- انتخاب --</option>
+                    ${optionsHTML}
+                </select>
+                <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید" style="flex-shrink: 0; background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 16px; cursor: pointer; height: 32px; min-width: 32px; display: flex; align-items: center; justify-content: center;">➕</button>
+            </div>
+        </div>
+        <div class="peripheral-remove-wrapper" style="flex: 0 0 auto; padding-bottom: 2px;">
+            <button type="button" class="btn-remove-peripheral" onclick="removePeripheralRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px;">🗑️</button>
+        </div>
+    `;
     container.appendChild(newRow);
 
-    const removeBtn = newRow.querySelector('.btn-remove-peripheral');
-    if (removeBtn) {
-        removeBtn.style.display = 'inline-block';
-    }
 }
-
 function removePeripheralRow(btn) {
     const row = btn.closest('.peripheral-row');
     const container = document.getElementById('peripherals_container');
@@ -762,6 +775,7 @@ function saveComponent() {
                 let selectId = type + '_id';
                 if (type === 'motherboard') selectId = 'motherboard_id';
                 if (type === 'storage') selectId = 'storage_id';
+                if (type === 'peripheral') selectId = 'peripheral_id';
 
                 const select = document.getElementById(selectId);
                 if (select) {
@@ -787,6 +801,59 @@ function saveComponent() {
             Swal.fire({
                 title: 'خطا!',
                 text: 'مشکلی در ثبت قطعه رخ داد.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+}
+// ============================================
+// مودال افزودن تجهیز جانبی
+// ============================================
+
+function openPeripheralModal() {
+    const modal = document.getElementById('peripheralModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function savePeripheral() {
+    const form = document.getElementById('peripheralForm');
+    const formData = new FormData(form);
+
+    fetch('admin_systems.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // پیدا کردن آخرین سلکت تجهیزات جانبی
+                const selects = document.querySelectorAll('.peripheral-select');
+                const select = selects[selects.length - 1];
+                if (select) {
+                    const option = document.createElement('option');
+                    option.value = data.id;
+                    option.textContent = data.display_name;
+                    select.appendChild(option);
+                    select.value = data.id;
+                }
+
+                closeModal('peripheralModal');
+
+                Swal.fire({
+                    title: 'موفق!',
+                    text: 'تجهیز جانبی با موفقیت ثبت شد.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'خطا!',
+                text: 'مشکلی در ثبت تجهیز جانبی رخ داد.',
                 icon: 'error',
                 confirmButtonColor: '#dc3545'
             });

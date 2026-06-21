@@ -18,33 +18,87 @@ $message = '';
 $departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
 $topics = $db->query("SELECT * FROM topics WHERE status = 'active' ORDER BY name ASC")->fetchAll();
 
-// ثبت درخواست
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_ticket'])) {
-    $fullname = htmlspecialchars($_POST['fullname']);
-    $department_id = $_POST['department_id'];
-    $subject = htmlspecialchars($_POST['subject']);
-    $requestMessage = htmlspecialchars($_POST['message']);
+// ============================================
+// پردازش AJAX - ثبت درخواست
+// ============================================
 
-    if ($fullname && $department_id && $subject && $requestMessage) {
-        $trackingCode = 'TK-' . jdate('Ymd') . '-' . rand(1000, 9999);
-        $stmt = $db->prepare("INSERT INTO tickets (tracking_code, user_id, fullname, department_id, subject, message, status, created_at) VALUES (:code, :uid, :name, :did, :sub, :msg, 'جدید', :date)");
-        $stmt->execute([':code' => $trackingCode, ':uid' => $_SESSION['user_id'], ':name' => $fullname, ':did' => $department_id, ':sub' => $subject, ':msg' => $requestMessage, ':date' => now()]);
-        $message = "✅ درخواست شما ثبت شد. کد پیگیری: " . fa_number($trackingCode);
-    }
+if (isset($_POST['add_ticket_ajax'])) {
+$fullname = htmlspecialchars(trim($_POST['fullname']));
+$department_id = filter_var($_POST['department_id'], FILTER_VALIDATE_INT);
+$subject = htmlspecialchars(trim($_POST['subject']));
+$message = htmlspecialchars(trim($_POST['message']));
+
+if ($fullname && $department_id && $subject && $message) {
+$trackingCode = 'TK-' . jdate('Ymd') . '-' . rand(1000, 9999);
+$stmt = $db->prepare("INSERT INTO tickets 
+    (tracking_code, user_id, fullname, department_id, subject, message, status, created_at) 
+VALUES (:code, :uid, :name, :did, :sub, :msg, 'جدید', :date)");
+
+$success = $stmt->execute([
+    ':code' => $trackingCode,
+    ':uid' => $_SESSION['user_id'],
+    ':name' => $fullname,
+    ':did' => $department_id,
+    ':sub' => $subject,
+    ':msg' => $message,
+    ':date' => now()
+]);
+if ($success) {
+$newId = $db->lastInsertId();
+// دریافت اطلاعات کامل تیکت جدید
+$stmt2 = $db->prepare("
+                SELECT t.*, d.name as department_name 
+                FROM tickets t 
+                LEFT JOIN departments d ON t.department_id = d.id 
+                WHERE t.id = :id
+            ");
+    $stmt2->execute([':id' => $newId]);
+    $newTicket = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => true,
+        'ticket' => $newTicket,
+        'tracking_code' => $trackingCode,
+        'message' => 'درخواست با موفقیت ثبت شد'
+    ]);
+    exit;
+             }
+
 }
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'خطا در ثبت درخواست']);
+    exit;
+}
+// ============================================
+// پردازش AJAX - حذف درخواست
+// ============================================
 
-// حذف درخواست
-if (isset($_POST['delete_ticket'])) {
-    $ticket_id = $_POST['ticket_id'];
+if (isset($_POST['delete_ticket_ajax'])) {
+    $ticket_id = filter_var($_POST['ticket_id'], FILTER_VALIDATE_INT);
+
     $stmt = $db->prepare("DELETE FROM tickets WHERE id = :id AND user_id = :uid");
-    $stmt->execute([':id' => $ticket_id, ':uid' => $_SESSION['user_id']]);
-    $message = "✅ درخواست حذف شد";
+    $success = $stmt->execute([':id' => $ticket_id, ':uid' => $_SESSION['user_id']]);
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => $success,
+        'id' => $ticket_id,
+        'message' => $success ? 'درخواست با موفقیت حذف شد' : 'خطا در حذف درخواست'
+    ]);
+    exit;
 }
 
 // گرفتن درخواست‌های کاربر
 $stmt = $db->prepare("SELECT t.*, d.name as department_name FROM tickets t LEFT JOIN departments d ON t.department_id = d.id WHERE t.user_id = :uid ORDER BY t.created_at DESC");
 $stmt->execute([':uid' => $_SESSION['user_id']]);
 $myTickets = $stmt->fetchAll();
+
+// پیام از session
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,36 +108,95 @@ $myTickets = $stmt->fetchAll();
     <title>داشبورد کاربر</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/user-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="user-page">
 <div class="container">
     <div class="header">
-        <div><span>👤</span> خوش آمدید، <strong><?php echo htmlspecialchars($_SESSION['fullname']); ?></strong></div>
+        <div><span>👤</span> خوش آمدید <strong><?php echo htmlspecialchars($_SESSION['fullname']); ?></strong></div>
         <div><span class="dynamic-time" id="liveClock"><?php echo fa_number(now()); ?></span><a href="logout.php" class="logout-btn">🚪 خروج</a></div>
     </div>
 
     <div class="form-box">
-        <h2>📧 ثبت درخواست جدید</h2>
+        <h2>📧 ثبت تیکت جدید</h2>
+        <div id="form_message"></div>
         <?php if($message): ?><div class="alert alert-success"><?php echo $message; ?></div><?php endif; ?>
-        <form method="post">
-            <div class="form-group"><label>کد رایانه</label><input type="text" name="fullname" required></div>
-            <div class="form-group"><label>بخش</label><select name="department_id" required><option value="">انتخاب کنید</option><?php foreach($departments as $d): ?><option value="<?php echo $d['id']; ?>">🏥 <?php echo htmlspecialchars($d['name']); ?></option><?php endforeach; ?></select></div>
-            <div class="form-group"><label>موضوع</label><select name="subject" required><option value="">انتخاب کنید</option><?php foreach($topics as $t): ?><option value="<?php echo htmlspecialchars($t['name']); ?>">📌 <?php echo htmlspecialchars($t['name']); ?></option><?php endforeach; ?></select></div>
-            <div class="form-group"><label>متن درخواست</label><textarea name="message" rows="5" required></textarea></div>
-            <button type="submit">📨 ارسال درخواست</button>
+        <form method="post" id="ticketForm">
+            <div class="form-row">
+
+             <div class="form-group">
+                <label>کد رایانه</label>
+                <input type="text" name="fullname" id="fullname" required>
+             </div>
+
+                <div class="form-group">
+                <label>بخش</label>
+                <select name="department_id" id="department_id" required>
+                    <option value="">انتخاب کنید</option>
+                    <?php foreach($departments as $d): ?>
+                        <option value="<?php echo $d['id']; ?>">🏥 <?php echo htmlspecialchars($d['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                </div>
+
+                <div class="form-group">
+                    <label>موضوع</label>
+                    <select name="subject" id="subject" required>
+                        <option value="">انتخاب کنید</option>
+                        <?php foreach($topics as $t): ?>
+                            <option value="<?php echo htmlspecialchars($t['name']); ?>">📌 <?php echo htmlspecialchars($t['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+                <label>توضیحات</label>
+                <textarea name="message" id="message" rows="5"></textarea>
+            </div>
+            <button type="button" id="submitTicket" class="sub-btn">📨 ارسال تیکت</button>
         </form>
     </div>
 
-    <div class="tickets-table"><h3>📋 درخواست‌های قبلی (<?php echo fa_number(count($myTickets)); ?>)</h3>
-        <table><thead><tr><th>#</th><th>کد پیگیری</th><th>بخش</th><th>موضوع</th><th>وضعیت</th><th>تاریخ</th><th>عملیات</th></tr></thead>
-            <tbody><?php $i=1; foreach($myTickets as $t): ?>
-                <tr><td><?php echo fa_number($i); ?></td><td><?php echo fa_number(htmlspecialchars($t['tracking_code'])); ?></td>
-                    <td><?php echo htmlspecialchars($t['department_name']??'-'); ?></td><td><?php echo htmlspecialchars($t['subject']); ?></td>
-                    <td><span class="status-badge status-<?php echo $t['status']=='جدید'?'new':($t['status']=='در حال بررسی'?'review':'closed'); ?>"><?php echo $t['status']; ?></span></td>
+    <div class="tickets-table">
+        <h3>📋 تیکت‌ها (<?php echo fa_number(count($myTickets)); ?>)</h3>
+        <div id="tickets_container">
+        <table>
+            <thead>
+            <tr>
+                <th>ردیف</th>
+                <th>کد پیگیری</th>
+                <th>بخش</th>
+                <th>موضوع</th>
+                <th>متن درخواست</th>
+                <th>وضعیت</th>
+                <th>تاریخ</th>
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody id="ticketsBody">
+            <?php $i=1; foreach($myTickets as $t): ?>
+                <tr>
+                    <td><?php echo fa_number($i); ?></td>
+                    <td><?php echo fa_number(htmlspecialchars($t['tracking_code'])); ?></td>
+                    <td><?php echo htmlspecialchars($t['department_name']??'-'); ?></td>
+                    <td><?php echo htmlspecialchars($t['subject']); ?></td>
+                    <td><?php echo htmlspecialchars($t['message']); ?></td>
+                    <td>
+                        <span class="status-badge status-<?php echo $t['status']=='جدید'?'new':($t['status']=='در حال بررسی'?'review':'closed'); ?>"><?php echo $t['status']; ?></span></td>
                     <td class="date-ltr"><?php echo fa_number(htmlspecialchars($t['created_at'])); ?></td>
-                    <td><form method="post" onsubmit="return confirm('حذف؟');"><input type="hidden" name="ticket_id" value="<?php echo $t['id']; ?>"><button type="submit" name="delete_ticket" class="delete-btn-table">🗑️</button></form></td></tr>
-                <?php $i++; endforeach; ?></tbody></table></div>
+                    <td>
+                        <button class="delete-btn-table" onclick="deleteTicket(<?php echo $t['id']; ?>)">🗑️</button>
+                    </td>
+                </tr>
+                <?php $i++; endforeach; ?>
+            </tbody>
+        </table>
+        </div>
 </div>
-<script>function updateClock(){fetch('get_time.php').then(r=>r.json()).then(d=>{let c=document.getElementById('liveClock');if(c)c.innerHTML='📅 '+d.datetime;});}setInterval(updateClock,1000);updateClock();</script>
+
+<script src="assets/js/user-dashboard.js"></script>
 </body>
 </html>
