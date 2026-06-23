@@ -8,9 +8,6 @@
 .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 13px; color: #555; }
 .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; }
 
-.products-table { background: white; border-radius: 15px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 20px; }
-.products-table table { width: 100%; border-collapse: collapse; min-width: 500px; }
-.products-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #eee; }
 
 .date { direction: ltr; text-align: center; font-family: monospace; letter-spacing: 1px; }
 

@@ -153,7 +153,7 @@ if (isset($_SESSION['message'])) {
 
 
             <div class="form-group">
-                <label>توضیحات</label>
+                <label>متن درخواست</label>
                 <textarea name="message" id="message" rows="5"></textarea>
             </div>
             <button type="button" id="submitTicket" class="sub-btn">📨 ارسال تیکت</button>

@@ -63,33 +63,7 @@
     white-space: nowrap;
 }
 
-.persons-table {
-    background: white;
-    border-radius: 15px;
-    overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 20px;
-}
 
-.persons-table table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 400px;
-}
-
-
-.persons-table td {
-    padding: 10px 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
-
-.persons-table .date {
-    direction: ltr;
-    text-align: center;
-    font-family: monospace;
-    letter-spacing: 1px;
-}
 
 .action-buttons {
     display: flex;

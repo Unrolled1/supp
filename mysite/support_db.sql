@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 16, 2026 at 08:19 PM
+-- Generation Time: Jun 23, 2026 at 12:41 PM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -30,10 +30,10 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `activities`;
 CREATE TABLE IF NOT EXISTS `activities` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `created_at` varchar(50) DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `activities`
@@ -52,10 +52,53 @@ INSERT INTO `activities` (`id`, `name`, `created_at`) VALUES
 DROP TABLE IF EXISTS `brands`;
 CREATE TABLE IF NOT EXISTS `brands` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `created_at` varchar(50) DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `brands`
+--
+
+INSERT INTO `brands` (`id`, `name`, `created_at`) VALUES
+(10, 'Western Digital', '2026-06-19'),
+(7, 'Intel', '2026-06-19'),
+(9, 'Samsung', '2026-06-19'),
+(11, 'Kingston', '2026-06-19'),
+(12, 'Corsair', '2026-06-19'),
+(13, 'G.Skill', '2026-06-19'),
+(36, 'Gplus', '1405-03-30'),
+(15, 'MSI', '2026-06-19'),
+(16, 'Gigabyte', '2026-06-19'),
+(17, 'Cooler Master', '2026-06-19'),
+(18, 'Seasonic', '2026-06-19'),
+(19, 'LG', '2026-06-19'),
+(20, 'Dell', '2026-06-19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cpus`
+--
+
+DROP TABLE IF EXISTS `cpus`;
+CREATE TABLE IF NOT EXISTS `cpus` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int NOT NULL,
+  `model_id` int NOT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cpus`
+--
+
+INSERT INTO `cpus` (`id`, `brand_id`, `model_id`, `created_at`) VALUES
+(8, 36, 3, '1405-03-30');
 
 -- --------------------------------------------------------
 
@@ -66,12 +109,19 @@ CREATE TABLE IF NOT EXISTS `brands` (
 DROP TABLE IF EXISTS `departments`;
 CREATE TABLE IF NOT EXISTS `departments` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `description` text,
-  `status` enum('active','inactive') DEFAULT 'active',
-  `created_at` varchar(50) DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `departments`
+--
+
+INSERT INTO `departments` (`id`, `name`, `description`, `status`, `created_at`) VALUES
+(5, 'زنان', '', 'active', '1405-03-31');
 
 -- --------------------------------------------------------
 
@@ -82,25 +132,16 @@ CREATE TABLE IF NOT EXISTS `departments` (
 DROP TABLE IF EXISTS `invoices`;
 CREATE TABLE IF NOT EXISTS `invoices` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `company_name` varchar(255) NOT NULL,
-  `invoice_number` varchar(100) NOT NULL,
-  `subject` varchar(255) DEFAULT NULL,
+  `company_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `invoice_number` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `amount` bigint DEFAULT NULL,
   `invoice_date` date DEFAULT NULL,
-  `description` text,
+  `description` text COLLATE utf8mb4_unicode_ci,
   `created_at` date NOT NULL,
   `created_by` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `invoices`
---
-
-INSERT INTO `invoices` (`id`, `company_name`, `invoice_number`, `subject`, `amount`, `invoice_date`, `description`, `created_at`, `created_by`) VALUES
-(3, 'ش', '2', 'درخواست دسترسی', 1, '2026-06-15', 'ddddddddddddddddddd', '1405-03-25', 1),
-(4, 'ب', '3', 'گزارش خطا', 1000, '2026-06-15', '', '1405-03-25', 1),
-(6, 'ت', '8', 'مشکل در نرم‌افزار', 1220, '2026-06-15', '', '1405-03-25', 1);
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -122,14 +163,7 @@ CREATE TABLE IF NOT EXISTS `kala` (
   `created_at` date DEFAULT NULL,
   `created_by` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `kala`
---
-
-INSERT INTO `kala` (`id`, `computer_code`, `property_code`, `name`, `department_id`, `receiver_person_id`, `quantity`, `brand_id`, `serial_number`, `created_at`, `created_by`) VALUES
-(1, '', '', 'غ', NULL, NULL, 1, NULL, '', '1405-03-26', 1);
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -140,17 +174,118 @@ INSERT INTO `kala` (`id`, `computer_code`, `property_code`, `name`, `department_
 DROP TABLE IF EXISTS `models`;
 CREATE TABLE IF NOT EXISTS `models` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `created_at` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `brand_id` int DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_models_brand` (`brand_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `models`
 --
 
-INSERT INTO `models` (`id`, `name`, `created_at`) VALUES
-(1, 'ش', '1405-03-15 11:26:09');
+INSERT INTO `models` (`id`, `name`, `brand_id`, `created_at`) VALUES
+(3, 'GDM', 36, '1405-03-30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `monitors`
+--
+
+DROP TABLE IF EXISTS `monitors`;
+CREATE TABLE IF NOT EXISTS `monitors` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int NOT NULL,
+  `model_id` int NOT NULL,
+  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `monitors`
+--
+
+INSERT INTO `monitors` (`id`, `brand_id`, `model_id`, `property_code`, `created_at`) VALUES
+(1, 13, 3, '1', '1405-03-30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `motherboards`
+--
+
+DROP TABLE IF EXISTS `motherboards`;
+CREATE TABLE IF NOT EXISTS `motherboards` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int NOT NULL,
+  `model_id` int NOT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `motherboards`
+--
+
+INSERT INTO `motherboards` (`id`, `brand_id`, `model_id`, `created_at`) VALUES
+(1, 10, 3, '1405-03-30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `peripherals`
+--
+
+DROP TABLE IF EXISTS `peripherals`;
+CREATE TABLE IF NOT EXISTS `peripherals` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `type_id` int NOT NULL,
+  `computer_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `brand_id` int DEFAULT NULL,
+  `model_id` int DEFAULT NULL,
+  `connection_type` enum('USB','Network','Bluetooth','Parallel','Wireless','Other') COLLATE utf8mb4_unicode_ci DEFAULT 'USB',
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `type_id` (`type_id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `peripheral_types`
+--
+
+DROP TABLE IF EXISTS `peripheral_types`;
+CREATE TABLE IF NOT EXISTS `peripheral_types` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sort_order` int DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `peripheral_types`
+--
+
+INSERT INTO `peripheral_types` (`id`, `name`, `sort_order`) VALUES
+(1, 'پرینتر', 1),
+(2, 'بارکدخوان', 2),
+(3, 'اسکنر', 3),
+(4, 'کارت‌خوان', 4),
+(5, 'وب‌کم', 5);
 
 -- --------------------------------------------------------
 
@@ -232,10 +367,10 @@ INSERT INTO `permissions` (`id`, `role`, `permission_key`, `permission_value`) V
 DROP TABLE IF EXISTS `persons`;
 CREATE TABLE IF NOT EXISTS `persons` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `created_at` varchar(50) DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `persons`
@@ -247,6 +382,51 @@ INSERT INTO `persons` (`id`, `name`, `created_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `powers`
+--
+
+DROP TABLE IF EXISTS `powers`;
+CREATE TABLE IF NOT EXISTS `powers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int NOT NULL,
+  `model_id` int NOT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `powers`
+--
+
+INSERT INTO `powers` (`id`, `brand_id`, `model_id`, `created_at`) VALUES
+(1, 15, 3, '1405-03-30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `printers`
+--
+
+DROP TABLE IF EXISTS `printers`;
+CREATE TABLE IF NOT EXISTS `printers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `computer_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `activity_id` int DEFAULT NULL,
+  `department_id` int DEFAULT NULL,
+  `brand_id` int DEFAULT NULL,
+  `serial_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `products`
 --
 
@@ -254,11 +434,38 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE IF NOT EXISTS `products` (
   `id` int NOT NULL AUTO_INCREMENT,
   `brand_id` int DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
-  `created_at` varchar(50) DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `rams`
+--
+
+DROP TABLE IF EXISTS `rams`;
+CREATE TABLE IF NOT EXISTS `rams` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int NOT NULL,
+  `model_id` int NOT NULL,
+  `type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `capacity` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `rams`
+--
+
+INSERT INTO `rams` (`id`, `brand_id`, `model_id`, `type`, `capacity`, `created_at`) VALUES
+(1, 20, 3, 'DDR3', '8GB', '1405-03-30'),
+(2, 13, 3, 'DDR4', '64GB', '1405-03-30');
 
 -- --------------------------------------------------------
 
@@ -269,15 +476,15 @@ CREATE TABLE IF NOT EXISTS `products` (
 DROP TABLE IF EXISTS `service_requests`;
 CREATE TABLE IF NOT EXISTS `service_requests` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `service_name` varchar(100) NOT NULL,
+  `service_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `department_id` int DEFAULT NULL,
   `brand_id` int DEFAULT NULL,
   `receiver_person_id` int DEFAULT NULL,
-  `serial_number` varchar(100) DEFAULT NULL,
-  `service_date` varchar(50) DEFAULT NULL,
-  `computer_code` varchar(50) DEFAULT NULL,
-  `description` text,
-  `created_at` varchar(50) DEFAULT NULL,
+  `serial_number` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `service_date` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `computer_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `department_id` (`department_id`),
@@ -289,15 +496,172 @@ CREATE TABLE IF NOT EXISTS `service_requests` (
   KEY `idx_created_at` (`created_at`),
   KEY `idx_name_status` (`service_name`),
   KEY `idx_date_status` (`service_date`)
-) ENGINE=MyISAM AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
 
 --
--- Dumping data for table `service_requests`
+-- Table structure for table `storages`
 --
 
-INSERT INTO `service_requests` (`id`, `service_name`, `department_id`, `brand_id`, `receiver_person_id`, `serial_number`, `service_date`, `computer_code`, `description`, `created_at`, `created_by`) VALUES
-(33, 'یشی', NULL, NULL, NULL, '', '2026-06-07', '', '', '1405-03-17', 27),
-(35, 'ی', NULL, NULL, NULL, '1', '2026-06-11', '', '', '1405-03-21', 1);
+DROP TABLE IF EXISTS `storages`;
+CREATE TABLE IF NOT EXISTS `storages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `brand_id` int NOT NULL,
+  `model_id` int NOT NULL,
+  `type` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `capacity` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brand_id` (`brand_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `storages`
+--
+
+INSERT INTO `storages` (`id`, `brand_id`, `model_id`, `type`, `capacity`, `created_at`) VALUES
+(1, 17, 3, 'HDD', '512GB', '1405-03-30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `systems`
+--
+
+DROP TABLE IF EXISTS `systems`;
+CREATE TABLE IF NOT EXISTS `systems` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `computer_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `property_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `department_id` int DEFAULT NULL,
+  `cpu_id` int DEFAULT NULL,
+  `motherboard_id` int DEFAULT NULL,
+  `power_id` int DEFAULT NULL,
+  `monitor_id` int DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `computer_code` (`computer_code`),
+  KEY `department_id` (`department_id`),
+  KEY `cpu_id` (`cpu_id`),
+  KEY `motherboard_id` (`motherboard_id`),
+  KEY `power_id` (`power_id`),
+  KEY `monitor_id` (`monitor_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `systems`
+--
+
+INSERT INTO `systems` (`id`, `computer_code`, `property_code`, `name`, `department_id`, `cpu_id`, `motherboard_id`, `power_id`, `monitor_id`, `created_at`, `created_by`) VALUES
+(11, '3', '', '3', NULL, NULL, NULL, NULL, NULL, '1405-03-30', 1),
+(12, '4', '', '4', NULL, NULL, NULL, NULL, NULL, '1405-03-30', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_ips`
+--
+
+DROP TABLE IF EXISTS `system_ips`;
+CREATE TABLE IF NOT EXISTS `system_ips` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `system_id` int NOT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `network_type` enum('LAN','WAN','VPN','WiFi','Other') COLLATE utf8mb4_unicode_ci DEFAULT 'LAN',
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `system_id` (`system_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_peripherals`
+--
+
+DROP TABLE IF EXISTS `system_peripherals`;
+CREATE TABLE IF NOT EXISTS `system_peripherals` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `system_id` int NOT NULL,
+  `peripheral_id` int NOT NULL,
+  `connection_port` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `notes` text COLLATE utf8mb4_unicode_ci,
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_system_peripheral` (`system_id`,`peripheral_id`),
+  KEY `peripheral_id` (`peripheral_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_rams`
+--
+
+DROP TABLE IF EXISTS `system_rams`;
+CREATE TABLE IF NOT EXISTS `system_rams` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `system_id` int NOT NULL,
+  `ram_id` int NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `system_id` (`system_id`),
+  KEY `ram_id` (`ram_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `system_rams`
+--
+
+INSERT INTO `system_rams` (`id`, `system_id`, `ram_id`, `description`, `created_at`, `created_by`) VALUES
+(2, 9, 1, NULL, '1405-03-30', 1),
+(3, 10, 1, NULL, '1405-03-30', 1),
+(4, 11, 1, NULL, '1405-03-30', 1),
+(5, 12, 2, NULL, '1405-03-30', 1),
+(6, 12, 1, NULL, '1405-03-30', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_storages`
+--
+
+DROP TABLE IF EXISTS `system_storages`;
+CREATE TABLE IF NOT EXISTS `system_storages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `system_id` int NOT NULL,
+  `storage_id` int NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `system_id` (`system_id`),
+  KEY `storage_id` (`storage_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `system_storages`
+--
+
+INSERT INTO `system_storages` (`id`, `system_id`, `storage_id`, `description`, `created_at`, `created_by`) VALUES
+(2, 9, 1, NULL, '1405-03-30', 1),
+(3, 10, 1, NULL, '1405-03-30', 1),
+(4, 11, 1, NULL, '1405-03-30', 1),
+(5, 12, 1, NULL, '1405-03-30', 1);
 
 -- --------------------------------------------------------
 
@@ -308,19 +672,26 @@ INSERT INTO `service_requests` (`id`, `service_name`, `department_id`, `brand_id
 DROP TABLE IF EXISTS `tickets`;
 CREATE TABLE IF NOT EXISTS `tickets` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `tracking_code` varchar(20) NOT NULL,
+  `tracking_code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` int DEFAULT NULL,
-  `fullname` varchar(100) NOT NULL,
-  `subject` varchar(100) NOT NULL,
+  `fullname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `department_id` int DEFAULT NULL,
-  `message` text NOT NULL,
-  `status` enum('جدید','در حال بررسی','پاسخ داده شده','بسته شده') DEFAULT 'جدید',
-  `created_at` varchar(50) DEFAULT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('جدید','در حال بررسی','پاسخ داده شده','بسته شده') COLLATE utf8mb4_unicode_ci DEFAULT 'جدید',
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `tracking_code` (`tracking_code`),
   KEY `user_id` (`user_id`),
   KEY `department_id` (`department_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tickets`
+--
+
+INSERT INTO `tickets` (`id`, `tracking_code`, `user_id`, `fullname`, `subject`, `department_id`, `message`, `status`, `created_at`) VALUES
+(20, 'TK-14050331-7721', 25, '2', 'درخواست دسترسی', 5, '2', 'جدید', '1405-03-31');
 
 -- --------------------------------------------------------
 
@@ -331,15 +702,15 @@ CREATE TABLE IF NOT EXISTS `tickets` (
 DROP TABLE IF EXISTS `topics`;
 CREATE TABLE IF NOT EXISTS `topics` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `description` text,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
   `department_id` int DEFAULT NULL,
-  `status` enum('active','inactive') DEFAULT 'active',
+  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   `sort_order` int DEFAULT '0',
-  `created_at` varchar(50) DEFAULT NULL,
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `department_id` (`department_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `topics`
@@ -361,14 +732,14 @@ INSERT INTO `topics` (`id`, `name`, `description`, `department_id`, `status`, `s
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `fullname` varchar(100) NOT NULL,
-  `role` enum('admin','user') DEFAULT 'user',
-  `created_at` varchar(50) DEFAULT NULL,
+  `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fullname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('admin','user') COLLATE utf8mb4_unicode_ci DEFAULT 'user',
+  `created_at` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
@@ -376,8 +747,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `fullname`, `role`, `created_at`) VALUES
 (1, 'admin', 'c4ca4238a0b923820dcc509a6f75849b', 'علی محمد', 'admin', '1404-03-11'),
-(27, 'd', '8277e0910d750195b448797616e091ad', 'd', 'admin', '1405-03-17'),
-(25, 'a', '0cc175b9c0f1b6a831c399e269772661', 'a', 'user', '1405-03-14 21:08:44');
+(27, 'd', 'c4ca4238a0b923820dcc509a6f75849b', 'd', 'admin', '1405-03-17'),
+(25, 'a', 'c4ca4238a0b923820dcc509a6f75849b', 'a', 'user', '1405-03-14 21:08:44');
 
 -- --------------------------------------------------------
 
@@ -393,21 +764,22 @@ CREATE TABLE IF NOT EXISTS `user_permissions` (
   `permission_value` tinyint DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_user_permission` (`user_id`,`permission_key`)
-) ENGINE=MyISAM AUTO_INCREMENT=719 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=768 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `user_permissions`
 --
 
 INSERT INTO `user_permissions` (`id`, `user_id`, `permission_key`, `permission_value`) VALUES
-(704, 27, 'services_edit', 1),
-(703, 27, 'services_delete', 1),
+(765, 27, 'users_delete', 0),
+(764, 27, 'topics_manage', 0),
 (63, 1, 'departments_delete', 1),
-(702, 27, 'reports_view', 0),
-(701, 27, 'products_view', 0),
-(700, 27, 'products_manage', 0),
-(699, 27, 'products_edit', 0),
-(698, 27, 'products_delete', 0),
+(763, 27, 'topics_edit', 0),
+(762, 27, 'topics_delete', 0),
+(761, 27, 'tickets_manage', 1),
+(760, 27, 'tickets_edit', 1),
+(759, 27, 'tickets_delete', 1),
+(747, 27, 'products_delete', 0),
 (64, 1, 'departments_edit', 1),
 (65, 1, 'departments_manage', 1),
 (66, 1, 'tickets_delete', 1),
@@ -419,48 +791,47 @@ INSERT INTO `user_permissions` (`id`, `user_id`, `permission_key`, `permission_v
 (72, 1, 'users_delete', 1),
 (73, 1, 'users_edit', 1),
 (74, 1, 'users_manage', 1),
-(705, 27, 'services_view', 1),
-(706, 27, 'systems_delete', 0),
-(707, 27, 'systems_edit', 0),
-(708, 27, 'systems_manage', 0),
-(709, 27, 'systems_view', 0),
-(710, 27, 'tickets_delete', 1),
-(711, 27, 'tickets_edit', 1),
-(712, 27, 'tickets_manage', 1),
-(713, 27, 'topics_delete', 0),
-(714, 27, 'topics_edit', 0),
-(697, 27, 'printers_view', 0),
-(696, 27, 'printers_manage', 0),
-(694, 27, 'printers_delete', 0),
-(695, 27, 'printers_edit', 0),
-(693, 27, 'persons_view', 0),
-(692, 27, 'persons_edit', 0),
-(691, 27, 'persons_delete', 0),
-(690, 27, 'models_view', 0),
-(689, 27, 'models_edit', 0),
-(688, 27, 'models_delete', 0),
-(687, 27, 'invoices_view', 0),
-(686, 27, 'invoices_manage', 0),
-(685, 27, 'invoices_edit', 0),
-(684, 27, 'invoices_delete', 0),
-(683, 27, 'goods_view', 0),
-(682, 27, 'goods_manage', 0),
-(681, 27, 'goods_edit', 0),
-(680, 27, 'goods_delete', 0),
-(679, 27, 'departments_manage', 0),
-(678, 27, 'departments_edit', 0),
-(677, 27, 'departments_delete', 0),
-(676, 27, 'brands_view', 0),
-(675, 27, 'brands_manage', 0),
-(674, 27, 'brands_edit', 0),
-(673, 27, 'brands_delete', 0),
-(672, 27, 'activities_manage', 0),
-(671, 27, 'activities_edit', 0),
-(670, 27, 'activities_delete', 0),
-(715, 27, 'topics_manage', 0),
-(716, 27, 'users_delete', 0),
-(717, 27, 'users_edit', 0),
-(718, 27, 'users_manage', 0);
+(758, 27, 'systems_view', 1),
+(757, 27, 'systems_manage', 1),
+(756, 27, 'systems_edit', 1),
+(755, 27, 'systems_delete', 1),
+(754, 27, 'services_view', 1),
+(753, 27, 'services_edit', 1),
+(752, 27, 'services_delete', 1),
+(751, 27, 'reports_view', 0),
+(750, 27, 'products_view', 0),
+(749, 27, 'products_manage', 0),
+(748, 27, 'products_edit', 0),
+(746, 27, 'printers_view', 0),
+(745, 27, 'printers_manage', 0),
+(744, 27, 'printers_edit', 0),
+(743, 27, 'printers_delete', 0),
+(742, 27, 'persons_view', 0),
+(741, 27, 'persons_edit', 0),
+(740, 27, 'persons_delete', 0),
+(739, 27, 'models_view', 0),
+(738, 27, 'models_edit', 0),
+(737, 27, 'models_delete', 0),
+(736, 27, 'invoices_view', 0),
+(735, 27, 'invoices_manage', 0),
+(734, 27, 'invoices_edit', 0),
+(733, 27, 'invoices_delete', 0),
+(732, 27, 'goods_view', 0),
+(731, 27, 'goods_manage', 0),
+(730, 27, 'goods_edit', 0),
+(729, 27, 'goods_delete', 0),
+(728, 27, 'departments_manage', 0),
+(727, 27, 'departments_edit', 0),
+(726, 27, 'departments_delete', 0),
+(725, 27, 'brands_view', 0),
+(724, 27, 'brands_manage', 0),
+(723, 27, 'brands_edit', 0),
+(722, 27, 'brands_delete', 0),
+(721, 27, 'activities_manage', 0),
+(720, 27, 'activities_edit', 0),
+(719, 27, 'activities_delete', 0),
+(766, 27, 'users_edit', 0),
+(767, 27, 'users_manage', 0);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

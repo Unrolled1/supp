@@ -124,6 +124,15 @@ body {
     max-height: 500px;
 }
 
+.has-submenu .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.has-submenu.open .submenu {
+    max-height: 800px;
+}
 .sidebar-nav .submenu li a {
     padding: 6px 16px 6px 40px;
     font-size: 12px;

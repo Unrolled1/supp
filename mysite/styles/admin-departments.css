@@ -65,13 +65,7 @@
     box-sizing: border-box;
 }
 
-/* جدول بخش‌ها */
-.departments-table {
-    background: white;
-    border-radius: 15px;
-    overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
+
 
 .departments-table .empty-message {
     text-align: center;
@@ -80,25 +74,8 @@
     font-size: 14px;
 }
 
-.departments-table table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
-}
 
 
-
-.departments-table td {
-    padding: 12px 15px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    font-size: 13px;
-    vertical-align: middle;
-}
-
-.departments-table tr:hover {
-    background: #f9f9f9;
-}
 
 /* وضعیت بخش */
 .status-badge {

@@ -21,6 +21,7 @@ $db = getDB();
 $successMessage = '';
 $errorMessage = '';
 
+
 $stmt = $db->query("
     SELECT t.*, u.username, u.fullname as user_fullname, d.name as department_name
     FROM tickets t 
@@ -80,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock">📅<?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
@@ -116,11 +117,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
             <table>
                 <thead>
                 <tr>
-                    <th>#</th>
+                    <th>ردیف</th>
                     <th>کد پیگیری</th>
                     <th>بخش</th>
                     <th>نام کاربر</th>
                     <th>موضوع</th>
+                    <th>متن درخواست</th>
                     <th>وضعیت</th>
                     <th>تاریخ ثبت</th>
                     <th>عملیات</th>
@@ -144,8 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
                             <td>🏥 <?php echo htmlspecialchars($ticket['department_name'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($ticket['fullname']); ?></td>
                             <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
+                            <td class="message-cell"><?php echo nl2br(htmlspecialchars($ticket['message'])); ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo $ticket['status']; ?></span></td>
                             <td class="date-ltr"><?php echo fa_number(htmlspecialchars($ticket['created_at'])); ?></td>
+
                             <td class="action-buttons">
                                 <?php if (canEditTickets()): ?>
                                     <form method="post" style="display:inline;">
@@ -175,17 +179,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
     </div>
 </div>
 
-<script>
-    function updateClock() {
-        fetch('get_time.php')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('liveClock').innerHTML = '📅 ' + data.datetime;
-            })
-            .catch(error => console.log('خطا:', error));
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
 </body>
 </html>

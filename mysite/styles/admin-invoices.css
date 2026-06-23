@@ -2,33 +2,7 @@
    استایل مدیریت فاکتورها
    ============================================ */
 
-/* جدول فاکتورها */
-.invoices-table {
-    background: white;
-    border-radius: 15px;
-    overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 20px;
-}
 
-.invoices-table table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-}
-
-
-
-.invoices-table td {
-    padding: 10px 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    color: #334155;
-}
-
-.invoices-table .date {
-    direction: ltr;
-}
 
 .description-cell {
     max-width: 200px;

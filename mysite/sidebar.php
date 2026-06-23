@@ -3,11 +3,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <div class="sidebar">
     <div class="sidebar-header">
-        <h2>🏥 سیستم پشتیبانی</h2>
+        <h2>🏥 سامانه IMS</h2>
         <p>پنل مدیریت</p>
     </div>
-    <ul class="sidebar-nav">
 
+    <ul class="sidebar-nav">
+        <li>
+            <a href="dashboard.php" class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
+                <span class="icon">📊</span>
+                <span class="text">داشبورد</span>
+            </a>
+        </li>
         <!-- پنل درخواست‌ها -->
         <?php if (canViewTickets()): ?>
             <li>
@@ -181,7 +187,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         <!-- پشتیبان گیری -->
         <li>
-            <a href="#" class="">
+            <a href="backup.php" class="<?php echo $current_page == 'backup.php' ? 'active' : ''; ?>">
                 <span class="icon">💾</span>
                 <span class="text">پشتیبان گیری</span>
             </a>
@@ -190,43 +196,56 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </div>
 
 <script>
-    (function() {
-        if (window.sidebarInitialized) return;
-        window.sidebarInitialized = true;
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggles = document.querySelectorAll('.submenu-toggle');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var submenuToggles = document.querySelectorAll('.submenu-toggle');
+        toggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            for (var i = 0; i < submenuToggles.length; i++) {
-                (function(toggle) {
-                    var parentLi = toggle.closest('.has-submenu');
-                    var submenu = parentLi.querySelector('.submenu');
-                    var activeLink = parentLi.querySelector('.submenu a.active');
+                var parentLi = this.closest('.has-submenu');
+                var submenu = parentLi.querySelector('.submenu');
 
-                    if (activeLink) {
-                        parentLi.classList.add('open');
-                        if (submenu) {
-                            submenu.style.maxHeight = submenu.scrollHeight + "px";
+                // بستن سایر منوها
+                var allMenus = document.querySelectorAll('.has-submenu');
+                allMenus.forEach(function(menu) {
+                    if (menu !== parentLi) {
+                        menu.classList.remove('open');
+                        var otherSub = menu.querySelector('.submenu');
+                        if (otherSub) {
+                            otherSub.style.maxHeight = null;
                         }
                     }
+                });
 
-                    toggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (parentLi.classList.contains('open')) {
-                            parentLi.classList.remove('open');
-                            if (submenu) {
-                                submenu.style.maxHeight = null;
-                            }
-                        } else {
-                            parentLi.classList.add('open');
-                            if (submenu) {
-                                submenu.style.maxHeight = submenu.scrollHeight + "px";
-                            }
-                        }
-                    });
-                })(submenuToggles[i]);
-            }
+                // باز یا بسته کردن منو فعلی
+                parentLi.classList.toggle('open');
+                if (parentLi.classList.contains('open')) {
+                    if (submenu) {
+                        submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                    }
+                } else {
+                    if (submenu) {
+                        submenu.style.maxHeight = null;
+                    }
+                }
+            });
         });
-    })();
+
+        // جلوگیری از بسته شدن منو وقتی روی لینک کلیک میشه
+        var submenuLinks = document.querySelectorAll('.submenu a');
+        submenuLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                var parentLi = this.closest('.has-submenu');
+                if (parentLi) {
+                    parentLi.classList.add('open');
+                    var submenu = parentLi.querySelector('.submenu');
+                    if (submenu) {
+                        submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                    }
+                }
+            });
+        });
+    });
 </script>

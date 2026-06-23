@@ -1,0 +1,245 @@
+/* ============================================
+   استایل پشتیبان‌گیری و بازیابی
+   ============================================ */
+
+.backup-card,
+.restore-card,
+.backup-list-card {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.backup-card h2,
+.restore-card h2,
+.backup-list-card h2 {
+    color: #f7fafc;
+    font-size: 20px;
+    margin: 0 0 10px 0;
+    padding-right: 15px;
+    border-right: 4px solid #667eea;
+}
+
+.backup-desc,
+.restore-desc {
+    color: #a0aec0;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.restore-warning {
+    color: #fc8181;
+    font-size: 13px;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background: #742a2a;
+    border-radius: 8px;
+    border: 1px solid #9b2c2c;
+}
+
+/* دکمه‌ها */
+.btn-backup {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+}
+
+.btn-backup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(72, 187, 120, 0.4);
+}
+
+.btn-restore {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+}
+
+.btn-restore:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(237, 137, 54, 0.4);
+}
+
+/* آپلود فایل */
+.file-upload-wrapper {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.file-upload-wrapper input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-label {
+    display: block;
+    padding: 12px 20px;
+    background: #1a202c;
+    border: 2px dashed #4a5568;
+    border-radius: 10px;
+    text-align: center;
+    color: #a0aec0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.file-label:hover {
+    border-color: #667eea;
+    background: #1a202c;
+}
+
+/* جدول لیست پشتیبان‌ها */
+.backup-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.backup-table th {
+    background: #1a202c;
+    color: #cbd5e0;
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 2px solid #4a5568;
+}
+
+.backup-table td {
+    padding: 10px 10px;
+    text-align: center;
+    border-bottom: 1px solid #4a5568;
+    color: #e2e8f0;
+    vertical-align: middle;
+}
+
+.backup-table tbody tr:hover {
+    background: #1a202c;
+}
+
+/* دکمه‌های عملیات */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons .btn-download {
+    display: inline-block;
+    background: #2b6cb0;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.action-buttons .btn-download:hover {
+    background: #2c5282;
+    transform: scale(1.05);
+}
+
+.action-buttons .btn-delete {
+    background: #742a2a;
+    color: #fc8181;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.action-buttons .btn-delete:hover {
+    background: #e53e3e;
+    color: white;
+    transform: scale(1.05);
+}
+
+.empty-list {
+    color: #a0aec0;
+    text-align: center;
+    padding: 30px 0;
+    font-size: 16px;
+}
+
+/* تاریخ */
+.date-ltr {
+    direction: ltr;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    font-size: 13px;
+    color: #a0aec0;
+}
+
+/* ============================================
+   ریسپانسیو
+   ============================================ */
+
+@media (max-width: 768px) {
+    .backup-card,
+    .restore-card,
+    .backup-list-card {
+        padding: 15px;
+    }
+
+    .backup-table {
+        font-size: 12px;
+    }
+
+    .backup-table th,
+    .backup-table td {
+        padding: 6px 4px;
+    }
+
+    .action-buttons .btn-download,
+    .action-buttons .btn-delete {
+        padding: 4px 10px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .backup-table {
+        font-size: 10px;
+    }
+
+    .backup-table th,
+    .backup-table td {
+        padding: 4px 2px;
+    }
+
+    .btn-backup,
+    .btn-restore {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .file-label {
+        font-size: 12px;
+        padding: 10px 15px;
+    }
+}

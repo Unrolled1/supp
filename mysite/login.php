@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'db.php';
+require_once 'assets/jdf.php';
 require_once 'functions.php';
 
 $error = '';
@@ -68,21 +69,76 @@ if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ورود به سیستم</title>
+    <title>IMS</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/login.css">
 </head>
-<body>
-<div class="login-container">
-    <h2>🔐 ورود به سیستم</h2>
-    <?php if ($error): ?>
-        <div class="alert alert-error"><?php echo $error; ?></div>
-    <?php endif; ?>
-    <form method="post">
-        <input type="text" name="username" placeholder="نام کاربری" required>
-        <input type="password" name="password" placeholder="رمز عبور" required>
-        <button type="submit">ورود</button>
-    </form>
+<body class="login-page">
+<div class="login-wrapper">
+    <div class="login-box">
+        <div class="login-header">
+            <h1>🔐 سامانه تیکت</h1>
+            <p>بیمارستان حضرت ابوالفضل میناب</p>
+        </div>
+
+        <?php if ($error): ?>
+            <div class="alert alert-error"><?php echo $error; ?></div>
+        <?php endif; ?>
+
+        <form method="post" class="login-form">
+            <div class="form-group">
+                <label>👤 نام کاربری</label>
+                <input type="text" name="username"  required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label>🔑 رمز عبور</label>
+                <input type="password" name="password"  required>
+            </div>
+
+            <button type="submit" class="login-btn"> ورود</button>
+        </form>
+
+        <div class="login-footer">
+            <p>سیستم مدیریت یکپارچه(IMS)</p>
+            <small>© <?php echo jdate('Y'); ?> - تمامی حقوق محفوظ است</small>
+        </div>
+    </div>
 </div>
+<script>
+    // ============================================
+    // ارسال فرم با کلید Enter
+    // ============================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('loginForm');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+
+        // وقتی کاربر Enter بزنه
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                form.submit();
+            }
+        }
+
+        // اضافه کردن event listener به هر دو فیلد
+        if (username) {
+            username.addEventListener('keypress', handleKeyPress);
+        }
+
+        if (password) {
+            password.addEventListener('keypress', handleKeyPress);
+        }
+
+        // فوکوس خودکار روی فیلد نام کاربری
+        if (username) {
+            setTimeout(() => {
+                username.focus();
+            }, 100);
+        }
+    });
+</script>
 </body>
 </html>

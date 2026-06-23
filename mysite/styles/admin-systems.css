@@ -702,15 +702,7 @@
         width: 100%;
     }
 
-    .systems-table table {
-        font-size: 12px;
-    }
 
-    .systems-table th,
-    .systems-table td {
-        padding: 6px 4px;
-        font-size: 11px;
-    }
 
     .action-buttons {
         flex-direction: column;
@@ -723,15 +715,7 @@
     }
 }
 
-@media (max-width: 480px) {
-    .systems-table table {
-        font-size: 10px;
-    }
 
-    .systems-table th,
-    .systems-table td {
-        padding: 4px 2px;
-    }
 
     .item-small {
         font-size: 10px;
@@ -752,7 +736,7 @@
         font-size: 11px;
         padding: 2px 4px !important;
     }
-}
+
 
 /* ============================================
    اسکرول برای محتوای مودال
@@ -785,9 +769,6 @@
    جدول سیستم‌ها - استایل خاص
    ============================================ */
 
-.systems-table td {
-    vertical-align: middle;
-}
 
 .systems-table .badge {
     display: inline-block;
