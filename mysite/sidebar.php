@@ -38,7 +38,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li>
                             <a href="admin_activities.php" class="<?php echo $current_page == 'admin_activities.php' ? 'active' : ''; ?>">
                                 <span class="icon">📋</span>
-                                <span class="text">خدمات</span>
+                                <span class="text">فعالیت</span>
                             </a>
                         </li>
                     <?php endif; ?>
@@ -122,7 +122,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li>
                             <a href="admin_services.php" class="<?php echo $current_page == 'admin_services.php' ? 'active' : ''; ?>">
                                 <span class="icon">🔧</span>
-                                <span class="text">ثبت خدمات</span>
+                                <span class="text">ثبت فعالیت</span>
                             </a>
                         </li>
                     <?php endif; ?>

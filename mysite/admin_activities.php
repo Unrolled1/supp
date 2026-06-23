@@ -102,7 +102,7 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
         </div>
 
         <div class="main-title">
-            <h1>📋 خدمات</h1>
+            <h1>📋 فعالیت</h1>
         </div>
 
         <?php if ($successMessage): ?>

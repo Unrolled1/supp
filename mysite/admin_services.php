@@ -216,7 +216,7 @@ foreach ($services as $key => $service) {
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مدیریت خدمات</title>
+    <title>مدیریت فعالیت</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/admin-services.css">
     <link rel="stylesheet" href="styles/sidebar.css">
@@ -239,7 +239,7 @@ foreach ($services as $key => $service) {
         </div>
 
         <div class="main-title">
-            <h1>🔧 مدیریت خدمات</h1>
+            <h1>🔧 مدیریت فعالیت</h1>
         </div>
 
         <?php if ($successMessage): ?>
@@ -252,11 +252,11 @@ foreach ($services as $key => $service) {
         <!-- فرم ثبت سرویس -->
         <?php if (canEditServices()): ?>
             <div class="add-card">
-                <h2>➕ ثبت سرویس جدید</h2>
+                <h2>➕ ثبت فعالیت جدید</h2>
                 <form method="post" class="services-form" >
                     <div class="form-row">
                         <div class="form-group">
-                            <label>نام خدمت *</label>
+                            <label>فعالیت *</label>
                             <select name="service_name" required>
                                 <option value="">-- انتخاب کنید --</option>
                                 <?php foreach ($activities as $activity): ?>
@@ -318,18 +318,18 @@ foreach ($services as $key => $service) {
                         <textarea name="description" rows="3"></textarea>
                     </div>
                     </div>
-                    <button type="submit" name="add_service" class="btn-add">💾 ذخیره سرویس</button>
+                    <button type="submit" name="add_service" class="btn-add">💾 ذخیره فعالیت</button>
                 </form>
             </div>
         <?php endif; ?>
 
         <!-- بخش جستجو -->
         <div class="search-card">
-            <h2>🔍 جستجوی خدمات</h2>
+            <h2>🔍 جستجوی فعالیت</h2>
             <div class="search-form">
                 <div class="search-row">
                     <div class="service-name-group">
-                        <label>نام خدمت</label>
+                        <label>فعالیت</label>
                         <select id="search_name">
                             <option value="">-- همه --</option>
                             <?php foreach ($activities as $activity): ?>
@@ -408,12 +408,12 @@ foreach ($services as $key => $service) {
                 <thead>
                 <tr>
                     <th>ردیف</th>
-                    <th>نام خدمت</th>
+                    <th>فعالیت</th>
                     <th>بخش</th>
                     <th>برند</th>
                     <th>تحویل گیرنده</th>
                     <th>سریال</th>
-                    <th>تاریخ سرویس</th>
+                    <th>تاریخ فعالیت</th>
                     <th>کد رایانه</th>
                     <th>توضیحات</th>
                     <th>تاریخ ثبت</th>
@@ -471,12 +471,12 @@ foreach ($services as $key => $service) {
 <!-- مودال ویرایش سرویس -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3>✏️ ویرایش سرویس</h3>
+        <h3>✏️ ویرایش فعالیت</h3>
         <form method="post">
             <input type="hidden" name="service_id" id="edit_service_id">
             <div class="form-row">
             <div class="form-group">
-                <label>نام خدمت *</label>
+                <label>فعالیت *</label>
                 <select name="service_name" id="edit_service_name" required>
                     <option value="">-- انتخاب کنید --</option>
                     <?php foreach ($activities as $activity): ?>

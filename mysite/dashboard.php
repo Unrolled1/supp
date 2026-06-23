@@ -109,7 +109,7 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                     <?php if (canViewActivities()): ?>
                         <a href="admin_activities.php" class="quick-card">
                             <span class="icon">📋</span>
-                            <span class="label">خدمات</span>
+                            <span class="label">فعالیت</span>
                         </a>
                     <?php endif; ?>
                     <?php if (canViewDepartments()): ?>
@@ -164,7 +164,7 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                     <?php if (canViewServices()): ?>
                         <a href="admin_services.php" class="quick-card">
                             <span class="icon">🔧</span>
-                            <span class="label">ثبت خدمات</span>
+                            <span class="label">ثبت فعالیت</span>
                         </a>
                     <?php endif; ?>
                     <?php if (canViewInvoices()): ?>
