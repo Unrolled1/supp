@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -12,7 +13,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 }
 
 if (!isAdmin()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
@@ -20,41 +21,8 @@ $db = getDB();
 $successMessage = '';
 $errorMessage = '';
 
-// حذف فعالیت
-if (isset($_POST['delete_activity'])) {
-    $activity_id = $_POST['activity_id'];
 
-    $deleteStmt = $db->prepare("DELETE FROM activities WHERE id = :id");
-    if ($deleteStmt->execute([':id' => $activity_id])) {
-        $successMessage = "✅ فعالیت با موفقیت حذف شد";
-    } else {
-        $errorMessage = "❌ خطا در حذف فعالیت";
-    }
-    header('Location: admin_activities.php');
-    exit;
-}
-
-// ویرایش فعالیت
-if (isset($_POST['edit_activity'])) {
-    $activity_id = $_POST['activity_id'];
-    $name = htmlspecialchars($_POST['name']);
-
-    if (empty($name)) {
-        $errorMessage = "❌ نام فعالیت الزامی است";
-    } else {
-        $updateStmt = $db->prepare("UPDATE activities SET name = :name WHERE id = :id");
-        if ($updateStmt->execute([':name' => $name, ':id' => $activity_id])) {
-            $successMessage = "✅ فعالیت با موفقیت ویرایش شد";
-        } else {
-            $errorMessage = "❌ خطا در ویرایش فعالیت";
-        }
-    }
-    header('Location: admin_activities.php');
-    exit;
-}
-
-// افزودن فعالیت جدید
-if (isset($_POST['add_activity'])) {
+if (isset($_POST['add_activity'])&& canEditActivities()) {
     $name = htmlspecialchars($_POST['name']);
 
     if (empty($name)) {
@@ -72,6 +40,56 @@ if (isset($_POST['add_activity'])) {
     exit;
 }
 
+// ============================================
+// پردازش AJAX - ویرایش فعالیت
+// ============================================
+
+if (isset($_POST['edit_activity'])&& canEditActivities()) {
+    $activity_id = filter_var($_POST['activity_id'], FILTER_VALIDATE_INT);
+    $name = htmlspecialchars(trim($_POST['name']));
+
+    if (empty($name)) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'نام فعالیت الزامی است']);
+        exit;
+    }
+
+    $updateStmt = $db->prepare("UPDATE activities SET name = :name WHERE id = :id");
+    $success = $updateStmt->execute([':name' => $name, ':id' => $activity_id]);
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => $success,
+        'id' => $activity_id,
+        'name' => $name,
+        'message' => $success ? 'فعالیت با موفقیت ویرایش شد' : 'خطا در ویرایش فعالیت'
+    ]);
+    exit;
+}
+
+// حذف فعالیت با AJAX
+if (isset($_POST['delete_activity'])&& canEditActivities()) {
+    $activity_id = filter_var($_POST['activity_id'], FILTER_VALIDATE_INT);
+
+    if ($activity_id) {
+        $deleteStmt = $db->prepare("DELETE FROM activities WHERE id = :id");
+        $success = $deleteStmt->execute([':id' => $activity_id]);
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $success,
+            'id' => $activity_id,
+            'message' => $success ? 'فعالیت با موفقیت حذف شد' : 'خطا در حذف فعالیت'
+        ]);
+        exit;
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'شناسه نامعتبر']);
+    exit;
+}
+
+
 // گرفتن لیست فعالیت‌ها
 $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll();
 ?>
@@ -80,10 +98,8 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>خدمات - پنل ادمین</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/admin-activities.css">
+    <title>تعریف فعالیت</title>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -101,9 +117,11 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
             </div>
         </div>
 
+
         <div class="main-title">
-            <h1>📋 فعالیت</h1>
+            <h1>📋 تعریف فعالیت</h1>
         </div>
+
 
         <?php if ($successMessage): ?>
             <div class="alert alert-success"><?php echo $successMessage; ?></div>
@@ -115,13 +133,15 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
         <!-- افزودن فعالیت جدید -->
         <div class="add-card">
             <h2>➕ افزودن فعالیت جدید</h2>
-            <form method="post" class="form-inline">
-                <div class="form-group-inline">
+
+            <form method="post" class="form-row">
+                <div class="activityname-group">
                     <label>نام فعالیت</label>
                     <input type="text" name="name" required>
                 </div>
-                <button type="submit" name="add_activity" class="btn-add">➕ افزودن فعالیت</button>
+                <button type="submit" name="add_activity" class="btn-add">➕ ثبت</button>
             </form>
+
         </div>
 
         <!-- جدول فعالیت‌ها -->
@@ -141,14 +161,22 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
                         <td colspan="4" style="text-align: center; padding: 40px;">📋 هیچ فعالیتی ثبت نشده است</td>
                     </tr>
                 <?php else: ?>
+
                     <?php $row_num = 1; foreach ($activities as $activity): ?>
-                        <tr>
+                        <tr id="activity_<?php echo $activity['id']; ?>">
                             <td><?php echo fa_number($row_num); ?></td>
                             <td><?php echo htmlspecialchars($activity['name']); ?></td>
                             <td class="date"><?php echo fa_number(htmlspecialchars($activity['created_at'])); ?></td>
                             <td class="action-buttons">
-                                <button class="edit-btn" onclick='openEditModal(<?php echo $activity['id']; ?>, "<?php echo htmlspecialchars($activity['name']); ?>")'>✏️ ویرایش</button>
+
+                                <?php if (canEditActivities()): ?>
+                                <button class="edit-btn" onclick='openEditModal(<?php echo $activity['id']; ?>)'>✏️ ویرایش</button>
+                                <?php endif; ?>
+
+                                <?php if (canDeleteActivities()): ?>
                                 <button class="delete-btn" onclick="confirmDelete(<?php echo $activity['id']; ?>, '<?php echo htmlspecialchars($activity['name']); ?>')">🗑️ حذف</button>
+                                <?php endif; ?>
+
                             </td>
                         </tr>
                         <?php $row_num++; ?>
@@ -164,53 +192,26 @@ $activities = $db->query("SELECT * FROM activities ORDER BY name ASC")->fetchAll
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>✏️ ویرایش فعالیت</h3>
-        <form method="post">
+        <form id="editForm">
             <input type="hidden" name="activity_id" id="edit_activity_id">
-            <label>نام فعالیت</label>
-            <input type="text" name="name" id="edit_name" required>
+            <input type="hidden" name="edit_activity_ajax" value="1">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>نام فعالیت</label>
+                    <input type="text" name="name" id="edit_name" required>
+                </div>
+            </div>
+
             <div class="modal-buttons">
-                <button type="submit" name="edit_activity" class="modal-save">💾 ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
+                <button type="button" class="btn-add" onclick="saveEdit()">💾 ذخیره</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-    function openEditModal(id, name) {
-        document.getElementById('edit_activity_id').value = id;
-        document.getElementById('edit_name').value = name;
-        document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function confirmDelete(id, name) {
-        if (confirm('آیا از حذف فعالیت "' + name + '" مطمئن هستید؟')) {
-            var form = document.createElement('form');
-            form.method = 'post';
-            form.innerHTML = '<input type="hidden" name="delete_activity" value="1"><input type="hidden" name="activity_id" value="' + id + '">';
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    }
-
-    function updateClock() {
-        fetch('get_time.php').then(r=>r.json()).then(d=>{
-            var c = document.getElementById('liveClock');
-            if (c) c.innerHTML = '📅 ' + d.datetime;
-        }).catch(e=>console.log(e));
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
+<script src="assets/js/alljs.js"></script>
+<script src="assets/js/sweetalert2.min.js"></script>
+<script src="assets/js/admin-activities.js"></script>
 </body>
 </html>

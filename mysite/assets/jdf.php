@@ -82,7 +82,7 @@ function jdate($format, $timestamp = null)
 
 function now()
 {
-    return jdate('Y-m-d');
+    return jdate('Y/m/d');
 }
 
 // تبدیل اعداد انگلیسی به فارسی

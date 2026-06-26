@@ -1,24 +1,4 @@
 /* استایل مدیریت کاربران - فقط چیدمان */
-.main-title {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-
-.add-card {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.add-card h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
-    border-right: 4px solid #28a745;
-    padding-right: 15px;
-}
 
 .form-row {
     display: flex;
@@ -32,36 +12,46 @@
     min-width: 180px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 13px;
-    color: #555;
+
+.edit-form {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 30px 35px;
+    width: 95%;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
 }
 
-.form-group input,
-.form-group select {
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: inherit;
+    padding: 10px 14px;
+    border: 2px solid #4a5568;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    background: #1a202c;
+    color: #e2e8f0;
+    box-sizing: border-box;
 }
 
-
+.edit-form input:focus,
+.edit-form select:focus,
+.edit-form textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    background: #1a202c;
+}
 .role-badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 13px;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
 }
 
 /* دسترسی‌ها به صورت لیست افقی */
@@ -96,37 +86,6 @@
     color: #333;
 }
 
-.access-title {
-    font-weight: bold;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #555;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    animation: modalSlideIn 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    width: 90%;
-
-    max-height: 85vh;
-    overflow-y: auto;
-    margin: 20px auto;
-}
 
 @keyframes modalSlideIn {
     from {
@@ -158,12 +117,6 @@
     background: #764ba2;
 }
 
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    justify-content: center;
-}
 
 .alert {
     padding: 12px 20px;
@@ -176,29 +129,14 @@
    استایل دسترسی درختی
    ============================================ */
 
-.access-tree {
-    margin-top: 10px;
-}
-
-.tree-node {
-    margin-bottom: 12px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-}
-
 .tree-node-main {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 0;
     cursor: pointer;
-    background: #f8f9fa;
     border-radius: 8px;
     padding: 10px;
-}
-
-.tree-node-main:hover {
-    background: #e9ecef;
 }
 
 .tree-node-main input {
@@ -211,7 +149,6 @@
 .tree-node-main label {
     font-weight: bold;
     font-size: 14px;
-    color: #333;
     cursor: pointer;
     margin: 0;
     flex: 1;
@@ -241,18 +178,7 @@
     display: block;
 }
 
-.tree-child {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 0 6px 10px;
-    margin: 3px 0;
-    border-radius: 6px;
-}
 
-.tree-child:hover {
-    background: #f5f5f5;
-}
 
 .tree-child input {
     width: 16px;
@@ -261,12 +187,6 @@
     margin: 0;
 }
 
-.tree-child label {
-    font-size: 13px;
-    color: #555;
-    cursor: pointer;
-    margin: 0;
-}
 
 .tree-child.disabled {
     opacity: 0.5;
@@ -275,4 +195,18 @@
 .tree-child.disabled input,
 .tree-child.disabled label {
     cursor: not-allowed;
+}
+/* ============================================
+   گرید دو ستونی دسترسی‌ها
+   ============================================ */
+
+.permission-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.permission-col {
+    flex: 1;
+    min-width: 280px;
 }

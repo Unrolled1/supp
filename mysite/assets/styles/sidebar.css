@@ -2,12 +2,6 @@
    استایل پنل کناری سمت راست
    ============================================ */
 
-/* تغییر ساختار کلی */
-body {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
 .admin-wrapper {
     display: flex;
     min-height: 100vh;
@@ -147,17 +141,7 @@ body {
 }
 
 /* هدر در محتوای اصلی */
-.main-header {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 15px 25px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
+
 
 .user-info {
     display: flex;
@@ -172,20 +156,6 @@ body {
 }
 
 
-.logout-btn-sidebar:hover {
-    background: #94222d;
-}
-
-/* ساعت در هدر */
-.clock-display {
-    font-size: 13px;
-    background: rgba(255,255,255,0.1);
-    padding: 5px 12px;
-    border-radius: 20px;
-    direction: ltr;
-    color: white;
-    margin-left: 15px;  /* اضافه کن - فاصله از دکمه خروج */
-}
 
 /* واکنش‌گرایی برای موبایل */
 @media (max-width: 768px) {

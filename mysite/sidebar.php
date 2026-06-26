@@ -8,6 +8,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </div>
 
     <ul class="sidebar-nav">
+
         <li>
             <a href="dashboard.php" class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
                 <span class="icon">📊</span>
@@ -17,7 +18,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <!-- پنل درخواست‌ها -->
         <?php if (canViewTickets()): ?>
             <li>
-                <a href="admin.php" class="<?php echo $current_page == 'admin.php' ? 'active' : ''; ?>">
+                <a href="requests.php" class="<?php echo $current_page == 'requests.php' ? 'active' : ''; ?>">
                     <span class="icon">📋</span>
                     <span class="text">درخواست‌ها</span>
                 </a>
@@ -25,9 +26,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php endif; ?>
 
         <!-- منوی تعاریف -->
-        <?php if (canViewPersons() || canViewModels() || canViewUsers() || canViewDepartments()
-            || canViewTopics() || canViewBrands() || canViewProducts() || canViewActivities()): ?>
-            <li class="has-submenu">
+        <?php
+        if (canViewPersons() || canViewModels() || canViewUsers() || canViewDepartments()
+            || canViewTopics() || canViewBrands() || canViewProducts() || canViewActivities()):
+            // بررسی اینکه آیا صفحه فعلی در منوی تعاریف است
+            $definitionsPages = ['admin_activities.php', 'admin_departments.php', 'admin_topics.php',
+                'admin_brands.php', 'admin_models.php', 'admin_products.php',
+                'admin_persons.php', 'admin_users.php'];
+            $isDefinitionsActive = in_array($current_page, $definitionsPages);
+            ?>
+
+            <li class="has-submenu <?php echo $isDefinitionsActive ? 'open' : ''; ?>">
+
                 <a href="javascript:void(0)" class="submenu-toggle">
                     <span class="icon">⚙️</span>
                     <span class="text">تعاریف</span>
@@ -110,8 +120,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php endif; ?>
 
         <!-- منوی عملیات -->
-        <?php if (canViewServices() || canViewInvoices() || canViewGoods() || canViewPrinters() || canViewSystems()): ?>
-            <li class="has-submenu">
+        <?php
+        if (canViewServices() || canViewInvoices() || canViewkala() || canViewPrinters() || canViewSystems()):
+
+            $operationsPages = ['admin_services.php', 'admin_invoices.php', 'admin_kala.php',
+                'admin_printers.php', 'admin_systems.php'];
+            $isOperationsActive = in_array($current_page, $operationsPages);
+
+            ?>
+            <li class="has-submenu <?php echo $isOperationsActive ? 'open' : ''; ?>">
+
                 <a href="javascript:void(0)" class="submenu-toggle">
                     <span class="icon">📊</span>
                     <span class="text">عملیات</span>
@@ -136,7 +154,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </li>
                     <?php endif; ?>
 
-                    <?php if (canViewGoods()): ?>
+                    <?php if (canViewkala()): ?>
                         <li>
                             <a href="admin_kala.php" class="<?php echo $current_page == 'admin_kala.php' ? 'active' : ''; ?>">
                                 <span class="icon">📦</span>
@@ -166,7 +184,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </li>
         <?php endif; ?>
 
-        <!-- منوی گزارشات -->
+        <!-- منوی گزارش‌ها -->
         <?php if (canViewReports()): ?>
             <li class="has-submenu">
                 <a href="javascript:void(0)" class="submenu-toggle">
@@ -186,12 +204,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php endif; ?>
 
         <!-- پشتیبان گیری -->
+        <?php if(canViewBackup()): ?>
         <li>
             <a href="backup.php" class="<?php echo $current_page == 'backup.php' ? 'active' : ''; ?>">
                 <span class="icon">💾</span>
                 <span class="text">پشتیبان گیری</span>
             </a>
         </li>
+        <?php endif; ?>
     </ul>
 </div>
 

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -11,7 +12,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 }
 
 if (!isAdmin() || !canManageUsers()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
@@ -27,9 +28,9 @@ $permissionLabels = [
     'tickets_edit' => 'ويرايش درخواست ها',
     'tickets_delete' => 'حذف درخواست ها',
 
-    'activities_manage' => 'مدیریت خدمات',
-    'activities_edit' => 'ويرايش خدمات',
-    'activities_delete' => 'حذف خدمات',
+    'activities_view' => 'مدیریت فعالیت',
+    'activities_edit' => 'ويرايش فعالیت',
+    'activities_delete' => 'حذف فعالیت',
 
     'departments_manage' => 'مدیریت بخش ها',
     'departments_edit' => 'ويرايش بخش ها',
@@ -59,10 +60,10 @@ $permissionLabels = [
     'users_edit' => 'ويرايش کاربران',
     'users_delete' => 'حذف کاربران',
 
-    'services_manage' => 'ثبت خدمات',
-    'services_view' => ' مشاهده خدمات',
-    'services_edit' => 'ويرايش خدمات',
-    'services_delete' => 'حذف خدمات',
+    'services_manage' => 'ثبت فعالیت',
+    'services_view' => ' مشاهده فعالیت',
+    'services_edit' => 'ويرايش فعالیت',
+    'services_delete' => 'حذف فعالیت',
 
     // دسترسی‌های فاکتور
     'invoices_view' => ' مشاهده فاکتورها',
@@ -91,72 +92,291 @@ $permissionLabels = [
     'reports_view' => ' مشاهده گزارشات',
 ];
 
-// حذف کاربر
+// ============================================
+// تعریف درخت دسترسی‌ها بر اساس منوها
+// ============================================
+
+$permissionTree = [
+    // ============================================
+    // گروه: تعاریف
+    // ============================================
+    [
+        'name' => '📋 تعاریف',
+        'key' => 'definitions',
+        'children' => [
+            // فعالیت
+            [
+                'name' => '🛠️ فعالیت',
+                'key' => 'activities',
+                'children' => [
+                    ['name' => '👁️ مشاهده خدمات', 'key' => 'activities_view'],
+                    ['name' => '✏️ ویرایش خدمات', 'key' => 'activities_edit'],
+                    ['name' => '🗑️ حذف خدمات', 'key' => 'activities_delete'],
+                ]
+            ],
+            //بخش
+            [
+                'name' => '🛠️ بخش',
+                'key' => 'departments',
+                'children' => [
+                    ['name' => '👁️ مشاهده بخش', 'key' => 'departments_view'],
+                    ['name' => '✏️ ویرایش بخش', 'key' => 'departments_edit'],
+                    ['name' => '🗑️ حذف بخش', 'key' => 'departments_delete'],
+                ]
+            ],
+
+            // موضوعات
+            [
+                'name' => '📝 موضوعات',
+                'key' => 'topics',
+                'children' => [
+                    ['name' => '✏️ مشاهده موضوع', 'key' => 'topics_view'],
+                    ['name' => '✏️ ویرایش موضوع', 'key' => 'topics_edit'],
+                    ['name' => '🗑️ حذف موضوع', 'key' => 'topics_delete']
+                ]
+            ],
+
+            // برندها
+            [
+                'name' => '🏷️ برندها',
+                'key' => 'brands',
+                'children' => [
+                    ['name' => '✏️ ویرایش برند', 'key' => 'brands_edit'],
+                    ['name' => '🗑️ حذف برند', 'key' => 'brands_delete']
+                ]
+            ],
+            // مدل‌ها
+            [
+                'name' => '📱 مدل‌ها',
+                'key' => 'models',
+                'children' => [
+                    ['name' => '✏️ ویرایش مدل', 'key' => 'models_edit'],
+                    ['name' => '🗑️ حذف مدل', 'key' => 'models_delete']
+                ]
+            ],
+            // کالاها
+            [
+                'name' => '📦 کالاها',
+                'key' => 'products',
+                'children' => [
+                    ['name' => '✏️ ویرایش کالا', 'key' => 'products_edit'],
+                    ['name' => '🗑️ حذف کالا', 'key' => 'products_delete']
+                ]
+            ],
+            // اشخاص
+            [
+                'name' => '👤 اشخاص',
+                'key' => 'persons',
+                'children' => [
+                    ['name' => '✏️ ویرایش شخص', 'key' => 'persons_edit'],
+                    ['name' => '🗑️ حذف شخص', 'key' => 'persons_delete']
+                ]
+            ],
+        ]
+    ],
+
+    // ============================================
+    // گروه: عملیات
+    // ============================================
+    [
+        'name' => '⚙️ عملیات',
+        'key' => 'operations',
+        'children' => [
+            // درخواست‌ها
+            [
+                'name' => '📩 درخواست‌ها',
+                'key' => 'tickets',
+                'children' => [
+                    ['name' => '✏️ ویرایش درخواست', 'key' => 'tickets_edit'],
+                    ['name' => '🗑️ حذف درخواست', 'key' => 'tickets_delete']
+                ]
+            ],
+            //ثبت فعالیت
+            [
+                'name' => '🧾 ثبت فعالیت',
+                'key' => 'services',
+                'children' => [
+                    ['name' => '👁️ مشاهده فاکتورها', 'key' => 'invoices_view'],
+                    ['name' => '✏️ ویرایش فاکتور', 'key' => 'invoices_edit'],
+                    ['name' => '🗑️ حذف فاکتور', 'key' => 'invoices_delete']
+                ]
+            ],
+            // فاکتورها
+            [
+                'name' => '🧾 فاکتورها',
+                'key' => 'invoices',
+                'children' => [
+                    ['name' => '👁️ مشاهده فاکتورها', 'key' => 'invoices_view'],
+                    ['name' => '✏️ ویرایش فاکتور', 'key' => 'invoices_edit'],
+                    ['name' => '🗑️ حذف فاکتور', 'key' => 'invoices_delete']
+                ]
+            ],
+            // کالاها
+            [
+                'name' => '📦 ثبت کالاها',
+                'key' => 'goods',
+                'children' => [
+                    ['name' => '👁️ مشاهده کالاها', 'key' => 'goods_view'],
+                    ['name' => '✏️ ویرایش کالا', 'key' => 'goods_edit'],
+                    ['name' => '🗑️ حذف کالا', 'key' => 'goods_delete']
+                ]
+            ],
+            // پرینترها
+            [
+                'name' => '🖨️ پرینترها',
+                'key' => 'printers',
+                'children' => [
+                    ['name' => '👁️ مشاهده پرینترها', 'key' => 'printers_view'],
+                    ['name' => '✏️ ویرایش پرینتر', 'key' => 'printers_edit'],
+                    ['name' => '🗑️ حذف پرینتر', 'key' => 'printers_delete']
+                ]
+            ],
+            // سیستم‌ها
+            [
+                'name' => '💻 سیستم‌ها',
+                'key' => 'systems',
+                'children' => [
+                    ['name' => '👁️ مشاهده سیستم‌ها', 'key' => 'systems_view'],
+                    ['name' => '✏️ ویرایش سیستم', 'key' => 'systems_edit'],
+                    ['name' => '🗑️ حذف سیستم', 'key' => 'systems_delete']
+                ]
+            ],
+
+        ]
+    ],
+
+    // ============================================
+    // گروه: کاربران
+    // ============================================
+    [
+        'name' => '👥 کاربران',
+        'key' => 'users_management',
+        'children' => [
+            [
+                'name' => '👤 مدیریت کاربران',
+                'key' => 'users',
+                'children' => [
+                    ['name' => '✏️ ویرایش کاربر', 'key' => 'users_edit'],
+                    ['name' => '🗑️ حذف کاربر', 'key' => 'users_delete']
+                ]
+            ]
+        ]
+    ],
+
+    // ============================================
+    // گروه: گزارشات
+    // ============================================
+    [
+        'name' => '📊 گزارشات',
+        'key' => 'reports_section',
+        'children' => [
+            [
+                'name' => '📈 مشاهده گزارشات',
+                'key' => 'reports',
+                'children' => [
+                    ['name' => '👁️ مشاهده گزارشات', 'key' => 'reports_view']
+                ]
+            ]
+        ]
+    ]
+];
+
+// ============================================
+// حذف کاربر با Ajax
+// ============================================
+
 if (isset($_POST['delete_user'])) {
+    header('Content-Type: application/json');
+
     $user_id = $_POST['user_id'];
 
+    // جلوگیری از حذف خود کاربر
     if ($user_id == $_SESSION['user_id']) {
-        $errorMessage = "❌ نمی‌توانید خودتان را حذف کنید!";
-    } else {
+        echo json_encode(['success' => false, 'message' => '❌ نمی‌توانید خودتان را حذف کنید!']);
+        exit;
+    }
+
+    try {
+        // به‌روزرسانی تیکت‌ها
         $updateTickets = $db->prepare("UPDATE tickets SET user_id = NULL WHERE user_id = :user_id");
         $updateTickets->execute([':user_id' => $user_id]);
 
+        // حذف کاربر
         $deleteStmt = $db->prepare("DELETE FROM users WHERE id = :id");
-        if ($deleteStmt->execute([':id' => $user_id])) {
+        $success = $deleteStmt->execute([':id' => $user_id]);
+
+        if ($success) {
+            // حذف دسترسی‌های کاربر
             $delPermStmt = $db->prepare("DELETE FROM user_permissions WHERE user_id = :user_id");
             $delPermStmt->execute([':user_id' => $user_id]);
-            $successMessage = "✅ کاربر با موفقیت حذف شد";
+
+            echo json_encode([
+                'success' => true,
+                'id' => $user_id,
+                'message' => 'کاربر با موفقیت حذف شد'
+            ]);
         } else {
-            $errorMessage = "❌ خطا در حذف کاربر";
+            echo json_encode(['success' => false, 'message' => 'خطا در حذف کاربر']);
         }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'خطای سرور: ' . $e->getMessage()]);
     }
-    header('Location: admin_users.php');
     exit;
 }
+// ============================================
+// ویرایش کاربر با Ajax
+// ============================================
 
-// ویرایش کاربر
 if (isset($_POST['edit_user'])) {
+    header('Content-Type: application/json');
+
     $user_id = $_POST['user_id'];
     $username = trim($_POST['username']);
     $fullname = htmlspecialchars($_POST['fullname']);
     $role = $_POST['role'];
+    $permissions = json_decode($_POST['permissions'], true);
 
-    if ($user_id == $_SESSION['user_id']) {
-        $stmt = $db->prepare("SELECT role FROM users WHERE id = :id");
-        $stmt->execute([':id' => $user_id]);
-        $currentRole = $stmt->fetchColumn();
-        $role = $currentRole;
-    }
+    try {
+        // بررسی نام کاربری تکراری
+        $checkStmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND id != :id");
+        $checkStmt->execute([':username' => $username, ':id' => $user_id]);
+        $exists = $checkStmt->fetchColumn();
 
-    $checkStmt = $db->prepare("SELECT COUNT(*) FROM users WHERE username = :username AND id != :id");
-    $checkStmt->execute([':username' => $username, ':id' => $user_id]);
-    $exists = $checkStmt->fetchColumn();
+        if ($exists) {
+            echo json_encode(['success' => false, 'message' => 'این نام کاربری قبلاً استفاده شده است']);
+            exit;
+        }
 
-    if ($exists) {
-        $errorMessage = "❌ این نام کاربری قبلاً توسط کاربر دیگری استفاده شده است";
-    } else {
+        // بروزرسانی کاربر
         $updateStmt = $db->prepare("UPDATE users SET username = :username, fullname = :fullname, role = :role WHERE id = :id");
-        if ($updateStmt->execute([':username' => $username, ':fullname' => $fullname, ':role' => $role, ':id' => $user_id])) {
+        $success = $updateStmt->execute([':username' => $username, ':fullname' => $fullname, ':role' => $role, ':id' => $user_id]);
 
+        if ($success) {
+            // حذف دسترسی‌های قبلی
             $delPermStmt = $db->prepare("DELETE FROM user_permissions WHERE user_id = :user_id");
             $delPermStmt->execute([':user_id' => $user_id]);
 
-            if ($role === 'admin') {
-                $allPermissions = $db->query("SELECT DISTINCT permission_key FROM permissions WHERE role = 'admin' ORDER BY permission_key")->fetchAll();
+            // ذخیره دسترسی‌های جدید
+            if ($role === 'admin' && !empty($permissions)) {
                 $insertPermStmt = $db->prepare("INSERT INTO user_permissions (user_id, permission_key, permission_value) VALUES (:user_id, :permission_key, :permission_value)");
-                foreach ($allPermissions as $perm) {
-                    $permKey = $perm['permission_key'];
-                    $value = isset($_POST['perm_' . $permKey]) ? 1 : 0;
-                    $insertPermStmt->execute([':user_id' => $user_id, ':permission_key' => $permKey, ':permission_value' => $value]);
+                foreach ($permissions as $key => $value) {
+                    $insertPermStmt->execute([':user_id' => $user_id, ':permission_key' => $key, ':permission_value' => $value]);
                 }
             }
 
-            $successMessage = "✅ کاربر با موفقیت ویرایش شد";
+            echo json_encode([
+                'success' => true,
+                'id' => $user_id,
+                'username' => $username,
+                'fullname' => $fullname,
+                'role' => $role
+            ]);
         } else {
-            $errorMessage = "❌ خطا در ویرایش کاربر";
+            echo json_encode(['success' => false, 'message' => 'خطا در بروزرسانی کاربر']);
         }
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'خطای سرور: ' . $e->getMessage()]);
     }
-    header('Location: admin_users.php');
     exit;
 }
 
@@ -246,16 +466,16 @@ foreach ($users as $user) {
         $userPermissions[$user['id']][$perm['permission_key']] = $perm['permission_value'];
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مدیریت کاربران - پنل ادمین</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/admin-users.css">
+    <title>تعریف کاربران </title>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -308,7 +528,7 @@ foreach ($users as $user) {
                     </select>
                 </div>
                 <div class="form-group">
-                    <button type="submit" name="add_user" class="btn-add">➕ افزودن</button>
+                    <button type="submit" name="add_user" class="btn-add">➕ ثبت</button>
                 </div>
             </form>
         </div>
@@ -353,17 +573,19 @@ foreach ($users as $user) {
     </div>
 </div>
 
-<!-- مودال ویرایش کاربر -->
+
 <!-- مودال ویرایش کاربر -->
 <div id="editModal" class="modal">
-    <div class="modal-content">
+    <div class="edit-form">
         <h3>✏️ ویرایش کاربر</h3>
         <form method="post">
             <input type="hidden" name="user_id" id="edit_user_id">
+            <input type="hidden" id="current_user_id" value="<?php echo $_SESSION['user_id']; ?>">
 
             <!-- بخش ثابت (اینپوت‌ها) -->
             <div class="modal-fixed-fields">
                 <div class="form-row">
+
                     <div class="form-group">
                         <label>نام کاربری</label>
                         <input type="text" name="username" id="edit_username" required>
@@ -372,9 +594,6 @@ foreach ($users as $user) {
                         <label>نام کامل</label>
                         <input type="text" name="fullname" id="edit_fullname" required>
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                         <label>نقش</label>
                         <select name="role" id="edit_role">
@@ -383,19 +602,20 @@ foreach ($users as $user) {
                         </select>
                     </div>
                 </div>
+
             </div>
 
             <!-- بخش اسکرول دار (چک لیست دسترسی‌ها) -->
-            <div id="edit_access_section" class="access-section" style="display: none;">
-                <div class="access-title">🔐 دسترسی‌های مدیریتی:</div>
+            <div id="edit_access_section" class="access-section" >
+                <div class="access-title">🔐 دسترسی‌ها:</div>
                 <div class="access-scroll-area">
                     <div id="edit_permissions_grid" class="access-tree"></div>
                 </div>
             </div>
 
             <div class="modal-buttons">
-                <button type="submit" name="edit_user" class="modal-save">💾 ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
+                <button type="button"  class="btn-add" onclick="saveusersEdit()">💾 ذخیره</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
         </form>
     </div>
@@ -410,288 +630,23 @@ foreach ($users as $user) {
             <label>رمز عبور جدید</label>
             <input type="text" name="new_password" required>
             <div class="modal-buttons">
-                <button type="submit" name="change_password" class="modal-save">ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('passwordModal')">لغو</button>
+                <button type="submit" name="change_password" class="btn-add">ذخیره</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('passwordModal')">لغو</button>
             </div>
         </form>
     </div>
 </div>
-
 <script>
-    var allPermissions = <?php echo json_encode(array_column($allPermissions, 'permission_key')); ?>;
-    var permissionLabels = <?php echo json_encode($permissionLabels); ?>;
-    var existingPermissions = <?php
-        $permsData = [];
-        foreach ($users as $user) {
-            $permsData[$user['id']] = $userPermissions[$user['id']] ?? [];
-        }
-        echo json_encode($permsData);
-        ?>;
-
-    var permissionTree = [
-        { name: 'مدیریت درخواست‌ها', key: 'tickets', children: [
-                { name: '✏️ ویرایش درخواست', key: 'tickets_edit' },
-                { name: '🗑️ حذف درخواست', key: 'tickets_delete' }
-            ] },
-
-        { name: 'تعریف خدمات', key: 'activities', children: [
-                { name: '✏️ ویرایش خدمت', key: 'activities_edit' },
-                { name: '🗑️ حذف خدمت', key: 'activities_delete' }
-            ] },
-
-        { name: 'تعریف بخش‌ها', key: 'departments', children: [
-                { name: '✏️ ویرایش بخش', key: 'departments_edit' },
-                { name: '🗑️ حذف بخش', key: 'departments_delete' }
-            ] },
-
-        { name: 'تعریف موضوع', key: 'topics', children: [
-                { name: '✏️ ویرایش موضوع', key: 'topics_edit' },
-                { name: '🗑️ حذف موضوع', key: 'topics_delete' }
-            ] },
-
-        { name: 'تعریف برندها', key: 'brands', children: [
-                { name: '✏️ ویرایش برند', key: 'brands_edit' },
-                { name: '🗑️ حذف برند', key: 'brands_delete' }
-            ] },
-
-        { name: 'تعریف مدل‌ها', key: 'models', children: [
-                { name: '✏️ ویرایش مدل', key: 'models_edit' },
-                { name: '🗑️ حذف مدل', key: 'models_delete' }
-            ] },
-
-        { name: 'تعریف کالاها', key: 'products', children: [
-                { name: '✏️ ویرایش کالا', key: 'products_edit' },
-                { name: '🗑️ حذف کالا', key: 'products_delete' }
-            ] },
-
-        { name: 'تعریف اشخاص', key: 'persons', children: [
-                { name: '✏️ ویرایش شخص', key: 'persons_edit' },
-                { name: '🗑️ حذف شخص', key: 'persons_delete' }
-            ] },
-
-        { name: 'مدیریت کاربران', key: 'users', children: [
-                { name: '✏️ ویرایش کاربر', key: 'users_edit' },
-                { name: '🗑️ حذف کاربر', key: 'users_delete' }
-            ] },
-
-        { name: 'ثبت خدمات', key: 'services', children: [
-                { name: '👁️ مشاهده خدمات', key: 'services_view' },
-                { name: '✏️ ویرایش خدمات', key: 'services_edit' },
-                { name: '🗑️ حذف خدمات', key: 'services_delete' }
-            ] },
-
-        {name: 'مدیریت فاکتورها', key: 'invoices', children: [
-                { name: '👁️ مشاهده فاکتورها', key: 'invoices_view' },
-                { name: '✏️ ویرایش فاکتور', key: 'invoices_edit' },
-                { name: '🗑️ حذف فاکتور', key: 'invoices_delete' }
-            ]},
-
-        {name: 'مدیریت کالاها', key: 'goods', children: [
-                { name: '👁️ مشاهده کالاها', key: 'goods_view' },
-                { name: '✏️ ویرایش کالا', key: 'goods_edit' },
-                { name: '🗑️ حذف کالا', key: 'goods_delete' }
-            ]},
-
-        {name: 'مدیریت پرینترها', key: 'printers', children: [
-                { name: '👁️ مشاهده پرینترها', key: 'printers_view' },
-                { name: '✏️ ویرایش پرینتر', key: 'printers_edit' },
-                { name: '🗑️ حذف پرینتر', key: 'printers_delete' }
-            ]},
-
-        {name: 'مدیریت سیستم‌ها', key: 'systems', children: [
-                { name: '👁️ مشاهده سیستم‌ها', key: 'systems_view' },
-                { name: '✏️ ویرایش سیستم', key: 'systems_edit' },
-                { name: '🗑️ حذف سیستم', key: 'systems_delete' }
-            ]},
-
-        {name: 'گزارشات', key: 'reports', children: [
-                { name: '👁️ مشاهده گزارشات', key: 'reports_view' }]
-        },
-    ];
-
-    function buildPermissionTree(containerId, existingPermissions) {
-        var container = document.getElementById(containerId);
-        if (!container) return;
-        container.innerHTML = '';
-        for (var i = 0; i < permissionTree.length; i++) {
-            var node = permissionTree[i];
-            var allChildrenChecked = true;
-            var anyChildChecked = false;
-            for (var j = 0; j < node.children.length; j++) {
-                var childKey = node.children[j].key;
-                if (existingPermissions[childKey] !== 1) allChildrenChecked = false;
-                else anyChildChecked = true;
-            }
-            var mainChecked = allChildrenChecked;
-            var mainIndeterminate = (!allChildrenChecked && anyChildChecked);
-            var nodeHtml = '<div class="tree-node" data-parent-key="' + node.key + '">';
-            nodeHtml += '<div class="tree-node-main">';
-            nodeHtml += '<span class="tree-toggle" onclick="toggleTree(this)">▼</span>';
-            nodeHtml += '<input type="checkbox" name="perm_' + node.key + '_manage" id="perm_' + node.key + '_manage" value="1" ' + (mainChecked ? 'checked' : '') + ' onchange="toggleChildren(this)">';
-            nodeHtml += '<label for="perm_' + node.key + '_manage">' + node.name + '</label>';
-            nodeHtml += '</div>';
-            nodeHtml += '<div class="tree-children" id="children_' + node.key + '">';
-            for (var j = 0; j < node.children.length; j++) {
-                var child = node.children[j];
-                var childChecked = (existingPermissions[child.key] === 1);
-                nodeHtml += '<div class="tree-child" data-child-key="' + child.key + '">';
-                nodeHtml += '<input type="checkbox" name="perm_' + child.key + '" id="perm_' + child.key + '" value="1" ' + (childChecked ? 'checked' : '') + ' onchange="updateParent(this)">';
-                nodeHtml += '<label for="perm_' + child.key + '">' + child.name + '</label>';
-                nodeHtml += '</div>';
-            }
-            nodeHtml += '</div></div>';
-            container.innerHTML += nodeHtml;
-            var mainCheckbox = document.getElementById('perm_' + node.key + '_manage');
-            if (mainCheckbox && mainIndeterminate) mainCheckbox.indeterminate = true;
-        }
-    }
-
-    function toggleTree(element) {
-        var childrenDiv = element.parentElement.nextElementSibling;
-        if (childrenDiv) {
-            childrenDiv.classList.toggle('show');
-            element.textContent = childrenDiv.classList.contains('show') ? '▼' : '▶';
-        }
-    }
-
-    function toggleChildren(mainCheckbox) {
-        var parentDiv = mainCheckbox.closest('.tree-node');
-        var childrenDiv = parentDiv.querySelector('.tree-children');
-        var childCheckboxes = childrenDiv.querySelectorAll('input[type="checkbox"]');
-        for (var i = 0; i < childCheckboxes.length; i++) {
-            childCheckboxes[i].checked = mainCheckbox.checked;
-        }
-    }
-
-    function updateParent(childCheckbox) {
-        var parentDiv = childCheckbox.closest('.tree-node');
-        var mainCheckbox = parentDiv.querySelector('.tree-node-main input[type="checkbox"]');
-        var childCheckboxes = parentDiv.querySelectorAll('.tree-children input[type="checkbox"]');
-        var allChecked = true, anyChecked = false;
-        for (var i = 0; i < childCheckboxes.length; i++) {
-            if (!childCheckboxes[i].checked) allChecked = false;
-            if (childCheckboxes[i].checked) anyChecked = true;
-        }
-        if (allChecked) {
-            mainCheckbox.checked = true;
-            mainCheckbox.indeterminate = false;
-        } else if (anyChecked) {
-            mainCheckbox.checked = false;
-            mainCheckbox.indeterminate = true;
-        } else {
-            mainCheckbox.checked = false;
-            mainCheckbox.indeterminate = false;
-        }
-    }
-
-    function openEditModal(id, username, fullname, role, isLimitedAdmin) {
-        var currentUserId = <?php echo $_SESSION['user_id']; ?>;
-        document.getElementById('edit_user_id').value = id;
-        document.getElementById('edit_username').value = username;
-        document.getElementById('edit_fullname').value = fullname;
-        var roleSelectElem = document.getElementById('edit_role');
-        roleSelectElem.value = role;
-        if (id == currentUserId) {
-            roleSelectElem.disabled = true;
-            roleSelectElem.style.opacity = '0.6';
-            roleSelectElem.style.cursor = 'not-allowed';
-        } else {
-            roleSelectElem.disabled = false;
-            roleSelectElem.style.opacity = '1';
-            roleSelectElem.style.cursor = 'pointer';
-        }
-        var accessSection = document.getElementById('edit_access_section');
-        if (role === 'admin') {
-            accessSection.style.display = 'block';
-            var userPerms = existingPermissions[id] || {};
-            buildPermissionTree('edit_permissions_grid', userPerms);
-            var allToggles = document.querySelectorAll('#edit_permissions_grid .tree-toggle');
-            for (var i = 0; i < allToggles.length; i++) {
-                var childrenDiv = allToggles[i].parentElement.nextElementSibling;
-                if (childrenDiv) {
-                    childrenDiv.classList.add('show');
-                    allToggles[i].textContent = '▼';
-                }
-            }
-            var isSelf = (id == currentUserId);
-            if (isSelf) {
-                var allCheckboxes = accessSection.querySelectorAll('input[type="checkbox"]');
-                for (var i = 0; i < allCheckboxes.length; i++) {
-                    allCheckboxes[i].disabled = true;
-                    allCheckboxes[i].checked = true;
-                }
-            }
-        } else {
-            accessSection.style.display = 'none';
-        }
-        document.getElementById('editModal').style.display = 'flex';
-    }
-
-    var editRoleSelect = document.getElementById('edit_role');
-    if (editRoleSelect) {
-        editRoleSelect.addEventListener('change', function() {
-            var accessSection = document.getElementById('edit_access_section');
-            var userId = document.getElementById('edit_user_id').value;
-            var currentUserId = <?php echo $_SESSION['user_id']; ?>;
-            if (this.value === 'admin') {
-                accessSection.style.display = 'block';
-                var userPerms = existingPermissions[userId] || {};
-                buildPermissionTree('edit_permissions_grid', userPerms);
-                var allToggles = document.querySelectorAll('#edit_permissions_grid .tree-toggle');
-                for (var i = 0; i < allToggles.length; i++) {
-                    var childrenDiv = allToggles[i].parentElement.nextElementSibling;
-                    if (childrenDiv) {
-                        childrenDiv.classList.add('show');
-                        allToggles[i].textContent = '▼';
-                    }
-                }
-                var isSelf = (userId == currentUserId);
-                if (isSelf) {
-                    var allCheckboxes = accessSection.querySelectorAll('input[type="checkbox"]');
-                    for (var i = 0; i < allCheckboxes.length; i++) {
-                        allCheckboxes[i].disabled = true;
-                        allCheckboxes[i].checked = true;
-                    }
-                }
-            } else {
-                accessSection.style.display = 'none';
-            }
-        });
-    }
-
-    function openPasswordModal(id) {
-        document.getElementById('password_user_id').value = id;
-        document.getElementById('passwordModal').style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    function confirmDelete(id, username) {
-        if (confirm('آیا از حذف کاربر "' + username + '" مطمئن هستید؟')) {
-            var form = document.createElement('form');
-            form.method = 'post';
-            form.innerHTML = '<input type="hidden" name="delete_user" value="1"><input type="hidden" name="user_id" value="' + id + '">';
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    }
-
-    function updateClock() {
-        fetch('get_time.php').then(r=>r.json()).then(d=>{
-            var c = document.getElementById('liveClock');
-            if (c) c.innerHTML = '📅 ' + d.datetime;
-        }).catch(e=>console.log(e));
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+// داده‌های کاربران و دسترسی‌ها
+window.userData = {
+currentUserId: <?php echo json_encode($_SESSION['user_id']); ?>,
+allPermissions: <?php echo json_encode(array_column($allPermissions, 'permission_key')); ?>,
+permissionLabels: <?php echo json_encode($permissionLabels); ?>,
+existingPermissions: <?php echo json_encode($userPermissions); ?>,
+permissionTree: <?php echo json_encode($permissionTree); ?>
+};
 </script>
+
+
 </body>
 </html>

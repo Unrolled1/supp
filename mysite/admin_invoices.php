@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -26,7 +27,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 }
 
 if (!isAdmin() || !canViewInvoices()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
@@ -201,10 +202,7 @@ foreach ($invoices as $key => $invoice) {
 <head>
     <meta charset="UTF-8">
     <title>مدیریت فاکتورها</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/admin-invoices.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -453,7 +451,6 @@ foreach ($invoices as $key => $invoice) {
         </form>
     </div>
 </div>
-
 <script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
 <script src="assets/js/admin-invoices.js?v=<?php echo time(); ?>"></script>
 </body>

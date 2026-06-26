@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -42,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // هدایت بر اساس نقش
             if ($user['role'] === 'admin') {
-                header('Location: admin.php');
+                header('Location: dashboard.php');
             } else {
                 header('Location: user_dashboard.php');
             }
@@ -57,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) {
     if ($_SESSION['role'] === 'admin') {
-        header('Location: admin.php');
+        header('Location: dashboard.php');
     } else {
         header('Location: user_dashboard.php');
     }
@@ -70,8 +71,7 @@ if (isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true) 
 <head>
     <meta charset="UTF-8">
     <title>IMS</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/login.css">
+    <?php load_assets(); ?>
 </head>
 <body class="login-page">
 <div class="login-wrapper">

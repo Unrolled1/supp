@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -12,46 +13,13 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 }
 
 if (!isAdmin() || !canViewPersons()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
 $db = getDB();
 $successMessage = '';
 $errorMessage = '';
-
-// حذف شخص
-if (isset($_POST['delete_person']) && canDeletePersons()) {
-    $person_id = $_POST['person_id'];
-
-    $deleteStmt = $db->prepare("DELETE FROM persons WHERE id = :id");
-    if ($deleteStmt->execute([':id' => $person_id])) {
-        $successMessage = "✅ شخص با موفقیت حذف شد";
-    } else {
-        $errorMessage = "❌ خطا در حذف شخص";
-    }
-    header('Location: admin_persons.php');
-    exit;
-}
-
-// ویرایش شخص
-if (isset($_POST['edit_person']) && canEditPersons()) {
-    $person_id = $_POST['person_id'];
-    $name = htmlspecialchars($_POST['name']);
-
-    if (empty($name)) {
-        $errorMessage = "❌ نام شخص الزامی است";
-    } else {
-        $updateStmt = $db->prepare("UPDATE persons SET name = :name WHERE id = :id");
-        if ($updateStmt->execute([':name' => $name, ':id' => $person_id])) {
-            $successMessage = "✅ شخص با موفقیت ویرایش شد";
-        } else {
-            $errorMessage = "❌ خطا در ویرایش شخص";
-        }
-    }
-    header('Location: admin_persons.php');
-    exit;
-}
 
 // افزودن شخص جدید
 if (isset($_POST['add_person']) && canEditPersons()) {
@@ -72,6 +40,48 @@ if (isset($_POST['add_person']) && canEditPersons()) {
     exit;
 }
 
+// ویرایش شخص
+if (isset($_POST['edit_person']) && canEditPersons()) {
+    $person_id = filter_var($_POST['person_id'], FILTER_VALIDATE_INT);
+    $name = htmlspecialchars($_POST['name']);
+
+     if (empty($name)) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'نام شخص الزامی است']);
+        exit;
+    }
+        $updateStmt = $db->prepare("UPDATE persons SET name = :name WHERE id = :id");
+        $success=$updateStmt->execute([':name' => $name, ':id' => $person_id]);
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => $success,
+        'id' => $person_id,
+        'name' => $name,
+        'message' => $success ? 'شخص با موفقیت ویرایش شد' : 'خطا در ویرایش شخص'
+    ]);
+    exit;
+}
+
+// حذف شخص
+if (isset($_POST['delete_person'])) {
+    $person_id = filter_var($_POST['person_id'], FILTER_VALIDATE_INT);
+if($person_id)
+{
+    $deleteStmt = $db->prepare("DELETE FROM persons WHERE id = :id");
+    $success=$deleteStmt->execute([':id' => $person_id]);
+    header('Content-Type: application/json');
+    echo json_encode([
+            'success' => $success,
+        'id' => $person_id,
+        'message' => $success ? 'شخص با موفقیت حذف شد' : 'خطا در حذف شخص']);
+    exit;
+}
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'شناسه نامعتبر']);
+    exit;
+}
+
 // گرفتن لیست اشخاص
 $persons = $db->query("SELECT * FROM persons ORDER BY name ASC")->fetchAll();
 ?>
@@ -80,10 +90,8 @@ $persons = $db->query("SELECT * FROM persons ORDER BY name ASC")->fetchAll();
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مدیریت اشخاص - پنل ادمین</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/admin-persons.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
+    <title>تعریف اشخاص</title>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -115,12 +123,15 @@ $persons = $db->query("SELECT * FROM persons ORDER BY name ASC")->fetchAll();
         <?php if (canEditPersons()): ?>
             <div class="add-card">
                 <h2>➕ افزودن شخص جدید</h2>
-                <form method="post" class="form-inline">
-                    <div class="form-group-inline">
+                <form method="post" class="form-row">
+
+                    <div class="personname-group">
                         <label>نام شخص</label>
                         <input type="text" name="name" required>
                     </div>
-                    <button type="submit" name="add_person" class="btn-add">➕ افزودن</button>
+
+                    <button type="submit" name="add_person" class="btn-add">➕ ثبت</button>
+
                 </form>
             </div>
         <?php endif; ?>
@@ -142,13 +153,13 @@ $persons = $db->query("SELECT * FROM persons ORDER BY name ASC")->fetchAll();
                 </tr>
             <?php else: ?>
                 <?php $row_num = 1; foreach ($persons as $person): ?>
-                    <tr>
+                    <tr id="person_<?php echo $person['id']; ?>">
                         <td><?php echo fa_number($row_num); ?></td>
                         <td><?php echo htmlspecialchars($person['name']); ?></td>
                         <td class="date"><?php echo fa_number(htmlspecialchars($person['created_at'])); ?></td>
                         <td class="action-buttons">
                             <?php if (canEditPersons()): ?>
-                                <button class="edit-btn" onclick='openEditModal(<?php echo $person['id']; ?>, "<?php echo htmlspecialchars($person['name']); ?>")'>✏️ ویرایش</button>
+                                <button class="edit-btn" onclick='openEditModal(<?php echo $person['id']; ?>)'>✏️ ویرایش</button>
                             <?php endif; ?>
                             <?php if (canDeletePersons()): ?>
                                 <button class="delete-btn" onclick="confirmDelete(<?php echo $person['id']; ?>, '<?php echo htmlspecialchars($person['name']); ?>')">🗑️ حذف</button>
@@ -168,53 +179,17 @@ $persons = $db->query("SELECT * FROM persons ORDER BY name ASC")->fetchAll();
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>✏️ ویرایش شخص</h3>
-        <form method="post">
+        <form id="editForm">
             <input type="hidden" name="person_id" id="edit_person_id">
             <label>نام شخص</label>
             <input type="text" name="name" id="edit_name" required>
+
             <div class="modal-buttons">
-                <button type="submit" name="edit_person" class="modal-save">💾 ذخیره</button>
-                <button type="button" class="modal-cancel" onclick="closeModal('editModal')">لغو</button>
+                <button type="button"  class="btn-add" onclick="savepersonEdit()">💾 ذخیره</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-    function openEditModal(id, name) {
-        document.getElementById('edit_person_id').value = id;
-        document.getElementById('edit_name').value = name;
-        document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function confirmDelete(id, name) {
-        if (confirm('آیا از حذف شخص "' + name + '" مطمئن هستید؟')) {
-            var form = document.createElement('form');
-            form.method = 'post';
-            form.innerHTML = '<input type="hidden" name="delete_person" value="1"><input type="hidden" name="person_id" value="' + id + '">';
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    }
-
-    function updateClock() {
-        fetch('get_time.php').then(r=>r.json()).then(d=>{
-            var c = document.getElementById('liveClock');
-            if (c) c.innerHTML = '📅 ' + d.datetime;
-        }).catch(e=>console.log(e));
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-</script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -247,10 +248,7 @@ if (isset($_SESSION['backup_error'])) {
 <head>
     <meta charset="UTF-8">
     <title>پشتیبان‌گیری و بازیابی</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/backup.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">

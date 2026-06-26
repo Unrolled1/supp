@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -26,7 +27,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 }
 
 if (!isAdmin() || !canViewServices()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
@@ -191,7 +192,7 @@ $services = $db->query("
     ORDER BY s.id DESC
 ")->fetchAll();
 
-// اضافه کردن تاریخ شمسی برای نمایش
+
 // اضافه کردن تاریخ شمسی برای نمایش
 foreach ($services as $key => $service) {
     if (!empty($service['service_date']) && $service['service_date'] != '0000-00-00') {
@@ -217,10 +218,7 @@ foreach ($services as $key => $service) {
 <head>
     <meta charset="UTF-8">
     <title>مدیریت فعالیت</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/admin-services.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">

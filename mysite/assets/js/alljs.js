@@ -340,9 +340,35 @@ window.onclick = function(event) {
 };
 
 // ============================================
-// راه‌اندازی اولیه
+// کنترل مکان‌نما در فیلدهای راست‌چین
 // ============================================
 
+function setCursorToEnd(input) {
+    // مکان‌نما رو به انتهای متن ببر
+    if (input.setSelectionRange) {
+        setTimeout(function() {
+            input.setSelectionRange(input.value.length, input.value.length);
+        }, 0);
+    }
+}
+
+// وقتی کاربر روی فیلد کلیک میکنه
+document.addEventListener('DOMContentLoaded', function() {
+    // همه فیلدهای ورودی
+    const inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
+
+    inputs.forEach(function(input) {
+        // وقتی کاربر کلیک میکنه
+        input.addEventListener('focus', function() {
+            setCursorToEnd(this);
+        });
+
+        // وقتی کاربر با Tab میاد
+        input.addEventListener('click', function() {
+            setCursorToEnd(this);
+        });
+    });
+});
 document.addEventListener('DOMContentLoaded', function() {
     renderSearchDateSelects('search_date_from_container', 'search_date_from');
     renderSearchDateSelects('search_date_to_container', 'search_date_to');

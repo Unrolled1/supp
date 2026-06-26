@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -11,7 +12,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true 
     exit;
 }
 if (!isAdmin() || !canViewReports()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
@@ -99,9 +100,7 @@ $departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORD
 <head>
     <meta charset="UTF-8">
     <title>گزارشات تیکت‌ها</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/admin-reports.css">
+    <?php load_assets(); ?>
     <style>
         .date-group {
             display: flex;
@@ -341,16 +340,6 @@ $departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORD
         window.open(url, '_blank');
     }
 
-    function updateClock() {
-        fetch('get_time.php')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('liveClock').innerHTML = '📅 ' + data.datetime;
-            })
-            .catch(error => console.log('خطا:', error));
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
 </script>
 
 </body>

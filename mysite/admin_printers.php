@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -12,7 +13,7 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 }
 
 if (!isAdmin() || !canViewPrinters()) {
-    header('Location: admin.php');
+    header('Location: requests.php');
     exit;
 }
 
@@ -275,10 +276,7 @@ $printers = $printers->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>مدیریت پرینترها</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/admin-printers.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -43,9 +44,7 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 <head>
     <meta charset="UTF-8">
     <title>داشبورد مدیریت</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/dashboard.css">
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -112,48 +111,56 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                             <span class="label">فعالیت</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewDepartments()): ?>
                         <a href="admin_departments.php" class="quick-card">
                             <span class="icon">🏥</span>
                             <span class="label">بخش‌ها</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewTopics()): ?>
                         <a href="admin_topics.php" class="quick-card">
                             <span class="icon">📋</span>
                             <span class="label">موضوعات</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewBrands()): ?>
                         <a href="admin_brands.php" class="quick-card">
                             <span class="icon">🏷️</span>
                             <span class="label">برندها</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewModels()): ?>
                         <a href="admin_models.php" class="quick-card">
                             <span class="icon">📦</span>
                             <span class="label">مدل‌ها</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewProducts()): ?>
                         <a href="admin_products.php" class="quick-card">
                             <span class="icon">📦</span>
                             <span class="label">کالاها</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewPersons()): ?>
                         <a href="admin_persons.php" class="quick-card">
                             <span class="icon">👥</span>
                             <span class="label">اشخاص</span>
                         </a>
                     <?php endif; ?>
+
                     <?php if (canViewUsers()): ?>
                         <a href="admin_users.php" class="quick-card">
                             <span class="icon">👥</span>
                             <span class="label">کاربران</span>
                         </a>
                     <?php endif; ?>
+
                 </div>
             </div>
 
@@ -161,6 +168,14 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
             <div class="quick-row">
                 <h2 class="quick-title">📊 عملیات</h2>
                 <div class="quick-grid">
+                    <?php if (canViewTickets()): ?>
+
+                    <a href="requests.php" class="quick-card">
+                        <span class="icon">🔧</span>
+                        <span class="label">درخواست ها</span>
+                    </a>
+                    <?php endif; ?>
+
                     <?php if (canViewServices()): ?>
                         <a href="admin_services.php" class="quick-card">
                             <span class="icon">🔧</span>
@@ -173,7 +188,7 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                             <span class="label">ثبت فاکتور</span>
                         </a>
                     <?php endif; ?>
-                    <?php if (canViewGoods()): ?>
+                    <?php if (canViewkala()): ?>
                         <a href="admin_kala.php" class="quick-card">
                             <span class="icon">📦</span>
                             <span class="label">ثبت کالا</span>
