@@ -1062,54 +1062,6 @@ input:focus, select:focus, textarea:focus {
 
 
 
-.tree-node-main {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-}
-
-.tree-toggle {
-    cursor: pointer;
-    color: #64748b;
-    font-size: 12px;
-    width: 20px;
-    display: inline-block;
-}
-
-.tree-children {
-    padding-right: 25px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-}
-
-.tree-children.show {
-    max-height: 500px;
-    overflow-y: visible;
-}
-
-.tree-child {
-    padding: 5px 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.tree-child input[type="checkbox"],
-.tree-node-main input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    cursor: pointer;
-}
-
-.tree-child label,
-.tree-node-main label {
-    margin: 0;
-    cursor: pointer;
-    font-weight: normal;
-}
 /* ============================================
    تنظیم سلکت‌های تاریخ برای همه صفحات
    ============================================ */

@@ -24,7 +24,7 @@ $errorMessage = '';
 $allPermissions = $db->query("SELECT DISTINCT permission_key FROM permissions WHERE role = 'admin' ORDER BY permission_key")->fetchAll();
 
 $permissionLabels = [
-    'tickets_manage' => 'مدیریت درخواست ها',
+    'tickets_view' => 'مدیریت درخواست ها',
     'tickets_edit' => 'ويرايش درخواست ها',
     'tickets_delete' => 'حذف درخواست ها',
 
@@ -32,60 +32,56 @@ $permissionLabels = [
     'activities_edit' => 'ويرايش فعالیت',
     'activities_delete' => 'حذف فعالیت',
 
-    'departments_manage' => 'مدیریت بخش ها',
+    'departments_view' => 'مدیریت بخش ها',
     'departments_edit' => 'ويرايش بخش ها',
     'departments_delete' => 'حذف بخش ها',
 
-    'topics_manage' => 'مدیریت موضوعات',
+    'topics_view' => 'مدیریت موضوعات',
     'topics_edit' => 'ويرايش موضوعات',
     'topics_delete' => 'حذف موضوعات',
 
-    'brands_manage' => 'مدیریت برندها',
+    'brands_view' => 'مدیریت برندها',
     'brands_edit' => 'ويرايش برندها',
     'brands_delete' => 'حذف برندها',
 
-    'models_manage' => 'مدیریت مدل‌ها',
+    'models_view' => 'مدیریت مدل‌ها',
     'models_edit' => 'ويرايش مدل‌ها',
     'models_delete' => 'حذف مدل‌ها',
 
-    'products_manage' => 'مدیریت کالاها',
+    'products_view' => 'مدیریت کالاها',
     'products_edit' => 'ويرايش کالاها',
     'products_delete' => 'حذف کالاها',
 
-    'persons_manage' => 'مدیریت اشخاص',
+    'persons_view' => 'مدیریت اشخاص',
     'persons_edit' => 'ويرايش اشخاص',
     'persons_delete' => 'حذف اشخاص',
 
-    'users_manage' => 'مدیریت کاربران',
+    'users_view' => 'مدیریت کاربران',
     'users_edit' => 'ويرايش کاربران',
     'users_delete' => 'حذف کاربران',
 
-    'services_manage' => 'ثبت فعالیت',
+
     'services_view' => ' مشاهده فعالیت',
     'services_edit' => 'ويرايش فعالیت',
     'services_delete' => 'حذف فعالیت',
 
     // دسترسی‌های فاکتور
     'invoices_view' => ' مشاهده فاکتورها',
-    'invoices_manage' => 'مدیریت فاکتورها',
     'invoices_edit' => ' ویرایش فاکتور',
     'invoices_delete' => ' حذف فاکتور',
 
     // دسترسی‌های کالا
-    'goods_view' => ' مشاهده کالاها',
-    'goods_manage' => 'مدیریت کالاها',
-    'goods_edit' => ' ویرایش کالا',
-    'goods_delete' => ' حذف کالا',
+    'kala_view' => ' مشاهده کالاها',
+    'kala_edit' => ' ویرایش کالا',
+    'kala_delete' => ' حذف کالا',
 
     // دسترسی‌های پرینتر
     'printers_view' => ' مشاهده پرینترها',
-    'printers_manage' => 'مدیریت پرینترها',
     'printers_edit' => ' ویرایش پرینتر',
     'printers_delete' => ' حذف پرینتر',
 
     // دسترسی‌های سیستم
     'systems_view' => ' مشاهده سیستم‌ها',
-    'systems_manage' => 'مدیریت سیستم‌ها',
     'systems_edit' => ' ویرایش سیستم',
     'systems_delete' => ' حذف سیستم',
 
@@ -141,6 +137,7 @@ $permissionTree = [
                 'name' => '🏷️ برندها',
                 'key' => 'brands',
                 'children' => [
+                    ['name' => '✏️ مشاهده برند', 'key' => 'brands_view'],
                     ['name' => '✏️ ویرایش برند', 'key' => 'brands_edit'],
                     ['name' => '🗑️ حذف برند', 'key' => 'brands_delete']
                 ]
@@ -150,6 +147,7 @@ $permissionTree = [
                 'name' => '📱 مدل‌ها',
                 'key' => 'models',
                 'children' => [
+                    ['name' => '✏️ مشاهده مدل', 'key' => 'models_view'],
                     ['name' => '✏️ ویرایش مدل', 'key' => 'models_edit'],
                     ['name' => '🗑️ حذف مدل', 'key' => 'models_delete']
                 ]
@@ -159,6 +157,7 @@ $permissionTree = [
                 'name' => '📦 کالاها',
                 'key' => 'products',
                 'children' => [
+                    ['name' => '✏️ مشاهده کالا', 'key' => 'products_view'],
                     ['name' => '✏️ ویرایش کالا', 'key' => 'products_edit'],
                     ['name' => '🗑️ حذف کالا', 'key' => 'products_delete']
                 ]
@@ -168,6 +167,7 @@ $permissionTree = [
                 'name' => '👤 اشخاص',
                 'key' => 'persons',
                 'children' => [
+                    ['name' => '✏️ مشاهده شخص', 'key' => 'persons_view'],
                     ['name' => '✏️ ویرایش شخص', 'key' => 'persons_edit'],
                     ['name' => '🗑️ حذف شخص', 'key' => 'persons_delete']
                 ]
@@ -187,6 +187,7 @@ $permissionTree = [
                 'name' => '📩 درخواست‌ها',
                 'key' => 'tickets',
                 'children' => [
+                    ['name' => '✏️ مشاهده درخواست', 'key' => 'tickets_view'],
                     ['name' => '✏️ ویرایش درخواست', 'key' => 'tickets_edit'],
                     ['name' => '🗑️ حذف درخواست', 'key' => 'tickets_delete']
                 ]
@@ -216,9 +217,9 @@ $permissionTree = [
                 'name' => '📦 ثبت کالاها',
                 'key' => 'goods',
                 'children' => [
-                    ['name' => '👁️ مشاهده کالاها', 'key' => 'goods_view'],
-                    ['name' => '✏️ ویرایش کالا', 'key' => 'goods_edit'],
-                    ['name' => '🗑️ حذف کالا', 'key' => 'goods_delete']
+                    ['name' => '👁️ مشاهده کالاها', 'key' => 'kala_view'],
+                    ['name' => '✏️ ویرایش کالا', 'key' => 'kala_edit'],
+                    ['name' => '🗑️ حذف کالا', 'key' => 'kala_delete']
                 ]
             ],
             // پرینترها
@@ -256,6 +257,7 @@ $permissionTree = [
                 'name' => '👤 مدیریت کاربران',
                 'key' => 'users',
                 'children' => [
+                    ['name' => '✏️ مشاهده کاربر', 'key' => 'users_view'],
                     ['name' => '✏️ ویرایش کاربر', 'key' => 'users_edit'],
                     ['name' => '🗑️ حذف کاربر', 'key' => 'users_delete']
                 ]

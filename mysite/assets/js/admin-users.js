@@ -22,25 +22,15 @@ function buildPermissionTree(containerId, existingPerms) {
 
     // ساختار دو ستونی
     var gridHtml = '<div class="permission-grid">';
-    var halfLength = Math.ceil(permissionTree.length / 2);
 
-    // ستون راست و چپ
-    var leftCol = permissionTree.slice(0, halfLength);
-    var rightCol = permissionTree.slice(halfLength);
-
-    gridHtml += '<div class="permission-col">';
-    leftCol.forEach(function(node) {
+    permissionTree.forEach(function(node) {
+        gridHtml += '<div class="permission-col">';
         gridHtml += buildTreeNode(node, existingPerms);
+        gridHtml += '</div>';
     });
-    gridHtml += '</div>';
-
-    gridHtml += '<div class="permission-col">';
-    rightCol.forEach(function(node) {
-        gridHtml += buildTreeNode(node, existingPerms);
-    });
-    gridHtml += '</div>';
 
     gridHtml += '</div>';
+
     container.innerHTML = gridHtml;
 
     // باز کردن همه شاخه‌ها
@@ -57,70 +47,93 @@ function buildPermissionTree(containerId, existingPerms) {
 // ساخت نود درخت - با کلیک روی کل ردیف
 // ============================================
 
-function buildTreeNode(node, existingPerms) {
-    var allChildrenChecked = true;
-    var anyChildChecked = false;
+function buildTreeNode(node, existingPerms, level = 0) {
 
-    node.children.forEach(function(child) {
-        if (existingPerms[child.key] !== 1) allChildrenChecked = false;
-        else anyChildChecked = true;
-    });
+    let html = '<div class="tree-node level-' + level + '">';
 
-    var mainChecked = allChildrenChecked;
-    var mainIndeterminate = (!allChildrenChecked && anyChildChecked);
+    if (node.children && node.children.length > 0) {
 
-    var html = '<div class="tree-node" data-parent-key="' + node.key + '">';
-    // ✅ کل ردیف کلیک‌پذیر شد
-    html += '<div class="tree-node-main" onclick="toggleTreeByRow(event, this)">';
-    html += '<span class="tree-toggle">▼</span>';
-    html += '<input type="checkbox" name="perm_' + node.key + '_manage" id="perm_' + node.key + '_manage" value="1" ' + (mainChecked ? 'checked' : '') + ' onchange="toggleChildren(this)">';
-    html += '<label for="perm_' + node.key + '_manage" class="tree-main-label">' + node.name + '</label>';
-    html += '</div>';
-    html += '<div class="tree-children" id="children_' + node.key + '">';
+        html += `
+            <div class="tree-node-main">
 
-    node.children.forEach(function(child) {
-        var childChecked = (existingPerms[child.key] === 1);
-        html += '<div class="tree-child" data-child-key="' + child.key + '">';
-        html += '<input type="checkbox" name="perm_' + child.key + '" id="perm_' + child.key + '" value="1" ' + (childChecked ? 'checked' : '') + ' onchange="updateParent(this)">';
-        html += '<label for="perm_' + child.key + '">' + child.name + '</label>';
+                <span class="tree-toggle"
+                    onclick="toggleTree(this)">▼</span>
+
+                <input type="checkbox"
+                    onchange="toggleChildren(this)">
+
+                <label>${node.name}</label>
+
+            </div>
+
+            <div class="tree-children show">
+        `;
+
+        node.children.forEach(child => {
+            html += buildTreeNode(child, existingPerms, level + 1);
+        });
+
         html += '</div>';
-    });
 
-    html += '</div></div>';
+    } else {
+
+        let checked = existingPerms[node.key] == 1 ? 'checked' : '';
+
+        html += `
+            <div class="tree-child">
+
+                <input
+                    type="checkbox"
+                    name="perm_${node.key}"
+                    id="perm_${node.key}"
+                    value="1"
+                    ${checked}
+                    onchange="updateParents(this)">
+
+                <label for="perm_${node.key}">
+                    ${node.name}
+                </label>
+
+            </div>
+        `;
+    }
+
+    html += '</div>';
+
     return html;
 }
 
+
+// باز و بسته کردن درخت - یک تابع برای همه
 // ============================================
-// باز و بسته کردن درخت با کلیک روی کل ردیف
-// ============================================
 
-function toggleTreeByRow(event, element) {
-    // اگر روی چک‌باکس کلیک شده، کاری نکن (فقط تیک بخورد)
-    if (event.target.type === 'checkbox') return;
+function toggleTree(el){
 
-    var parentDiv = element.closest('.tree-node');
-    if (!parentDiv) return;
+    const children = el.parentElement.nextElementSibling;
 
-    var childrenDiv = parentDiv.querySelector('.tree-children');
-    var toggleSpan = parentDiv.querySelector('.tree-toggle');
+    if(!children) return;
 
-    if (childrenDiv) {
-        childrenDiv.classList.toggle('show');
-        if (toggleSpan) {
-            toggleSpan.textContent = childrenDiv.classList.contains('show') ? '▼' : '▶';
-        }
-    }
+    children.classList.toggle("show");
+
+    el.textContent =
+        children.classList.contains("show")
+            ? "▼"
+            : "▶";
+
 }
 
 // ============================================
-// باز و بسته کردن درخت با کلیک روی مثلث (قدیمی)
+// کلیک روی کل ردیف (همان toggleTree صدا زده می‌شود)
 // ============================================
 
-function toggleTree(element) {
-    var childrenDiv = element.parentElement.nextElementSibling;
-    if (childrenDiv) {
-        childrenDiv.classList.toggle('show');
-        element.textContent = childrenDiv.classList.contains('show') ? '▼' : '▶';
+function toggleTreeByRow(event, element) {
+    // اگر روی چک‌باکس کلیک شده، فقط تیک بخورد
+    if (event.target.type === 'checkbox') return;
+
+    // پیدا کردن دکمه toggle در همان ردیف
+    var toggleSpan = element.querySelector('.tree-toggle');
+    if (toggleSpan) {
+        toggleTree(toggleSpan);
     }
 }
 
@@ -128,36 +141,70 @@ function toggleTree(element) {
 // توابع مدیریت چک‌باکس‌ها
 // ============================================
 
-function toggleChildren(mainCheckbox) {
-    var parentDiv = mainCheckbox.closest('.tree-node');
-    var childrenDiv = parentDiv.querySelector('.tree-children');
-    var childCheckboxes = childrenDiv.querySelectorAll('input[type="checkbox"]');
-    for (var i = 0; i < childCheckboxes.length; i++) {
-        childCheckboxes[i].checked = mainCheckbox.checked;
-    }
+function toggleChildren(parent){
+
+    const node = parent.closest(".tree-node");
+
+    const checkboxes =
+        node.querySelectorAll(".tree-children input[type=checkbox]");
+
+    checkboxes.forEach(cb=>{
+
+        cb.checked = parent.checked;
+        cb.indeterminate = false;
+
+    });
+
 }
 
-function updateParent(childCheckbox) {
-    var parentDiv = childCheckbox.closest('.tree-node');
-    var mainCheckbox = parentDiv.querySelector('.tree-node-main input[type="checkbox"]');
-    var childCheckboxes = parentDiv.querySelectorAll('.tree-children input[type="checkbox"]');
-    var allChecked = true, anyChecked = false;
+function updateParents(child){
 
-    for (var i = 0; i < childCheckboxes.length; i++) {
-        if (!childCheckboxes[i].checked) allChecked = false;
-        if (childCheckboxes[i].checked) anyChecked = true;
+    let parentNode =
+        child.closest(".tree-children")
+            ?.closest(".tree-node");
+
+    while(parentNode){
+
+        const parentCheckbox =
+            parentNode.querySelector(":scope > .tree-node-main input");
+
+        const children =
+            parentNode.querySelectorAll(":scope > .tree-children input");
+
+        let checked = 0;
+
+        children.forEach(c=>{
+            if(c.checked) checked++;
+        });
+
+        if(parentCheckbox){
+
+            if(checked==0){
+
+                parentCheckbox.checked=false;
+                parentCheckbox.indeterminate=false;
+
+            }
+            else if(checked==children.length){
+
+                parentCheckbox.checked=true;
+                parentCheckbox.indeterminate=false;
+
+            }
+            else{
+
+                parentCheckbox.checked=false;
+                parentCheckbox.indeterminate=true;
+
+            }
+
+        }
+
+        parentNode =
+            parentNode.parentElement
+                ?.closest(".tree-node");
     }
 
-    if (allChecked) {
-        mainCheckbox.checked = true;
-        mainCheckbox.indeterminate = false;
-    } else if (anyChecked) {
-        mainCheckbox.checked = false;
-        mainCheckbox.indeterminate = true;
-    } else {
-        mainCheckbox.checked = false;
-        mainCheckbox.indeterminate = false;
-    }
 }
 
 // ============================================
@@ -212,12 +259,6 @@ function openPasswordModal(id) {
     document.getElementById('passwordModal').style.display = 'flex';
 }
 
-function closeModal(modalId) {
-    var modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
 
 // ============================================
 // تابع ذخیره ویرایش کاربر (Ajax)
