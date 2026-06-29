@@ -14,14 +14,19 @@
 
 
 .edit-form {
+    display:flex;
+    flex-direction:column;
     background: #2d3748;
     border-radius: 16px;
     padding: 30px 35px;
     width: 95%;
+    max-width:1200px;
     overflow-y: auto;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.06);
     position: relative;
+    max-height:90vh;
+
 }
 
 .edit-form input,
@@ -85,7 +90,20 @@
     font-size: 13px;
     color: #333;
 }
+.access-section{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+}
 
+.access-scroll-area{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-left:5px;
+}
 
 @keyframes modalSlideIn {
     from {
@@ -97,7 +115,6 @@
         transform: translateY(0) scale(1);
     }
 }
-
 /* استایل اسکرول مودال */
 .modal-content::-webkit-scrollbar {
     width: 6px;
@@ -128,175 +145,148 @@
    استایل دسترسی درختی
    ============================================ */
 
-.tree-node-main {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    border-radius: 8px;
-    padding: 10px;
-}
-
-.tree-node-main input {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    margin: 0;
-}
-
-.tree-node-main label {
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    margin: 0;
-
-}
 
 .tree-toggle {
-    cursor: pointer;
+    text-align:center;
+    cursor:pointer;
     font-size: 12px;
     color: #667eea;
     transition: transform 0.2s ease;
     width: 20px;
-    text-align: center;
 }
 
 .tree-toggle:hover {
-    color: #764ba2;
+    color: #667eea ;
 }
 
 /* ✅ اصلاح: حذف display: none و استفاده از max-height */
-.tree-children {
-    margin-right:8px;
+.tree-children{
     display:none;
-    padding-right: 8px;
-    border-right: 2px solid #4a5568;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
 }
 
-.tree-children.show {
+.tree-children.show{
     display:block;
-    max-height: 500px;
-    overflow: visible;
+    overflow:visible;
+}
+.tree-children.root-open{
+    display:block;
+    max-height:none !important;
+    overflow:visible;
 }
 
-.tree-child {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-right: 4px;
-    margin-right: 8px;
-}
-
-.tree-child input {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    margin: 0;
-}
-
-.tree-child label {
-    cursor: pointer;
-    font-size: 13px;
-    color: #cbd5e0;
-}
-
-.tree-child.disabled {
-    opacity: 0.5;
-}
-
-.tree-child.disabled input,
-.tree-child.disabled label {
-    cursor: not-allowed;
-}
 /* ============================================
    گرید دو ستونی دسترسی‌ها
    ============================================ */
 
-.permission-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 15px;
+.permission-tree{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:16px;
 }
 
-.permission-col {
-    width: 260px;      /* یا 240px */
-    flex: 0 0 260px;
+.tree-node{
+    border:1px solid #4a5568;
+    border-radius:8px;
+    margin-bottom:8px;
+    overflow:visible;
 }
 
-/* ============================================
-   رنگ‌های تم تیره
-   ============================================ */
-
-.tree-node {
-    margin-right: 15px;
-    margin-bottom: 8px;
-    background: #2d3748;
-    border-radius: 8px;
-    padding: 2px 6px;
-    border: 1px solid #4a5568;
+.tree-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 10px;
 }
+
+.tree-header input{
+    width:18px;
+    height:18px;
+    margin:0;
+}
+
+.tree-header label{
+    color:#e2e8f0;
+    cursor:pointer;
+    user-select:none;
+}
+
+
+.tree-space{
+    width:18px;
+}
+
+.level-0>.tree-header{
+    background:#1f2937;
+    font-weight:bold;
+}
+
+.level-1>.tree-header{
+    background:#2d3748;
+}
+
+.level-2>.tree-header{
+    background:#374151;
+}
+
+.level-3>.tree-header{
+    background:#4b5563;
+}
+
 
 .tree-node:hover {
     border-color: #667eea;
 }
 
 .tree-main-label {
-    color: #e2e8f0 !important;
+    color: #e2e8f0 ;
 }
 
 .tree-child label {
-    color: #cbd5e0 !important;
+    color: #cbd5e0 ;
 }
 
 .tree-child label:hover {
-    color: #ffffff !important;
+    color: #ffffff ;
 }
 
-.tree-toggle {
-    color: #94a3b8 !important;
-}
 
-.tree-toggle:hover {
-    color: #667eea !important;
-}
 /* ============================================
    نمایش کامل زیرمنوها - نهایی
    ============================================ */
 
-.tree-children {
-    display: block !important;
-    max-height: 500px !important;
-    overflow: visible !important;
-    margin-top: 6px !important;
-    border-right: 2px solid #4a5568 !important;
-    padding-right: 15px ;
-}
 
-.tree-children.show {
-    display: block !important;
-    max-height: 500px !important;
-    overflow: visible !important;
-}
+.tree-header{
 
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+
+}
+.tree-space{
+
+    width:18px;
+
+}
 .tree-child {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 6px 0 !important;
-    padding-right: 10px !important;
+    display: flex ;
+    align-items: center ;
+    gap: 8px ;
+    padding: 6px 0 ;
+    padding-right: 10px ;
 }
 
 .tree-child input[type="checkbox"] {
-    width: 18px !important;
-    height: 18px !important;
-    cursor: pointer !important;
+    width: 18px ;
+    height: 18px ;
+    cursor: pointer ;
 }
 
 .tree-child label {
-    cursor: pointer !important;
-    font-size: 14px !important;
-    color: #e2e8f0 !important;
+    cursor: pointer ;
+    font-size: 14px ;
+    color: #e2e8f0 ;
 }

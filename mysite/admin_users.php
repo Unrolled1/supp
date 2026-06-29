@@ -86,6 +86,7 @@ $permissionLabels = [
     'systems_delete' => ' حذف سیستم',
 
     'reports_view' => ' مشاهده گزارشات',
+    'backups_view' => ' پشتیبان گیری',
 ];
 
 // ============================================
@@ -172,6 +173,15 @@ $permissionTree = [
                     ['name' => '🗑️ حذف شخص', 'key' => 'persons_delete']
                 ]
             ],
+            [
+                'name' => '👤 مدیریت کاربران',
+                'key' => 'users',
+                'children' => [
+                    ['name' => '✏️ مشاهده کاربر', 'key' => 'users_view'],
+                    ['name' => '✏️ ویرایش کاربر', 'key' => 'users_edit'],
+                    ['name' => '🗑️ حذف کاربر', 'key' => 'users_delete']
+                ]
+            ]
         ]
     ],
 
@@ -247,25 +257,6 @@ $permissionTree = [
     ],
 
     // ============================================
-    // گروه: کاربران
-    // ============================================
-    [
-        'name' => '👥 کاربران',
-        'key' => 'users_management',
-        'children' => [
-            [
-                'name' => '👤 مدیریت کاربران',
-                'key' => 'users',
-                'children' => [
-                    ['name' => '✏️ مشاهده کاربر', 'key' => 'users_view'],
-                    ['name' => '✏️ ویرایش کاربر', 'key' => 'users_edit'],
-                    ['name' => '🗑️ حذف کاربر', 'key' => 'users_delete']
-                ]
-            ]
-        ]
-    ],
-
-    // ============================================
     // گروه: گزارشات
     // ============================================
     [
@@ -277,6 +268,13 @@ $permissionTree = [
                 'key' => 'reports',
                 'children' => [
                     ['name' => '👁️ مشاهده گزارشات', 'key' => 'reports_view']
+                ]
+            ],
+            [
+                    'name'=>'پشتیبان گیری',
+                'key' => 'backup',
+                'children' => [
+                        ['name' => 'پشتیبان گیری', 'key' => 'backup_view'],
                 ]
             ]
         ]
@@ -490,7 +488,7 @@ foreach ($users as $user) {
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock">📅 <?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock"> <?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
@@ -561,10 +559,14 @@ foreach ($users as $user) {
                         </td>
                         <td class="date"><?php echo fa_number(htmlspecialchars($user['created_at'])); ?></td>
                         <td class="action-buttons">
-                            <button class="edit-btn" onclick='openEditModal(<?php echo $user['id']; ?>, "<?php echo htmlspecialchars($user['username']); ?>", "<?php echo htmlspecialchars($user['fullname']); ?>", "<?php echo $user['role']; ?>", <?php echo isset($_SESSION['limited_admin']) && $_SESSION['limited_admin'] === true ? 'true' : 'false'; ?>)'>ویرایش</button>
+                            <button class="edit-btn" onclick='openEditModal(<?php echo $user['id']; ?>,
+                                    "<?php echo htmlspecialchars($user['username']); ?>",
+                                    "<?php echo htmlspecialchars($user['fullname']); ?>",
+                                    "<?php echo $user['role']; ?>",
+                            <?php echo isset($_SESSION['limited_admin']) && $_SESSION['limited_admin'] === true ? 'true' : 'false'; ?>)'>✏️ویرایش</button>
                             <button class="password-btn" onclick="openPasswordModal(<?php echo $user['id']; ?>)">تغییر رمز</button>
                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
-                                <button class="delete-btn" onclick="confirmDelete(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">حذف</button>
+                                <button class="delete-btn" onclick="confirmDelete(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">🗑️حذف</button>
                             <?php endif; ?>
                         </td>
                     </tr>

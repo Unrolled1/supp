@@ -5,7 +5,7 @@ function amountFormat(inputId) {
     if (!input) return;
 
     input.addEventListener('input', function () {
-        let value = this.value.replace(/,/g, '');
+        let value = this.value.replace(/\D/g, '');
 
         if (value === '') {
             this.value = '';
@@ -111,7 +111,7 @@ function confirmDelete(id, name) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const row = document.querySelector(`tr:has(button[onclick*="confirmDelete(${id}, "])`);
+                        const row = document.getElementById("invoice_" + id);
                         if (row) {
                             row.remove();
                             updateRowNumbers();
@@ -151,6 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const today=toJalali(new Date());
     renderDateSelects('invoice_date_container',today.year,today.month,today.day);
     initSearch();
+    initQuickDateSelect();
     amountFormat('amount');
     amountFormat('edit_amount');
 });

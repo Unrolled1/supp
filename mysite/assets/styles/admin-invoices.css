@@ -19,8 +19,6 @@
     flex: 0 0 auto;
 }
 
-
-
 .btn-add {
     color: white;
     border: none;
@@ -29,24 +27,6 @@
     cursor: pointer;
 }
 
-/* دکمه‌ها */
-.edit-btn {
-    background: #ffc107;
-    color: #000;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.delete-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
 /* مودال */
 .modal {
@@ -61,7 +41,6 @@
     align-items: center;
     z-index: 1000;
 }
-
 
 /* جستجو */
 .search-row input,select{
@@ -79,14 +58,6 @@
     color: #555;
 }
 
-.search-group input,
-.search-group select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
 
 
 .search-actions {
@@ -95,16 +66,6 @@
     display: flex;
     gap: 10px;
     align-items: flex-end;
-}
-
-
-.date-select-group select,
-.search-date-group select {
-    width: 50px;
-    min-width: 60px;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
 }
 
 .date-select-group select[name="month"],

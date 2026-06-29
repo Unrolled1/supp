@@ -15,8 +15,8 @@
     flex: 0 0 100%;
     width: 100%;
 }
-.peripheral-section,.ip-section{
-    margin-top: 10px;
+.form-row{
+    margin-top:  10px;
 }
 /* ============================================
    ردیف‌های چندگانه (رم، هارد، IP، تجهیزات)
@@ -27,15 +27,14 @@
 .storage-row,
 .ip-row,
 .peripheral-row {
-    background: #f8fafc;
-    padding: 12px 15px;
+    padding: 10px;
     border-radius: 10px;
     margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #4a5568;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    align-items: center;
+    align-items: flex-end;
     transition: all 0.2s ease;
 }
 
@@ -44,36 +43,64 @@
 .ip-row:hover,
 .peripheral-row:hover {
     border-color: #4f46e5;
-    background: #f1f5f9;
 }
 
-.ram-row .form-group,
-.storage-row .form-group,
-.ip-row .form-group,
-.peripheral-row .form-group {
-    flex: 1;
-    min-width: 140px;
-    margin: 0;
+.section-label{
+    display:block;
+    width:100%;
+    margin-bottom:6px;
+    font-weight:600;
+    color:#475569;
+}
+.select-wrapper{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    width:100%;
+}
+.select-wrapper select,
+.select-wrapper input{
+    flex:1;
+}
+.select-inline{
+    display:flex;
+    gap:8px;
+    width:100%;
 }
 
-.ram-row .form-group:last-child,
-.storage-row .form-group:last-child,
-.ip-row .form-group:last-child,
-.peripheral-row .form-group:last-child {
-    flex: 0 0 auto;
-    min-width: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.select-grow{
+    flex:1;
+    min-width:180px;
 }
 
-.ram-row label,
-.storage-row label,
-.ip-row label,
-.peripheral-row label {
-    font-size: 12px !important;
-    margin-bottom: 4px !important;
-    color: #475569 !important;
+.btn-add-quick-small{
+    flex-shrink:0;
+    height:32px;
+    min-width:32px;
+}
+
+.row-remove{
+    flex:0 0 auto;
+}
+
+.row-remove button{
+    background:#ef4444;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:4px 12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.row-remove button:hover{
+    background:#dc2626;
+}
+.select-wrapper select:focus,
+.select-wrapper input:focus{
+    border-color:#4f46e5;
+    outline:none;
+    box-shadow:0 0 0 2px rgba(79,70,229,.2);
 }
 
 .ram-row input,
@@ -84,180 +111,18 @@
 .storage-row select,
 .ip-row select,
 .peripheral-row select {
-    padding: 5px 8px !important;
-    font-size: 12px !important;
-    height: 32px !important;
+    padding: 5px 8px;
+    font-size: 12px;
+    height: 32px;
 }
 /* ============================================
    IP و تجهیزات جانبی کنار هم
    ============================================ */
 
-.ip-peripheral-wrapper {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.ip-peripheral-wrapper .ip-section,
-.ip-peripheral-wrapper .peripheral-section {
+ .ip-section,
+ .peripheral-section {
     flex: 1;
     min-width: 300px;
-}
-
-.ip-peripheral-wrapper .section-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    font-size: 13px;
-    color: #555;
-}
-.peripheral-select-wrapper .section-label{
-    display: block;
-
-}
-
-/* ============================================
-   ردیف‌های IP
-   ============================================ */
-
-.ip-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: #f8fafc;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.ip-row:hover {
-    border-color: #4f46e5;
-    background: #f1f5f9;
-}
-
-.ip-row .ip-select-wrapper {
-    flex: 2;
-    min-width: 120px;
-}
-
-.ip-row .ip-select-wrapper input {
-    width: 100%;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-    direction: ltr;
-}
-
-.ip-row .ip-select-wrapper input:focus {
-    border-color: #4f46e5;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-
-.ip-row .ip-network-wrapper {
-    flex: 1;
-    min-width: 80px;
-}
-
-.ip-row .ip-network-wrapper select {
-    width: 100%;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-}
-
-.ip-row .ip-remove-wrapper {
-    flex: 0 0 auto;
-}
-
-/* ============================================
-   ردیف‌های تجهیزات جانبی
-   ============================================ */
-
-.peripheral-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: #f8fafc;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.peripheral-row:hover {
-    border-color: #4f46e5;
-    background: #f1f5f9;
-}
-
-.peripheral-row .peripheral-select-wrapper {
-    flex: 1;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    min-width: 180px;
-}
-
-.peripheral-row .peripheral-select {
-    flex: 1;
-    min-width: 120px;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-}
-
-.peripheral-row .peripheral-select:focus {
-    border-color: #4f46e5;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-
-.peripheral-row .peripheral-remove-wrapper {
-    flex: 0 0 auto;
-}
-
-/* ============================================
-   دکمه‌های حذف
-   ============================================ */
-
-.btn-remove-ip,
-.btn-remove-peripheral {
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 10px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s ease;
-    display: none;
-}
-
-.btn-remove-ip:hover,
-.btn-remove-peripheral:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-}
-
-.btn-remove-ip.show,
-.btn-remove-peripheral.show {
-    display: inline-block;
 }
 
 /* ============================================
@@ -282,314 +147,6 @@
     transform: translateY(-1px);
 }
 
-/* ============================================
-   ریسپانسیو
-   ============================================ */
-/* ============================================
-   IP و تجهیزات جانبی کنار هم
-   ============================================ */
-
-.ip-peripheral-wrapper {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.ip-peripheral-wrapper .ip-section,
-.ip-peripheral-wrapper .peripheral-section {
-    flex: 1;
-    min-width: 300px;
-}
-
-/* ============================================
-   ردیف‌های IP
-   ============================================ */
-
-.ip-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    background: #f8fafc;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.ip-row:hover {
-    border-color: #4f46e5;
-    background: #f1f5f9;
-}
-
-.ip-row .ip-select-wrapper {
-    flex: 2;
-    min-width: 120px;
-}
-
-.ip-row .ip-select-wrapper .ip-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: #475569;
-    margin-bottom: 4px;
-}
-
-.ip-row .ip-select-wrapper input {
-    width: 100%;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-    direction: ltr;
-}
-
-.ip-row .ip-select-wrapper input:focus {
-    border-color: #4f46e5;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-
-.ip-row .ip-network-wrapper {
-    flex: 1;
-    min-width: 80px;
-}
-
-.ip-row .ip-network-wrapper .ip-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: #475569;
-    margin-bottom: 4px;
-}
-
-.ip-row .ip-network-wrapper select {
-    width: 100%;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-}
-
-.ip-row .ip-remove-wrapper {
-    flex: 0 0 auto;
-    padding-bottom: 2px;
-}
-
-/* ============================================
-   ردیف‌های تجهیزات جانبی
-   ============================================ */
-
-.peripheral-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    background: #f8fafc;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.peripheral-row:hover {
-    border-color: #4f46e5;
-    background: #f1f5f9;
-}
-
-.peripheral-row .peripheral-select-wrapper {
-    flex: 1;
-    min-width: 180px;
-}
-
-.peripheral-row .peripheral-select-wrapper .peripheral-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: #475569;
-    margin-bottom: 4px;
-}
-
-.peripheral-row .peripheral-select-wrapper > div {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-}
-
-.peripheral-row .peripheral-select {
-    flex: 1;
-    min-width: 120px;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-}
-
-.peripheral-row .peripheral-select:focus {
-    border-color: #4f46e5;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-
-.peripheral-row .peripheral-remove-wrapper {
-    flex: 0 0 auto;
-    padding-bottom: 2px;
-}
-
-/* ============================================
-   دکمه‌های حذف
-   ============================================ */
-
-.btn-remove-ip,
-.btn-remove-peripheral {
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 10px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s ease;
-    display: none;
-}
-
-.btn-remove-ip:hover,
-.btn-remove-peripheral:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-}
-
-.btn-remove-ip.show,
-.btn-remove-peripheral.show {
-    display: inline-block;
-}
-
-/* ============================================
-   ریسپانسیو
-   ============================================ */
-
-@media (max-width: 768px) {
-    .ip-peripheral-wrapper .ip-section,
-    .ip-peripheral-wrapper .peripheral-section {
-        flex: 0 0 100%;
-        min-width: unset;
-    }
-
-    .ip-row,
-    .peripheral-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .ip-row .ip-select-wrapper,
-    .ip-row .ip-network-wrapper,
-    .peripheral-row .peripheral-select-wrapper {
-        width: 100%;
-        min-width: unset;
-    }
-
-    .ip-row .ip-remove-wrapper,
-    .peripheral-row .peripheral-remove-wrapper {
-        text-align: center;
-    }
-}
-@media (max-width: 768px) {
-    .ip-peripheral-wrapper .ip-section,
-    .ip-peripheral-wrapper .peripheral-section {
-        flex: 0 0 100%;
-        min-width: unset;
-    }
-
-    .ip-row,
-    .peripheral-row {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .ip-row .ip-select-wrapper,
-    .ip-row .ip-network-wrapper,
-    .peripheral-row .peripheral-select-wrapper {
-        width: 100%;
-        min-width: unset;
-    }
-}
-/* ============================================
-   دکمه‌های افزودن و حذف ردیف
-   ============================================ */
-
-.btn-add-row {
-    background: #4f46e5;
-    color: white;
-    border: none;
-    padding: 6px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    transition: all 0.2s ease;
-    margin-top: 5px;
-}
-
-.btn-add-row:hover {
-    background: #4338ca;
-    transform: translateY(-1px);
-}
-
-.btn-remove-ram,
-.btn-remove-storage,
-.btn-remove-ip,
-.btn-remove-peripheral {
-    background: #ef4444;
-    color: white;
-    border: none;
-    padding: 4px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    transition: all 0.2s ease;
-}
-
-.btn-remove-ram:hover,
-.btn-remove-storage:hover,
-.btn-remove-ip:hover,
-.btn-remove-peripheral:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-}
-
-/* ============================================
-   نمایش آیتم‌های کوچک در جدول
-   ============================================ */
-
-.item-small {
-    font-size: 12px;
-    padding: 3px 0;
-    border-bottom: 1px dashed #e2e8f0;
-    line-height: 1.6;
-}
-
-.item-small:last-child {
-    border-bottom: none;
-}
-
-.item-small .badge {
-    font-size: 9px;
-    padding: 1px 6px;
-    border-radius: 10px;
-    margin-right: 3px;
-}
 
 .badge-primary {
     background: #4f46e5;
@@ -621,12 +178,13 @@
 /* ============================================
    مودال ویرایش - تنظیم اندازه
    ============================================ */
+#editModal .modal-content{
+    width:95%;
+    max-width:850px;
 
-#editModal .modal-content {
-    max-width: 850px;
-    width: 95%;
+    max-height:90vh;
+    overflow-y:auto;
 }
-
 #editModal .form-group {
     flex: 1;
     min-width: 160px;
@@ -659,92 +217,6 @@
     border-color: #4f46e5;
     outline: none;
     box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-
-/* ============================================
-   ریسپانسیو
-   ============================================ */
-
-@media (max-width: 768px) {
-    .ram-row,
-    .storage-row,
-    .ip-row,
-    .peripheral-row {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .ram-row .form-group,
-    .storage-row .form-group,
-    .ip-row .form-group,
-    .peripheral-row .form-group {
-        width: 100%;
-        min-width: unset;
-    }
-
-    .ram-row .form-group:last-child,
-    .storage-row .form-group:last-child,
-    .ip-row .form-group:last-child,
-    .peripheral-row .form-group:last-child {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-    }
-
-    #editModal .modal-content {
-        max-width: 100%;
-        width: 98%;
-        padding: 15px;
-    }
-
-    .systems-form .form-group {
-        min-width: 100%;
-        width: 100%;
-    }
-
-
-
-    .action-buttons {
-        flex-direction: column;
-        gap: 3px;
-    }
-
-    .action-buttons button {
-        padding: 3px 8px;
-        font-size: 11px;
-    }
-}
-
-
-
-    .item-small {
-        font-size: 10px;
-    }
-
-    .modal-content {
-        padding: 12px;
-    }
-
-    .btn-add-row {
-        font-size: 11px;
-        padding: 4px 12px;
-    }
-
-    .date-select {
-        width: 50px;
-        min-width: 45px;
-        font-size: 11px;
-        padding: 2px 4px !important;
-    }
-
-
-/* ============================================
-   اسکرول برای محتوای مودال
-   ============================================ */
-
-#editModal .modal-content {
-    max-height: 90vh;
-    overflow-y: auto;
 }
 
 #editModal .modal-content::-webkit-scrollbar {
@@ -787,12 +259,6 @@
    دکمه‌های عملیات در جدول
    ============================================ */
 
-.action-buttons {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
 
 .action-buttons button {
     border: none;
@@ -845,156 +311,4 @@
 .btn-add-quick:hover {
     background: #059669;
     transform: scale(1.05);
-}
-.btn-cpu,.btn-motherboard,.btn-power{
-    display: flex;
-    gap: 8px;
-    flex: 1;
-}
-/* ============================================
-   ردیف رم و هارد کنار هم
-   ============================================ */
-
-.ram-hard-wrapper {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    width: 100%;
-    margin-top: 10px;
-}
-
-.ram-hard-wrapper .ram-section,
-.ram-hard-wrapper .hard-section {
-    flex: 1;
-    min-width: 300px;
-}
-
-.ram-hard-wrapper .section-label {
-    display: block;
-    margin-top: 8px;
-    font-weight: 500;
-    font-size: 13px;
-    color: #555;
-}
-
-/* ============================================
-   ردیف‌های رم و هارد
-   ============================================ */
-
-.ram-row,
-.storage-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: #f8fafc;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-
-.ram-row:hover,
-.storage-row:hover {
-    border-color: #4f46e5;
-    background: #f1f5f9;
-}
-
-.ram-row .ram-select-wrapper,
-.storage-row .storage-select-wrapper {
-    flex: 1;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    min-width: 200px;
-}
-
-.ram-row .ram-select,
-.storage-row .storage-select {
-    flex: 1;
-    min-width: 150px;
-    padding: 5px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    height: 32px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    font-size: 13px;
-    background: white;
-}
-
-.ram-row .ram-select:focus,
-.storage-row .storage-select:focus {
-    border-color: #4f46e5;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-
-.ram-row .ram-remove-wrapper,
-.storage-row .storage-remove-wrapper {
-    flex: 0 0 auto;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-/* ============================================
-   دکمه حذف
-   ============================================ */
-
-.btn-remove-ram,
-.btn-remove-storage {
-    background: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 10px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s ease;
-    display: none;
-}
-
-.btn-remove-ram:hover,
-.btn-remove-storage:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-}
-
-.btn-remove-ram.show,
-.btn-remove-storage.show {
-    display: inline-block;
-}
-
-/* ============================================
-   دکمه افزودن
-   ============================================ */
-
-.btn-add-row {
-    background: #4f46e5;
-    color: white;
-    border: none;
-    padding: 5px 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: 'Vazir', 'Tahoma', sans-serif;
-    transition: all 0.2s ease;
-    margin-top: 2px;
-}
-
-.btn-add-row:hover {
-    background: #4338ca;
-    transform: translateY(-1px);
-}
-
-/* ============================================
-   ریسپانسیو
-   ============================================ */
-
-@media (max-width: 768px) {
-    .ram-hard-wrapper .ram-section,
-    .ram-hard-wrapper .hard-section {
-        flex: 0 0 100%;
-        min-width: unset;
-    }
 }

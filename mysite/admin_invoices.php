@@ -94,7 +94,8 @@ if (isset($_POST['edit_invoice']) && canEditInvoices()) {
     exit;
 }
 // گرفتن لیست موضوعات
-$topics = $db->query("SELECT id, name FROM topics WHERE status = 'active' ORDER BY name ASC")->fetchAll();
+$topics = $db->query("SELECT id, name FROM topics ORDER BY name ASC")->fetchAll();
+
 // ============================================
 // پردازش فرم افزودن فاکتور جدید
 // ============================================
@@ -215,7 +216,7 @@ foreach ($invoices as $key => $invoice) {
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock">📅 <?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
@@ -309,7 +310,7 @@ foreach ($invoices as $key => $invoice) {
                         </select>
                     </div>
                 </div>
-                    <div class="search-row">
+                <div class="search-row">
                     <div class="date-group">
                         <label>انتخاب سریع</label>
                         <select id="quick_date_select">
@@ -364,7 +365,7 @@ foreach ($invoices as $key => $invoice) {
                     <tr><td colspan="10" style="text-align: center; padding: 40px;">🧾 هیچ فاکتوری ثبت نشده است</td></tr>
                 <?php else: ?>
                     <?php $row_num = 1; foreach ($invoices as $invoice): ?>
-                        <tr>
+                        <tr id="invoice_<?php echo $invoice['id']; ?>">
                             <td><?php echo fa_number($row_num); ?></td>
                             <td><?php echo htmlspecialchars($invoice['company_name']); ?></td>
                             <td><?php echo htmlspecialchars($invoice['invoice_number']); ?></td>
@@ -376,10 +377,10 @@ foreach ($invoices as $key => $invoice) {
                             <td><?php echo htmlspecialchars($invoice['creator_name'] ?? '-'); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditInvoices()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($invoice); ?>)'>✏️</button>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($invoice); ?>)'>✏️ویرایش</button>
                                 <?php endif; ?>
                                 <?php if (canDeleteInvoices()): ?>
-                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['company_name']); ?>')">🗑️</button>
+                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['company_name']); ?>')">🗑️حذف</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -445,9 +446,6 @@ foreach ($invoices as $key => $invoice) {
                 <button type="submit" name="edit_invoice" class="btn-add">💾 ذخیره</button>
                 <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
             </div>
-
-
-
         </form>
     </div>
 </div>

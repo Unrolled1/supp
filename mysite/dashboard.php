@@ -57,7 +57,7 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock">📅 <?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock"> <?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
@@ -219,10 +219,14 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                             <span class="label">گزارش درخواست‌ها</span>
                         </a>
                     <?php endif; ?>
+
+                    <?php if (canViewBackup()): ?>
                     <a href="backup.php" class="quick-card">
                         <span class="icon">💾</span>
                         <span class="label">پشتیبان‌گیری</span>
                     </a>
+                    <?php endif; ?>
+
                 </div>
             </div>
 

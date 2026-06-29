@@ -72,7 +72,7 @@ body {
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
@@ -157,10 +157,7 @@ body {
 
 }
 .action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
+
 }
 
 
@@ -309,7 +306,6 @@ input:focus, select:focus, textarea:focus {
     padding: 10px 14px;
     border: 2px solid #4a5568;
     border-radius: 10px;
-    font-size: 14px;
     font-family: 'Vazir', 'Tahoma', sans-serif;
     transition: 0.3s;
     background: #1a202c;
@@ -385,7 +381,7 @@ input:focus, select:focus, textarea:focus {
 .search-card input,
 .search-card select {
     width: 100%;
-    padding: 8px 12px;
+    padding: 6px 8px;
     border: 2px solid #4a5568;
     border-radius: 8px;
     font-size: 13px;
@@ -795,10 +791,6 @@ input:focus, select:focus, textarea:focus {
     margin-left: 0;
 }
 
-/* تغییر رنگ متن جستجوی خدمات به سفید */
-.search-card h2 {
-    color: black;
-}
 /* استایل سلکت‌های تاریخ جستجو با فونت وزیر */
 .search-date-day,
 .search-date-month,
@@ -843,7 +835,7 @@ input:focus, select:focus, textarea:focus {
     background: #2d3748;
     border-radius: 16px;
     padding: 30px 35px;
-    max-width: 600px;
+    max-width: 1000px;
     width: 95%;
     max-height: 90vh;
     overflow-y: auto;
@@ -1085,14 +1077,6 @@ input:focus, select:focus, textarea:focus {
 .search-date-year:hover {
     border-color: #4f46e5;
 }
-.search-group input,
-.search-group select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: 'Vazir', Tahoma, sans-serif;
-    font-size: 13px;
-}
 /* کوچک کردن سلکت‌های تاریخ در فرم‌ها */
 .date-select-group select,
 .search-date-group select {
@@ -1143,11 +1127,6 @@ input:focus, select:focus, textarea:focus {
     align-items:flex-end;
 }
 
-.search-row select,
-.search-row input {
-    width:  100%;
-    padding: 6px 8px;
-}
 .invoices-form select option {
     font-family: 'Vazir', 'Tahoma', sans-serif ;
     font-size: 13px ;
@@ -1175,8 +1154,4 @@ input:focus, select:focus, textarea:focus {
 .search-date-group select option {
     direction: rtl !important;
     text-align: right !important;
-}
-.search-card label{
-    color: #374151;
-    font-size: 13px;
 }

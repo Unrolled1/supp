@@ -740,7 +740,7 @@ foreach ($systems as $key => $system) {
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock">📅 <?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
@@ -859,14 +859,13 @@ foreach ($systems as $key => $system) {
                     </div>
 
                     <!-- رم‌ها و هاردها کنار هم -->
-                    <div class="ram-hard-wrapper">
-
+                    <div class="form-row">
                         <!-- بخش رم -->
                         <div class="ram-section">
                             <div id="rams_container">
                                 <div class="ram-row" data-row="0">
-                                    <label class="section-label">🧠 رم‌ها</label>
-                                    <div class="ram-select-wrapper">
+                                    <label class="section-label"> رم‌</label>
+                                    <div class="select-wrapper">
                                         <select name="ram_id_0" class="ram-select">
                                             <option value="">-- انتخاب --</option>
                                             <?php foreach ($rams as $ram): ?>
@@ -878,7 +877,7 @@ foreach ($systems as $key => $system) {
                                         <!-- دکمه افزودن سریع کنار سلکت رم -->
                                         <button type="button" class="btn-add-quick" onclick="openComponentModal('ram')" title="افزودن رم جدید">➕</button>
                                     </div>
-                                    <div class="ram-remove-wrapper">
+                                    <div class="row-remove">
                                         <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)">🗑️</button>
                                     </div>
                                 </div>
@@ -891,8 +890,8 @@ foreach ($systems as $key => $system) {
 
                             <div id="storages_container">
                                 <div class="storage-row" data-row="0">
-                                    <label class="section-label">💾 هاردها</label>
-                                    <div class="storage-select-wrapper">
+                                    <label class="section-label"> هارد</label>
+                                    <div class="select-wrapper">
                                         <select name="storage_id_0" class="storage-select">
                                             <option value="">-- انتخاب --</option>
                                             <?php foreach ($storages as $storage): ?>
@@ -903,26 +902,24 @@ foreach ($systems as $key => $system) {
                                         </select>
                                         <button type="button" class="btn-add-quick" onclick="openComponentModal('storage')" title="افزودن هارد جدید">➕</button>
                                     </div>
-                                    <div class="storage-remove-wrapper">
+                                    <div class="row-remove">
                                         <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)">🗑️</button>
                                     </div>
                                 </div>
                             </div>
                             <button type="button" class="btn-add-row" onclick="addStorageRow()">➕ افزودن هارد</button>
                         </div>
-                    </div>
 
-
-                    <div class="ip-peripheral-wrapper">
-
-                        <!-- بخش IPها -->
+                        <!-- بخش IP -->
                         <div class="ip-section">
                             <div id="ips_container">
                                 <div class="ip-row" data-row="0">
-                                    <div class="ip-select-wrapper">
-                                        <label class="section-label">🌐 IPها</label>
+                                    <label class="section-label">IP</label>
+
+                                    <div class="select-wrapper">
                                         <input type="text" name="ip_address_0">
                                     </div>
+
                                     <div class="ip-network-wrapper">
                                         <select name="ip_network_0">
                                             <option value="LAN">LAN</option>
@@ -932,22 +929,23 @@ foreach ($systems as $key => $system) {
                                             <option value="Other">سایر</option>
                                         </select>
                                     </div>
-                                    <div class="ip-remove-wrapper">
-                                        <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)" style="display: none;">🗑️</button>
+
+                                    <div class="row-remove">
+                                        <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)">🗑️</button>
                                     </div>
+
                                 </div>
                             </div>
                             <button type="button" class="btn-add-row" onclick="addIpRow()">➕ افزودن IP</button>
                         </div>
-
                         <!-- بخش تجهیزات جانبی -->
                         <div class="peripheral-section">
                             <div id="peripherals_container">
                                 <div class="peripheral-row" data-row="0">
-                                    <div class="peripheral-select-wrapper">
-                                        <label class="section-label">🔌 تجهیزات جانبی</label>
+                                    <label class="section-label"> تجهیزات جانبی</label>
 
-                                        <select name="peripheral_id_0" class="peripheral-select" style="flex: 1;">
+                                    <div class="select-wrapper">
+                                        <select name="peripheral_id_0" class="peripheral-select">
                                             <option value="">-- انتخاب --</option>
                                             <?php foreach ($peripheralTypes as $type): ?>
                                                 <optgroup label="<?php echo $type['icon'] . ' ' . $type['name']; ?>">
@@ -975,19 +973,21 @@ foreach ($systems as $key => $system) {
                                             <?php endforeach; ?>
                                         </select>
                                         <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید">➕</button>
-                                </div>
-                                    <div class="peripheral-remove-wrapper">
+                                    </div>
+                                    <div class="row-remove">
                                         <button type="button" class="btn-remove-peripheral" onclick="removePeripheralRow(this)" style="display: none;">🗑️</button>
                                     </div>
                                 </div>
                             </div>
                             <button type="button" class="btn-add-row" onclick="addPeripheralRow()">➕ افزودن تجهیز جانبی</button>
                         </div>
+
                     </div>
 
                     <div class="form-group">
                         <button type="submit" name="add_system" class="btn-add">💾 ذخیره سیستم</button>
                     </div>
+
                 </form>
             </div>
         <?php endif; ?>
@@ -1078,7 +1078,7 @@ foreach ($systems as $key => $system) {
                         <div class="form-row">
                             <div class="form-group">
                                 <label>کد اموال</label>
-                                <input type="text" name="monitor_property_code" placeholder="مثلاً: MON-001">
+                                <input type="text" name="monitor_property_code" >
                             </div>
                         </div>
                     </div>
@@ -1395,10 +1395,10 @@ foreach ($systems as $key => $system) {
 
                             <!-- عملیات -->
                              <td class="action-buttons">
-                                <?php if (canEditSystems()): ?> <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($system); ?>)' title="ویرایش">✏️</button>
+                                <?php if (canEditSystems()): ?> <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($system); ?>)' title="ویرایش">✏️ویرایش</button>
                                 <?php endif; ?>
                                 <?php if (canDeleteSystems()): ?>
-                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $system['id']; ?>, '<?php echo htmlspecialchars($system['name']); ?>')" title="حذف">🗑️</button>
+                                    <button class="delete-btn" onclick="confirmDelete(<?php echo $system['id']; ?>, '<?php echo htmlspecialchars($system['name']); ?>')" title="حذف">🗑️حذف</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
