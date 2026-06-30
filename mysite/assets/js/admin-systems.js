@@ -973,48 +973,125 @@ function refreshComponentSelect(type) {
 
         .then(rows => {
 
-            let select;
+            let selects = [];
 
             switch (type) {
 
                 case "ram":
-                    select = document.querySelector(".ram-select");
+                    selects = document.querySelectorAll(".ram-select");
                     break;
 
                 case "storage":
-                    select = document.querySelector(".storage-select");
+                    selects = document.querySelectorAll(".storage-select");
                     break;
 
                 case "peripheral":
-                    select = document.querySelector(".peripheral-select");
+                    selects = document.querySelectorAll(".peripheral-select");
                     break;
 
                 default:
-                    select = document.getElementById(type + "_id");
+                    const s = document.getElementById(type + "_id");
+                    if (s) selects = [s];
                     break;
             }
 
-            if (!select) return;
+            selects.forEach(select => {
 
-            let html = '<option value="">-- انتخاب --</option>';
+                const currentValue = select.value;
 
-            rows.forEach(row => {
+                let html = '<option value="">-- انتخاب --</option>';
 
-                let text = row.brand_name + " " + row.model_name;
+                rows.forEach(row => {
 
-                if (row.type) {
-                    text += ` (${row.capacity} ${row.type})`;
+                    let text;
+
+                    if (type === "peripheral") {
+
+                        text = `${row.brand_name} ${row.model_name}`;
+
+                        if (row.property_code) {
+                            text += ` (${row.property_code})`;
+                        }
+
+                    } else {
+
+                        text = `${row.brand_name} ${row.model_name}`;
+
+                        if (type === "ram" || type === "storage") {
+                            text += ` (${row.capacity} ${row.type})`;
+                        }
+                    }
+
+                    html += `<option value="${row.id}">${text}</option>`;
+                });
+
+                select.innerHTML = html;
+                select.value = currentValue;
+            });
+
+        })
+
+        .catch(console.error);
+
+}
+
+
+function refreshPeripheralSelect() {
+
+    fetch("assets/ajax/get_components.php?type=peripheral")
+
+        .then(r => r.json())
+
+        .then(rows => {
+
+            const selects = document.querySelectorAll(".peripheral-select");
+
+            selects.forEach(select => {
+
+                const currentValue = select.value;
+
+                let html = '<option value="">-- انتخاب --</option>';
+
+                let currentType = "";
+
+                rows.forEach(row => {
+
+                    if (currentType !== row.type_name) {
+
+                        if (currentType !== "") {
+                            html += "</optgroup>";
+                        }
+
+                        currentType = row.type_name;
+
+                        html += `<optgroup label="${currentType}">`;
+                    }
+
+                    let text = `${row.brand_name} ${row.model_name}`;
+
+                    if (row.property_code) {
+                        text += ` (${row.property_code})`;
+                    }
+
+                    html += `<option value="${row.id}">${text}</option>`;
+
+                });
+
+                if (currentType !== "") {
+                    html += "</optgroup>";
                 }
 
-                html += `<option value="${row.id}">${text}</option>`;
+                select.innerHTML = html;
+                select.value = currentValue;
 
             });
 
-            select.innerHTML = html;
+        })
 
-        });
+        .catch(console.error);
 
 }
+
 function saveComponent() {
     const form = document.getElementById('componentForm');
     const formData = new FormData(form);
@@ -1071,54 +1148,74 @@ function saveComponent() {
 // ============================================
 
 function openPeripheralModal() {
-    const modal = document.getElementById('peripheralModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
+
+    document.getElementById("peripheralForm").reset();
+
+    refreshComponentSelect("peripheral");
+
+    loadComponentList("peripheral");
+
+    document.getElementById("peripheralModal").style.display = "flex";
 }
 
 function savePeripheral() {
-    const form = document.getElementById('peripheralForm');
+
+    const form = document.getElementById("peripheralForm");
     const formData = new FormData(form);
 
-    fetch('admin_systems.php', {
-        method: 'POST',
+    fetch("admin_systems.php", {
+        method: "POST",
         body: formData
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // پیدا کردن آخرین سلکت تجهیزات جانبی
-                const selects = document.querySelectorAll('.peripheral-select');
-                const select = selects[selects.length - 1];
-                if (select) {
-                    const option = document.createElement('option');
-                    option.value = data.id;
-                    option.textContent = data.display_name;
-                    select.appendChild(option);
-                    select.value = data.id;
-                }
 
-                closeModal('peripheralModal');
+        .then(r => r.json())
+
+        .then(data => {
+
+            if (!data.success) {
 
                 Swal.fire({
-                    title: 'موفق!',
-                    text: 'تجهیز جانبی با موفقیت ثبت شد.',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
+                    icon: "error",
+                    title: "خطا",
+                    text: "ثبت انجام نشد."
                 });
+
+                return;
             }
-        })
-        .catch(error => {
-            Swal.fire({
-                title: 'خطا!',
-                text: 'مشکلی در ثبت تجهیز جانبی رخ داد.',
-                icon: 'error',
-                confirmButtonColor: '#dc3545'
+
+            refreshPeripheralSelect();
+            loadComponentList("peripheral");
+
+            document.querySelectorAll(".peripheral-select").forEach(select => {
+                select.value = data.id;
             });
+
+            closeModal("peripheralModal");
+
+            Swal.fire({
+                icon: "success",
+                title: "موفق",
+                text: "تجهیز جانبی ثبت شد.",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+        })
+
+        .catch(err => {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: "error",
+                title: "خطا",
+                text: "خطا در ارتباط با سرور"
+            });
+
         });
+
 }
+
 // ============================================
 // ویرایش سیستم
 // ============================================

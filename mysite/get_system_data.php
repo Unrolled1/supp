@@ -70,8 +70,8 @@ switch ($type) {
         $stmt = $db->prepare("
             SELECT 
                 sp.*,
-                p.computer_code, p.property_code, p.serial_number,
-                pt.name as type_name, pt.icon as type_icon,
+                p.computer_code, p.property_code,
+                pt.name as type_name, 
                 pm.name as model_name,
                 pb.name as brand_name
             FROM system_peripherals sp
@@ -132,8 +132,7 @@ switch ($type) {
         $peripherals = $db->prepare("
             SELECT 
                 sp.*,
-                p.computer_code, p.property_code, p.serial_number,
-                pt.name as type_name, pt.icon as type_icon,
+                p.computer_code, p.property_code, 
                 pm.name as model_name,
                 pb.name as brand_name
             FROM system_peripherals sp

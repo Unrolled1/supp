@@ -250,7 +250,7 @@ if (isset($_POST['add_peripheral']) && canEditSystems()) {
 
     // دریافت نام برای نمایش
     $infoStmt = $db->prepare("
-        SELECT pt.name as type_name, pt.icon, b.name as brand_name, m.name as model_name
+        SELECT pt.name as type_name,  b.name as brand_name, m.name as model_name
         FROM peripherals p
         INNER JOIN peripheral_types pt ON p.type_id = pt.id
         LEFT JOIN brands b ON p.brand_id = b.id
@@ -260,9 +260,10 @@ if (isset($_POST['add_peripheral']) && canEditSystems()) {
     $infoStmt->execute([':id' => $peripheral_id]);
     $info = $infoStmt->fetch();
 
-    $displayName = ($info['icon'] ?? '') . ' ' . ($info['brand_name'] ?? '') . ' ' . ($info['model_name'] ?? '');
-    if ($property_code) {
-        $displayName .= ' (' . $property_code . ')';
+    $displayName = trim(($info['brand_name'] ?? '') . ' ' . ($info['model_name'] ?? ''));
+
+    if (!empty($property_code)) {
+        $displayName .= " - {$property_code}";
     }
 
     header('Content-Type: application/json');
@@ -957,7 +958,7 @@ foreach ($systems as $key => $system) {
                                         <select name="peripheral_id_0" class="peripheral-select">
                                             <option value="">-- انتخاب --</option>
                                             <?php foreach ($peripheralTypes as $type): ?>
-                                                <optgroup label="<?php echo $type['icon'] . ' ' . $type['name']; ?>">
+                                                <optgroup label="<?php echo $type['name']; ?>">
                                                     <?php
                                                     $periphStmt = $db->prepare("
                                     SELECT p.*, m.name as model_name, b.name as brand_name
@@ -1101,7 +1102,7 @@ foreach ($systems as $key => $system) {
                                 <select name="peripheral_type_id" required>
                                     <option value="">-- انتخاب --</option>
                                     <?php foreach ($peripheralTypes as $type): ?>
-                                        <option value="<?php echo $type['id']; ?>"><?php echo $type['icon'] . ' ' . $type['name']; ?></option>
+                                        <option value="<?php echo $type['id']; ?>"><?php echo  $type['name']; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -1428,7 +1429,7 @@ foreach ($systems as $key => $system) {
                                     <?php foreach ($system['peripherals'] as $periph): ?>
                                          <span class="badge badge-info"
                                               title="<?php echo htmlspecialchars($periph['type_name'] . ': ' . ($periph['brand_name'] ?? '') . ' ' . ($periph['model_name'] ?? '')); ?>">
-                                            <?php echo $periph['type_icon']; ?>
+
                                         </span>
                                     <?php endforeach; ?>
                                 <?php else: ?>
