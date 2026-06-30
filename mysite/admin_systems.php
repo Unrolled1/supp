@@ -48,10 +48,10 @@ $models = $db->query("SELECT id, name FROM models ORDER BY name ASC")->fetchAll(
 
 // CPUها
 $cpus = $db->query("
-    SELECT c.*, m.name as model_name, b.name as brand_name 
+    SELECT c.*, m.name AS model_name, b.name AS brand_name
     FROM cpus c
-    LEFT JOIN models m ON c.model_id = m.id
-    LEFT JOIN brands b ON m.brand_id = b.id
+    INNER JOIN models m ON c.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
     ORDER BY b.name, m.name
 ")->fetchAll();
 
@@ -59,8 +59,8 @@ $cpus = $db->query("
 $motherboards = $db->query("
     SELECT mb.*, m.name as model_name, b.name as brand_name 
     FROM motherboards mb
-    LEFT JOIN models m ON mb.model_id = m.id
-    LEFT JOIN brands b ON m.brand_id = b.id
+    INNER JOIN models m ON mb.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
     ORDER BY b.name, m.name
 ")->fetchAll();
 
@@ -68,8 +68,8 @@ $motherboards = $db->query("
 $rams = $db->query("
     SELECT r.*, m.name as model_name, b.name as brand_name 
     FROM rams r
-    LEFT JOIN models m ON r.model_id = m.id
-    LEFT JOIN brands b ON m.brand_id = b.id
+    INNER JOIN models m ON r.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
     ORDER BY b.name, m.name
 ")->fetchAll();
 
@@ -77,8 +77,8 @@ $rams = $db->query("
 $storages = $db->query("
     SELECT s.*, m.name as model_name, b.name as brand_name 
     FROM storages s
-    LEFT JOIN models m ON s.model_id = m.id
-    LEFT JOIN brands b ON m.brand_id = b.id
+    INNER JOIN models m ON s.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
     ORDER BY b.name, m.name
 ")->fetchAll();
 
@@ -86,8 +86,8 @@ $storages = $db->query("
 $powers = $db->query("
     SELECT p.*, m.name as model_name, b.name as brand_name 
     FROM powers p
-    LEFT JOIN models m ON p.model_id = m.id
-    LEFT JOIN brands b ON m.brand_id = b.id
+    INNER JOIN models m ON p.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
     ORDER BY b.name, m.name
 ")->fetchAll();
 
@@ -95,8 +95,8 @@ $powers = $db->query("
 $monitors = $db->query("
     SELECT mon.*, m.name as model_name, b.name as brand_name 
     FROM monitors mon
-    LEFT JOIN models m ON mon.model_id = m.id
-    LEFT JOIN brands b ON m.brand_id = b.id
+    INNER JOIN models m ON mon.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
     ORDER BY b.name, m.name
 ")->fetchAll();
 
@@ -252,7 +252,7 @@ if (isset($_POST['add_peripheral']) && canEditSystems()) {
     $infoStmt = $db->prepare("
         SELECT pt.name as type_name, pt.icon, b.name as brand_name, m.name as model_name
         FROM peripherals p
-        LEFT JOIN peripheral_types pt ON p.type_id = pt.id
+        INNER JOIN peripheral_types pt ON p.type_id = pt.id
         LEFT JOIN brands b ON p.brand_id = b.id
         LEFT JOIN models m ON p.model_id = m.id
         WHERE p.id = :id
@@ -629,25 +629,25 @@ $systems = $db->prepare("
         u.fullname as creator_name
         
     FROM systems s
-    LEFT JOIN departments d ON s.department_id = d.id
+    INNER JOIN departments d ON s.department_id = d.id
     
-    LEFT JOIN cpus cpu ON s.cpu_id = cpu.id
-    LEFT JOIN models cpu_m ON cpu.model_id = cpu_m.id
-    LEFT JOIN brands cpu_b ON cpu_m.brand_id = cpu_b.id
+    INNER JOIN cpus cpu ON s.cpu_id = cpu.id
+    INNER JOIN models cpu_m ON cpu.model_id = cpu_m.id
+    INNER JOIN brands cpu_b ON cpu_m.brand_id = cpu_b.id
     
-    LEFT JOIN motherboards mb ON s.motherboard_id = mb.id
-    LEFT JOIN models mb_m ON mb.model_id = mb_m.id
-    LEFT JOIN brands mb_b ON mb_m.brand_id = mb_b.id
+    INNER JOIN motherboards mb ON s.motherboard_id = mb.id
+    INNER JOIN models mb_m ON mb.model_id = mb_m.id
+    INNER JOIN brands mb_b ON mb_m.brand_id = mb_b.id
     
-    LEFT JOIN powers p ON s.power_id = p.id
-    LEFT JOIN models p_m ON p.model_id = p_m.id
-    LEFT JOIN brands p_b ON p_m.brand_id = p_b.id
+    INNER JOIN powers p ON s.power_id = p.id
+    INNER JOIN models p_m ON p.model_id = p_m.id
+    INNER JOIN brands p_b ON p_m.brand_id = p_b.id
     
-    LEFT JOIN monitors mon ON s.monitor_id = mon.id
-    LEFT JOIN models mon_m ON mon.model_id = mon_m.id
-    LEFT JOIN brands mon_b ON mon_m.brand_id = mon_b.id
+    INNER JOIN monitors mon ON s.monitor_id = mon.id
+    INNER JOIN models mon_m ON mon.model_id = mon_m.id
+    INNER JOIN brands mon_b ON mon_m.brand_id = mon_b.id
     
-    LEFT JOIN users u ON s.created_by = u.id
+    INNER JOIN users u ON s.created_by = u.id
     
     $whereClause
     ORDER BY s.id DESC
@@ -666,9 +666,9 @@ foreach ($systems as $key => $system) {
             rm.name as model_name,
             rb.name as brand_name
         FROM system_rams sr
-        LEFT JOIN rams r ON sr.ram_id = r.id
-        LEFT JOIN models rm ON r.model_id = rm.id
-        LEFT JOIN brands rb ON rm.brand_id = rb.id
+        INNER JOIN rams r ON sr.ram_id = r.id
+        INNER JOIN models rm ON r.model_id = rm.id
+        INNER JOIN brands rb ON rm.brand_id = rb.id
         WHERE sr.system_id = :system_id
         ORDER BY sr.id DESC
     ");
@@ -683,9 +683,9 @@ foreach ($systems as $key => $system) {
             sm.name as model_name,
             sb.name as brand_name
         FROM system_storages ss
-        LEFT JOIN storages st ON ss.storage_id = st.id
-        LEFT JOIN models sm ON st.model_id = sm.id
-        LEFT JOIN brands sb ON sm.brand_id = sb.id
+        INNER JOIN storages st ON ss.storage_id = st.id
+        INNER JOIN models sm ON st.model_id = sm.id
+        INNER JOIN brands sb ON sm.brand_id = sb.id
         WHERE ss.system_id = :system_id
         ORDER BY ss.id DESC
     ");
@@ -710,10 +710,10 @@ foreach ($systems as $key => $system) {
             pm.name as model_name,
             pb.name as brand_name
         FROM system_peripherals sp
-        LEFT JOIN peripherals p ON sp.peripheral_id = p.id
-        LEFT JOIN peripheral_types pt ON p.type_id = pt.id
-        LEFT JOIN models pm ON p.model_id = pm.id
-        LEFT JOIN brands pb ON pm.brand_id = pb.id
+        INNER JOIN peripherals p ON sp.peripheral_id = p.id
+        INNER JOIN peripheral_types pt ON p.type_id = pt.id
+        INNER JOIN models pm ON p.model_id = pm.id
+        INNER JOIN brands pb ON pm.brand_id = pb.id
         WHERE sp.system_id = :system_id
         ORDER BY pt.sort_order ASC
     ");
@@ -766,6 +766,7 @@ foreach ($systems as $key => $system) {
 
                     <!-- اطلاعات اصلی -->
                     <div class="form-row">
+
                         <div class="pc-id">
                             <label>کد رایانه *</label>
                             <input type="text" name="computer_code" required>
@@ -792,10 +793,11 @@ foreach ($systems as $key => $system) {
                     </div>
 
                     <div class="form-row">
+
                         <div class="form-group">
                             <label>CPU</label>
                             <div style="display: flex; gap: 8px;">
-                                <select name="cpu_id" id="cpu_id" style="flex: 1;">
+                                <select name="cpu_id" id="cpu_id">
                                     <option value="">-- انتخاب --</option>
                                     <?php foreach ($cpus as $cpu): ?>
                                         <option value="<?php echo $cpu['id']; ?>">
@@ -805,6 +807,7 @@ foreach ($systems as $key => $system) {
                                 </select>
                                 <button type="button" class="btn-add-quick" onclick="openComponentModal('cpu')" title="افزودن CPU جدید">➕</button>
                             </div>
+
                         </div>
 
                         <!-- مادربرد -->
@@ -856,10 +859,11 @@ foreach ($systems as $key => $system) {
                                 <button type="button" class="btn-add-quick" onclick="openComponentModal('monitor')" title="افزودن مانیتور جدید">➕</button>
                             </div>
                         </div>
+
                     </div>
 
-                    <!-- رم‌ها و هاردها کنار هم -->
-                    <div class="form-row">
+
+                    <div class="rhid-row">
                         <!-- بخش رم -->
                         <div class="ram-section">
                             <div id="rams_container">
@@ -878,7 +882,7 @@ foreach ($systems as $key => $system) {
                                         <button type="button" class="btn-add-quick" onclick="openComponentModal('ram')" title="افزودن رم جدید">➕</button>
                                     </div>
                                     <div class="row-remove">
-                                        <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)">🗑️</button>
+                                        <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)" hidden="">🗑️</button>
                                     </div>
                                 </div>
                             </div>
@@ -902,8 +906,9 @@ foreach ($systems as $key => $system) {
                                         </select>
                                         <button type="button" class="btn-add-quick" onclick="openComponentModal('storage')" title="افزودن هارد جدید">➕</button>
                                     </div>
+
                                     <div class="row-remove">
-                                        <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)">🗑️</button>
+                                        <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)" hidden="">🗑️</button>
                                     </div>
                                 </div>
                             </div>
@@ -914,13 +919,13 @@ foreach ($systems as $key => $system) {
                         <div class="ip-section">
                             <div id="ips_container">
                                 <div class="ip-row" data-row="0">
+
                                     <label class="section-label">IP</label>
 
                                     <div class="select-wrapper">
-                                        <input type="text" name="ip_address_0">
-                                    </div>
 
-                                    <div class="ip-network-wrapper">
+                                        <input type="text" name="ip_address_0">
+
                                         <select name="ip_network_0">
                                             <option value="LAN">LAN</option>
                                             <option value="WAN">WAN</option>
@@ -928,12 +933,16 @@ foreach ($systems as $key => $system) {
                                             <option value="WiFi">WiFi</option>
                                             <option value="Other">سایر</option>
                                         </select>
-                                    </div>
 
+                                    </div>
                                     <div class="row-remove">
-                                        <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)">🗑️</button>
+                                        <button type="button"
+                                                class="btn-remove-ip"
+                                                onclick="removeIpRow(this)"
+                                                hidden>
+                                            🗑️
+                                        </button>
                                     </div>
-
                                 </div>
                             </div>
                             <button type="button" class="btn-add-row" onclick="addIpRow()">➕ افزودن IP</button>
@@ -953,8 +962,8 @@ foreach ($systems as $key => $system) {
                                                     $periphStmt = $db->prepare("
                                     SELECT p.*, m.name as model_name, b.name as brand_name
                                     FROM peripherals p
-                                    LEFT JOIN models m ON p.model_id = m.id
-                                    LEFT JOIN brands b ON m.brand_id = b.id
+                                    INNER JOIN models m ON p.model_id = m.id
+                                    INNER JOIN brands b ON m.brand_id = b.id
                                     WHERE p.type_id = :type_id
                                     ORDER BY b.name, m.name
                                 ");
@@ -991,6 +1000,7 @@ foreach ($systems as $key => $system) {
                 </form>
             </div>
         <?php endif; ?>
+
         <!-- ============================================ -->
         <!-- مودال افزودن قطعه جدید -->
         <!-- ============================================ -->
@@ -1121,6 +1131,27 @@ foreach ($systems as $key => $system) {
                             </div>
                         </div>
                     </div>
+
+                    <hr>
+                    <h4 id="componentListTitle">قطعات ثبت شده</h4>
+
+                    <table class="components-table" id="componentTable">
+
+                        <thead id="componentTableHead">
+                        <tr>
+                            <th>برند</th>
+                            <th>مدل</th>
+                            <th>ظرفیت</th>
+                            <th>نوع</th>
+                            <th>عملیات</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="componentTableBody">
+
+                        </tbody>
+                    </table>
+
                     <div class="modal-buttons">
                         <button type="button" class="btn-add" onclick="saveComponent()">💾 ذخیره</button>
                         <button type="button" class="btn-cancel" onclick="closeModal('componentModal')">لغو</button>
@@ -1128,6 +1159,7 @@ foreach ($systems as $key => $system) {
                 </form>
             </div>
         </div>
+
         <!-- ============================================ -->
         <!-- مودال افزودن تجهیز جانبی جدید -->
         <!-- ============================================ -->
@@ -1146,6 +1178,11 @@ foreach ($systems as $key => $system) {
                                     <option value="<?php echo $type['id']; ?>"><?php echo $type['name']; ?> </option>
                                 <?php endforeach; ?>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>کد اموال</label>
+                            <input type="text" name="property_code" placeholder="کد اموال">
                         </div>
                     </div>
 
@@ -1171,17 +1208,7 @@ foreach ($systems as $key => $system) {
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>کد رایانه</label>
-                            <input type="text" name="computer_code" placeholder="کد رایانه">
-                        </div>
-                        <div class="form-group">
-                            <label>کد اموال</label>
-                            <input type="text" name="property_code" placeholder="کد اموال">
-                        </div>
-                    </div>
 
-                    <div class="form-row">
                         <div class="form-group">
                             <label>نوع اتصال</label>
                             <select name="connection_type">
@@ -1192,10 +1219,32 @@ foreach ($systems as $key => $system) {
                         </div>
                     </div>
 
+                    <hr>
+                    <h4>تجهیزات جانبی ثبت شده</h4>
+
+                    <table class="components-table" id="peripheralTable">
+
+
+                        <thead>
+                        <tr>
+                            <th>نوع تجهیز</th>
+                            <th>برند</th>
+                            <th>مدل</th>
+                            <th>کد اموال</th>
+                            <th>عملیات</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="peripheralTableBody">
+
+                        </tbody>
+                    </table>
+
                     <div class="modal-buttons">
                         <button type="button" class="btn-add" onclick="savePeripheral()">💾 ذخیره</button>
                         <button type="button" class="btn-cancel" onclick="closeModal('peripheralModal')">لغو</button>
                     </div>
+
                 </form>
             </div>
         </div>

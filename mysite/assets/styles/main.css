@@ -335,7 +335,7 @@ input:focus, select:focus, textarea:focus {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-    align-items: flex-end;
+    margin-top: 10px;
 }
 
 .add-card .form-row .form-group {

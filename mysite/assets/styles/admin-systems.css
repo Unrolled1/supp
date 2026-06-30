@@ -15,9 +15,22 @@
     flex: 0 0 100%;
     width: 100%;
 }
-.form-row{
-    margin-top:  10px;
+.rhid-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    align-items:stretch;
+    margin-top: 10px;
 }
+
+.ram-section,
+.hard-section,
+.ip-section,
+.peripheral-section{
+    display:flex;
+    flex-direction:column;
+}
+
 /* ============================================
    ردیف‌های چندگانه (رم، هارد، IP، تجهیزات)
    ============================================ */
@@ -32,10 +45,16 @@
     margin-bottom: 8px;
     border: 1px solid #4a5568;
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 12px;
     align-items: flex-end;
     transition: all 0.2s ease;
+}
+.ip-row .row-remove{
+    margin-top:6px;
+    display:flex;
+    justify-content:flex-end;
 }
 
 .ram-row:hover,
@@ -58,10 +77,6 @@
     align-items:center;
     width:100%;
 }
-.select-wrapper select,
-.select-wrapper input{
-    flex:1;
-}
 .select-inline{
     display:flex;
     gap:8px;
@@ -79,30 +94,31 @@
     min-width:32px;
 }
 
-.row-remove{
-    flex:0 0 auto;
-}
-
-.row-remove button{
-    background:#ef4444;
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    padding:4px 12px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.row-remove button:hover{
-    background:#dc2626;
-}
 .select-wrapper select:focus,
 .select-wrapper input:focus{
     border-color:#4f46e5;
     outline:none;
     box-shadow:0 0 0 2px rgba(79,70,229,.2);
 }
+.ip-inline{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+}
 
+.ip-inline input{
+    flex:1;
+}
+
+.ip-inline select{
+    width:90px;
+    flex:0 0 90px;
+}
+
+.ip-inline .btn-remove-ip{
+    flex:0 0 auto;
+}
 .ram-row input,
 .storage-row input,
 .ip-row input,
@@ -115,16 +131,6 @@
     font-size: 12px;
     height: 32px;
 }
-/* ============================================
-   IP و تجهیزات جانبی کنار هم
-   ============================================ */
-
- .ip-section,
- .peripheral-section {
-    flex: 1;
-    min-width: 300px;
-}
-
 /* ============================================
    دکمه افزودن
    ============================================ */
@@ -270,12 +276,10 @@
 }
 
 .action-buttons .edit-btn {
-    background: #f59e0b;
     color: #1a1a1a;
 }
 
 .action-buttons .edit-btn:hover {
-    background: #d97706;
     transform: scale(1.05);
 }
 
@@ -285,7 +289,6 @@
 }
 
 .action-buttons .delete-btn:hover {
-    background: #dc2626;
     transform: scale(1.05);
 }
 /* ============================================
@@ -311,4 +314,37 @@
 .btn-add-quick:hover {
     background: #059669;
     transform: scale(1.05);
+}
+.btn-remove-ram,
+.btn-remove-storage,
+.btn-remove-ip,
+.btn-remove-peripheral,.btn-remove{
+    background:#ef4444;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:4px 12px;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.btn-remove-ram:hover,
+.btn-remove-storage:hover,
+.btn-remove-ip:hover,
+.btn-remove-peripheral:hover,
+.btn-remove:hover{
+    background:#dc2626;
+    transform:scale(1.05);
+}
+.components-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.components-table th,
+.components-table td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 10px;
+    text-align: center;
 }

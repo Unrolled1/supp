@@ -54,9 +54,6 @@ function getSystemData(systemId, type, callback) {
         });
 }
 
-// ============================================
-// مدیریت رم‌ها (افزودن در فرم ثبت)
-// ============================================
 function getSelectOptions(selector) {
     const select = document.querySelector(selector);
 
@@ -68,51 +65,60 @@ function getSelectOptions(selector) {
         .join('');
 }
 
-function createSelectRow(containerId, rowClass, selectName, selectClass, removeFunction) {
+function createSelectRow(config) {
 
-    const container = document.getElementById(containerId);
-    const rowCount = container.querySelectorAll("." + rowClass).length;
+    const container = document.getElementById(config.containerId);
 
-    const firstSelect = document.querySelector(`select[name="${selectName}_0"]`);
+    const rowCount =
+        container.querySelectorAll("." + config.rowClass).length;
 
-    let optionsHTML = "";
+    const firstSelect =
+        document.querySelector(config.firstSelect);
+
+    let options = "";
 
     if (firstSelect) {
-        firstSelect.querySelectorAll("option").forEach(opt => {
-            if (opt.value !== "") {
-                optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
-            }
-        });
+        options = firstSelect.innerHTML;
     }
 
     const row = document.createElement("div");
 
-    row.className = rowClass;
+    row.className = config.rowClass;
+
     row.dataset.row = rowCount;
 
     row.innerHTML = `
-        <div class="select-wrapper">
-            <select
-                name="${selectName}_${rowCount}"
-                class="${selectClass}">
-                <option value="">-- انتخاب --</option>
-                ${optionsHTML}
-            </select>
-        </div>
 
-        <div class="row-remove">
+        <label class="section-label">
+            ${config.label}
+        </label>
+
+        <div class="select-wrapper">
+
+            <select
+                name="${config.name}_${rowCount}"
+                class="${config.selectClass}">
+                ${options}
+            </select>
+
+            ${config.quickButton || ""}
+
             <button
                 type="button"
-                class="btn-remove-${selectName}"
-                onclick="${removeFunction}(this)">
+                class="${config.removeClass}"
+                onclick="${config.removeFunction}(this)"
+                ${rowCount===0?"hidden":""}>
                 🗑️
             </button>
+
         </div>
+
     `;
 
     container.appendChild(row);
 
 }
+
 function removeDynamicRow(button, rowClass, containerId, itemName) {
 
     const row = button.closest("." + rowClass);
@@ -149,17 +155,47 @@ function removeDynamicRow(button, rowClass, containerId, itemName) {
 
 }
 
-let ramCounter = 1;
+function createHtmlRow(containerId, rowClass, html) {
 
-function addRamRow() {
+    const container = document.getElementById(containerId);
 
-    createSelectRow(
-        "rams_container",
-        "ram-row",
-        "ram_id",
-        "ram-select",
-        "removeRamRow"
-    );
+    const row = document.createElement("div");
+
+    row.className = rowClass;
+
+    row.dataset.row = container.querySelectorAll("." + rowClass).length;
+
+    row.innerHTML = html;
+
+    container.appendChild(row);
+
+}
+
+// ============================================
+// مدیریت رم‌ها (افزودن در فرم ثبت)
+// ============================================
+
+function addRamRow(){
+
+    createSelectRow({
+
+        containerId:"rams_container",
+
+        rowClass:"ram-row",
+
+        firstSelect:'select[name="ram_id_0"]',
+
+        name:"ram_id",
+
+        selectClass:"ram-select",
+
+        removeClass:"btn-remove-ram",
+
+        removeFunction:"removeRamRow",
+
+        label:"رم",
+
+    });
 
 }
 
@@ -170,54 +206,70 @@ function removeRamRow(button) {
 // مدیریت هاردها (افزودن در فرم ثبت)
 // ============================================
 
-let storageCounter = 1;
+function addStorageRow(){
 
-function addStorageRow() {
+    createSelectRow({
 
-    createSelectRow(
-        "storages_container",
-        "storage-row",
-        "storage_id",
-        "storage-select",
-        "removeStorageRow"
-    );
+        containerId:"storages_container",
+
+        rowClass:"storage-row",
+
+        firstSelect:'select[name="storage_id_0"]',
+
+        name:"storage_id",
+
+        selectClass:"storage-select",
+
+        removeClass:"btn-remove-storage",
+
+        removeFunction:"removeStorageRow",
+
+        label:"هارد",
+
+
+    });
 
 }
+
 function removeStorageRow(button) {
     removeDynamicRow(button, "storage-row", "storages_container", "هارد");
-}// ============================================
+}
+
+// ============================================
 // مدیریت IPها (افزودن در فرم ثبت)
 // ============================================
 
-
-let ipCounter = 1;
-
 function addIpRow() {
-    const container = document.getElementById('ips_container');
-    const rowCount = container.querySelectorAll('.ip-row').length;
 
-    const newRow = document.createElement('div');
-    newRow.className = 'ip-row';
-    newRow.dataset.row = rowCount;
+    createHtmlRow(
+        "ips_container",
+        "ip-row",
+        `
+        <label class="section-label">IP</label>
 
-    newRow.innerHTML = `
-        <div class="select-wrapper">
-            <input type="text" name="ip_address_${rowCount}">
-        </div>
-        
-            <select name="ip_network_${rowCount}">
+        <div class="ip-inline">
+
+            <input type="text" name="ip_address_${document.querySelectorAll('#ips_container .ip-row').length}">
+
+            <select name="ip_network_${document.querySelectorAll('#ips_container .ip-row').length}">
                 <option value="LAN">LAN</option>
                 <option value="WAN">WAN</option>
                 <option value="VPN">VPN</option>
                 <option value="WiFi">WiFi</option>
                 <option value="Other">سایر</option>
             </select>
-        
-        <div class="row-remove">
-                    <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)">🗑️</button>
+
+            <button
+                type="button"
+                class="btn-remove-ip"
+                onclick="removeIpRow(this)">
+                🗑️
+            </button>
+
         </div>
-    `;
-    container.appendChild(newRow);
+        `
+    );
+
 }
 
 function removeIpRow(button) {
@@ -227,39 +279,40 @@ function removeIpRow(button) {
 // مدیریت تجهیزات جانبی (افزودن در فرم ثبت)
 // ============================================
 
-let peripheralCounter = 1;
-
 function addPeripheralRow() {
-    const container = document.getElementById('peripherals_container');
-    const rowCount = container.querySelectorAll('.peripheral-row').length;
 
-    const newRow = document.createElement('div');
-    newRow.className = 'peripheral-row';
-    newRow.dataset.row = rowCount;
+    const row = document.querySelectorAll("#peripherals_container .peripheral-row").length;
 
-    const firstSelect = document.querySelector('select[name="peripheral_id_0"]');
-    const optionsHTML = firstSelect ? firstSelect.innerHTML : '';
+    const options =
+        document.querySelector('select[name="peripheral_id_0"]').innerHTML;
 
-    newRow.innerHTML = `
+    createHtmlRow(
+        "peripherals_container",
+        "peripheral-row",
+        `
+        <label class="section-label">تجهیزات جانبی</label>
+
         <div class="select-wrapper">
 
-            <select name="peripheral_id_${rowCount}" class="peripheral-select">
-                ${optionsHTML}
+            <select
+                name="peripheral_id_${row}"
+                class="peripheral-select">
+
+                ${options}
+
             </select>
 
-        </div>
-
-        <div class="row-remove">
             <button
                 type="button"
                 class="btn-remove-peripheral"
                 onclick="removePeripheralRow(this)">
                 🗑️
             </button>
-        </div>
-    `;
 
-    container.appendChild(newRow);
+        </div>
+        `
+    );
+
 }
 
 function removePeripheralRow(button) {
@@ -279,6 +332,21 @@ function updateRowNumbers(className) {
                 input.name = name.replace(/_\d+$/, `_${index}`);
             }
         });
+    });
+    rows.forEach((row, index) => {
+
+        const removeBtn = row.querySelector(
+            ".btn-remove-ram, .btn-remove-storage, .btn-remove-ip, .btn-remove-peripheral"
+        );
+
+        if (!removeBtn) return;
+
+        if (index === 0) {
+            removeBtn.hidden = true;
+        } else {
+            removeBtn.hidden = false;
+        }
+
     });
 }
 
@@ -670,7 +738,6 @@ function openComponentModal(type) {
     const modal = document.getElementById('componentModal');
     const form = document.getElementById('componentForm');
     const title = document.getElementById('componentModalTitle');
-
     // ریست فرم
     form.reset();
 
@@ -687,6 +754,11 @@ function openComponentModal(type) {
     title.textContent = titles[type] || '➕ افزودن قطعه جدید';
     document.getElementById('component_type').value = type;
 
+    document.getElementById("componentListTitle").innerText =
+        "لیست " + componentTitles[type] + " های ثبت شده";
+
+    loadComponentList(type);
+
     // نمایش فیلدهای اختصاصی
     document.getElementById('ram_fields').style.display = type === 'ram' ? 'block' : 'none';
     document.getElementById('storage_fields').style.display = type === 'storage' ? 'block' : 'none';
@@ -695,6 +767,254 @@ function openComponentModal(type) {
     modal.style.display = 'flex';
 }
 
+const componentTitles = {
+    cpu: "CPU",
+    motherboard: "مادربرد",
+    ram: "رم",
+    storage: "هارد",
+    power: "پاور",
+    gpu: "کارت گرافیک",
+    monitor: "مانیتور"
+};
+function loadComponentList(type) {
+
+    fetch("assets/ajax/get_components.php?type=" + type)
+
+        .then(response => response.json())
+
+        .then(rows => {
+            const head = document.getElementById("componentTableHead");
+
+            if (type === "peripheral") {
+
+                head.innerHTML = `
+        <tr>
+            <th>نوع تجهیز</th>
+            <th>برند</th>
+            <th>مدل</th>
+            <th>کد اموال</th>
+            <th>عملیات</th>
+        </tr>
+    `;
+
+            }
+            else if (type === "ram" || type === "storage") {
+
+                head.innerHTML = `
+        <tr>
+            <th>برند</th>
+            <th>مدل</th>
+            <th>ظرفیت</th>
+            <th>نوع</th>
+            <th>عملیات</th>
+        </tr>
+    `;
+
+            } else {
+
+                head.innerHTML = `
+        <tr>
+            <th>برند</th>
+            <th>مدل</th>
+            <th>عملیات</th>
+        </tr>
+    `;
+
+            }
+            let html = "";
+            if (rows.length === 0) {
+
+                const colspan = type === "peripheral" ? 5 :
+                    (type === "ram" || type === "storage") ? 5 : 3;
+
+
+                html = `
+        <tr>
+            <td colspan="${colspan}" style="text-align:center;color:#888">
+                موردی ثبت نشده است
+            </td>
+        </tr>
+    `;
+            }else {
+                rows.forEach(row => {
+
+                    if (type === "peripheral") {
+
+                        html += `
+        <tr>
+            <td>${row.type_name}</td>
+            <td>${row.brand_name}</td>
+            <td>${row.model_name}</td>
+            <td>${row.property_code || "-"}</td>
+            <td>
+                <button
+                    class="btn-remove"
+                    onclick="deleteComponent('${type}', ${row.id})">
+                    🗑️
+                </button>
+            </td>
+        </tr>
+    `;
+
+                    }
+
+                    else if (type === "ram" || type === "storage") {
+
+                        html += `
+            <tr>
+                <td>${row.brand_name}</td>
+                <td>${row.model_name}</td>
+                <td>${row.capacity || "-"}</td>
+                <td>${row.type || "-"}</td>
+                <td>
+                    <button class="btn-remove"
+                        onclick="deleteComponent('${type}', ${row.id})">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+        `;
+
+                    } else {
+
+                        html += `
+            <tr>
+                <td>${row.brand_name}</td>
+                <td>${row.model_name}</td>
+                <td>
+                    <button class="btn-remove"
+                        onclick="deleteComponent('${type}', ${row.id})">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+        `;
+
+                    }
+
+                });
+            }
+            document.getElementById("componentTableBody").innerHTML = html;
+
+        })
+
+        .catch(err => console.error(err));
+}
+
+
+
+function deleteComponent(type,id){
+
+    Swal.fire({
+
+        title:"حذف شود؟",
+        text:"این قطعه حذف خواهد شد.",
+        icon:"warning",
+
+        showCancelButton:true,
+
+        confirmButtonText:"بله",
+        cancelButtonText:"لغو",
+
+        confirmButtonColor:"#dc3545"
+
+    }).then(result=>{
+
+        if(!result.isConfirmed) return;
+
+        fetch("assets/ajax/delete_component.php",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/x-www-form-urlencoded"
+            },
+
+            body:
+                "type="+encodeURIComponent(type)+
+                "&id="+id
+
+        })
+
+            .then(r=>r.json())
+
+            .then(data=>{
+
+                if(data.success){
+                    loadComponentList(type);
+                    refreshComponentSelect(type);
+
+                    Swal.fire({
+
+                        icon:"success",
+                        title:"حذف شد",
+                        timer:1200,
+                        showConfirmButton:false
+
+                    });
+
+
+                }else{
+
+                    Swal.fire("خطا","حذف انجام نشد","error");
+
+                }
+
+            });
+
+    });
+
+}
+function refreshComponentSelect(type) {
+
+    fetch("assets/ajax/get_components.php?type=" + type)
+
+        .then(r => r.json())
+
+        .then(rows => {
+
+            let select;
+
+            switch (type) {
+
+                case "ram":
+                    select = document.querySelector(".ram-select");
+                    break;
+
+                case "storage":
+                    select = document.querySelector(".storage-select");
+                    break;
+
+                case "peripheral":
+                    select = document.querySelector(".peripheral-select");
+                    break;
+
+                default:
+                    select = document.getElementById(type + "_id");
+                    break;
+            }
+
+            if (!select) return;
+
+            let html = '<option value="">-- انتخاب --</option>';
+
+            rows.forEach(row => {
+
+                let text = row.brand_name + " " + row.model_name;
+
+                if (row.type) {
+                    text += ` (${row.capacity} ${row.type})`;
+                }
+
+                html += `<option value="${row.id}">${text}</option>`;
+
+            });
+
+            select.innerHTML = html;
+
+        });
+
+}
 function saveComponent() {
     const form = document.getElementById('componentForm');
     const formData = new FormData(form);
@@ -708,7 +1028,7 @@ function saveComponent() {
         .then(data => {
             if (data.success) {
                 const type = document.getElementById('component_type').value;
-
+                console.log(type);
                 // پیدا کردن سلکت مربوطه
                 let selectId = type + '_id';
                 if (type === 'motherboard') selectId = 'motherboard_id';
@@ -733,6 +1053,8 @@ function saveComponent() {
                     timer: 1500,
                     showConfirmButton: false
                 });
+                refreshComponentSelect(type);
+                loadComponentList(type);
             }
         })
         .catch(error => {
