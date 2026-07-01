@@ -253,8 +253,8 @@ if (isset($_POST['add_peripheral']) && canEditSystems()) {
         SELECT pt.name as type_name,  b.name as brand_name, m.name as model_name
         FROM peripherals p
         INNER JOIN peripheral_types pt ON p.type_id = pt.id
-        LEFT JOIN brands b ON p.brand_id = b.id
-        LEFT JOIN models m ON p.model_id = m.id
+        INNER JOIN brands b ON p.brand_id = b.id
+        INNER JOIN models m ON p.model_id = m.id
         WHERE p.id = :id
     ");
     $infoStmt->execute([':id' => $peripheral_id]);
@@ -630,30 +630,29 @@ $systems = $db->prepare("
         u.fullname as creator_name
         
     FROM systems s
-    INNER JOIN departments d ON s.department_id = d.id
+    LEFT JOIN departments d ON s.department_id = d.id
     
-    INNER JOIN cpus cpu ON s.cpu_id = cpu.id
-    INNER JOIN models cpu_m ON cpu.model_id = cpu_m.id
-    INNER JOIN brands cpu_b ON cpu_m.brand_id = cpu_b.id
+    LEFT JOIN cpus cpu ON s.cpu_id = cpu.id
+    LEFT JOIN models cpu_m ON cpu.model_id = cpu_m.id
+    LEFT JOIN brands cpu_b ON cpu_m.brand_id = cpu_b.id
     
-    INNER JOIN motherboards mb ON s.motherboard_id = mb.id
-    INNER JOIN models mb_m ON mb.model_id = mb_m.id
-    INNER JOIN brands mb_b ON mb_m.brand_id = mb_b.id
+    LEFT JOIN motherboards mb ON s.motherboard_id = mb.id
+    LEFT JOIN models mb_m ON mb.model_id = mb_m.id
+    LEFT JOIN brands mb_b ON mb_m.brand_id = mb_b.id
     
-    INNER JOIN powers p ON s.power_id = p.id
-    INNER JOIN models p_m ON p.model_id = p_m.id
-    INNER JOIN brands p_b ON p_m.brand_id = p_b.id
+    LEFT JOIN powers p ON s.power_id = p.id
+    LEFT JOIN models p_m ON p.model_id = p_m.id
+    LEFT JOIN brands p_b ON p_m.brand_id = p_b.id
     
-    INNER JOIN monitors mon ON s.monitor_id = mon.id
-    INNER JOIN models mon_m ON mon.model_id = mon_m.id
-    INNER JOIN brands mon_b ON mon_m.brand_id = mon_b.id
+    LEFT JOIN monitors mon ON s.monitor_id = mon.id
+    LEFT JOIN models mon_m ON mon.model_id = mon_m.id
+    LEFT JOIN brands mon_b ON mon_m.brand_id = mon_b.id
     
-    INNER JOIN users u ON s.created_by = u.id
+    LEFT JOIN users u ON s.created_by = u.id
     
     $whereClause
     ORDER BY s.id DESC
 ");
-
 $systems->execute($params);
 $systems = $systems->fetchAll();
 
@@ -1226,7 +1225,7 @@ foreach ($systems as $key => $system) {
                     <table class="components-table" id="peripheralTable">
 
 
-                        <thead>
+                        <thead id="peripheralTableHead">
                         <tr>
                             <th>نوع تجهیز</th>
                             <th>برند</th>
@@ -1308,7 +1307,9 @@ foreach ($systems as $key => $system) {
                     <th>عملیات</th>
                 </tr>
                 </thead>
+
                 <tbody>
+
                 <?php if (empty($systems)): ?>
                     <tr>
                         <td colspan="14" style="text-align: center; padding: 40px;">💻 هیچ سیستمی ثبت نشده است</td>
@@ -1426,11 +1427,28 @@ foreach ($systems as $key => $system) {
                             <!-- تجهیزات جانبی -->
                              <td>
                                 <?php if (!empty($system['peripherals'])): ?>
-                                    <?php foreach ($system['peripherals'] as $periph): ?>
-                                         <span class="badge badge-info"
-                                              title="<?php echo htmlspecialchars($periph['type_name'] . ': ' . ($periph['brand_name'] ?? '') . ' ' . ($periph['model_name'] ?? '')); ?>">
 
-                                        </span>
+                                    <?php
+                                    $grouped = [];
+
+                                    foreach ($system['peripherals'] as $periph) {
+                                        $grouped[$periph['type_name']][] = $periph;
+                                    }
+                                    foreach ($grouped as $type => $items): ?>
+                                        <div class="peripheral-group">
+                                            <strong><?= htmlspecialchars($type) ?></strong>
+
+                                            <?php foreach ($items as $item): ?>
+                                                <div class="peripheral-item">
+                                                    <?= htmlspecialchars($item['brand_name']) ?>
+                                                    <?= htmlspecialchars($item['model_name']) ?>
+
+                                                    <?php if (!empty($item['property_code'])): ?>
+                                                        (<?= htmlspecialchars($item['property_code']) ?>)
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <span class="badge badge-secondary">-</span>
@@ -1461,11 +1479,11 @@ foreach ($systems as $key => $system) {
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- مودال ویرایش سیستم -->
-<!-- ============================================ -->
+   <!-- ============================================ -->
+   <!-- مودال ویرایش سیستم -->
+   <!-- ============================================ -->
  <div id="editModal" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
+    <div class="modal-content">
         <h3>✏️ ویرایش سیستم</h3>
         <form method="post" id="editForm">
             <input type="hidden" name="system_id" id="edit_system_id">
@@ -1484,9 +1502,6 @@ foreach ($systems as $key => $system) {
                     <label>نام سیستم *</label>
                     <input type="text" name="name" id="edit_name" required>
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group">
                     <label>بخش</label>
                     <select name="department_id" id="edit_department_id">
@@ -1496,6 +1511,10 @@ foreach ($systems as $key => $system) {
                         <?php endforeach; ?>
                     </select>
                 </div>
+            </div>
+
+            <div class="form-row">
+
                 <div class="form-group">
                     <label>پردازنده (CPU)</label>
                      <select name="cpu_id" id="edit_cpu_id">
@@ -1507,6 +1526,7 @@ foreach ($systems as $key => $system) {
                         <?php endforeach; ?>
                     </select>
                 </div>
+
                 <div class="form-group">
                      <label>مادربرد</label>
                     <select name="motherboard_id" id="edit_motherboard_id">
@@ -1518,9 +1538,6 @@ foreach ($systems as $key => $system) {
                         <?php endforeach; ?>
                     </select>
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group">
                     <label>پاور</label>
                     <select name="power_id" id="edit_power_id">
@@ -1537,51 +1554,63 @@ foreach ($systems as $key => $system) {
                     <select name="monitor_id" id="edit_monitor_id">
                         <option value="">-- انتخاب --</option>
                         <?php foreach ($monitors as $monitor): ?>
-                             <option value="<?php echo $monitor['id']; ?>">
+                            <option value="<?php echo $monitor['id']; ?>">
                                 <?php echo htmlspecialchars($monitor['brand_name'] . ' ' . $monitor['model_name']); ?>
                                 <?php if ($monitor['property_code']): ?>
                                     (<?php echo htmlspecialchars($monitor['property_code']); ?>)
                                 <?php endif; ?>
-                             </option>
+                            </option>
                         <?php endforeach; ?>
-                     </select>
+                    </select>
                 </div>
             </div>
 
-            <!-- رم‌ها -->
-            <div class="form-row">
-                <div class="form-group full-width">
-                    <label>🧠 رم‌ها</label>
+            <div class="rhid-row">
+
+                <div class="ram-section">
                     <div id="edit_rams_container"></div>
-                    <button type="button" class="btn-add-row" onclick="addEditRamRow()">➕ افزودن رم</button>
-                </div>
-            </div>
 
-            <!-- هاردها -->
-            <div class="form-row">
-                <div class="form-group full-width">
-                    <label>💾 هاردها</label>
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditRamRow()">
+                        ➕ افزودن رم
+                    </button>
+                </div>
+
+                <div class="hard-section">
                     <div id="edit_storages_container"></div>
-                    <button type="button" class="btn-add-row" onclick="addEditStorageRow()">➕ افزودن هارد</button>
-                </div>
-            </div>
 
-            <!-- IPها -->
-            <div class="form-row">
-                <div class="form-group full-width">
-                    <label>🌐 IPها</label>
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditStorageRow()">
+                        ➕ افزودن هارد
+                    </button>
+                </div>
+
+                <div class="ip-section">
                     <div id="edit_ips_container"></div>
-                    <button type="button" class="btn-add-row" onclick="addEditIpRow()">➕ افزودن IP</button>
-                </div>
-            </div>
 
-            <!-- تجهیزات جانبی -->
-            <div class="form-row">
-                <div class="form-group full-width">
-                    <label>🔌 تجهیزات جانبی</label>
-                    <div id="edit_peripherals_container"></div>
-                    <button type="button" class="btn-add-row" onclick="addEditPeripheralRow()">➕ افزودن تجهیز جانبی</button>
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditIpRow()">
+                        ➕ افزودن IP
+                    </button>
                 </div>
+
+                <div class="peripheral-section">
+                    <div id="edit_peripherals_container"></div>
+
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditPeripheralRow()">
+                        ➕ افزودن تجهیز جانبی
+                    </button>
+                </div>
+
             </div>
 
             <div class="modal-buttons">

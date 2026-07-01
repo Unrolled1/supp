@@ -353,7 +353,154 @@ function updateRowNumbers(className) {
 // ============================================
 // بارگذاری داده‌ها در مودال ویرایش
 // ============================================
+function createEditRamRow(index, selected = "") {
 
+    return `
+<div class="ram-row" data-row="${index}">
+
+    <label class="section-label">رم</label>
+
+    <div class="select-wrapper">
+
+        <select name="edit_ram_id_${index}" class="ram-select">
+
+
+            ${getRamOptions(selected)}
+
+        </select>
+
+    </div>
+
+    <div class="row-remove">
+
+        <button
+            type="button"
+            class="btn-remove-ram"
+            onclick="removeEditRamRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+
+    </div>
+
+</div>
+`;
+}
+
+function createEditStorageRow(index, selected = "") {
+
+    return `
+<div class="storage-row" data-row="${index}">
+
+    <label class="section-label">هارد</label>
+
+    <div class="select-wrapper">
+
+        <select
+            name="edit_storage_id_${index}"
+            class="storage-select">
+
+
+            ${getStorageOptions(selected)}
+
+        </select>
+
+    </div>
+
+    <div class="row-remove">
+
+        <button
+            type="button"
+            class="btn-remove-storage"
+            onclick="removeEditStorageRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+
+    </div>
+
+</div>
+`;
+
+}
+
+function createEditIpRow(index, ip = "", network = "LAN") {
+
+    return `
+<div class="ip-row" data-row="${index}">
+
+    <label class="section-label">IP</label>
+
+    <div class="select-wrapper">
+
+        <input
+            type="text"
+            name="edit_ip_address_${index}"
+            value="${ip}">
+
+        <select name="edit_ip_network_${index}">
+
+            <option value="LAN" ${network=="LAN"?"selected":""}>LAN</option>
+            <option value="WAN" ${network=="WAN"?"selected":""}>WAN</option>
+            <option value="VPN" ${network=="VPN"?"selected":""}>VPN</option>
+            <option value="WiFi" ${network=="WiFi"?"selected":""}>WiFi</option>
+            <option value="Other" ${network=="Other"?"selected":""}>سایر</option>
+
+        </select>
+
+    </div>
+
+    <div class="row-remove">
+
+        <button
+            type="button"
+            class="btn-remove-ip"
+            onclick="removeEditIpRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+
+    </div>
+
+</div>
+`;
+}
+function createEditPeripheralRow(index, selected = "") {
+
+    return `
+<div class="peripheral-row" data-row="${index}">
+
+    <label class="section-label">تجهیزات جانبی</label>
+
+    <div class="select-wrapper">
+
+        <select
+            name="edit_peripheral_id_${index}"
+            class="peripheral-select">
+
+
+            ${getPeripheralOptions(selected)}
+
+        </select>
+
+    </div>
+
+    <div class="row-remove">
+
+        <button
+            type="button"
+            class="btn-remove-peripheral"
+            onclick="removeEditPeripheralRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+
+    </div>
+
+</div>
+`;
+
+}
 function loadEditData(systemId) {
     // دریافت همه داده‌ها با یک درخواست
     getSystemData(systemId, 'all', function(data) {
@@ -367,47 +514,29 @@ function loadEditData(systemId) {
         loadEditPeripherals(data.peripherals || []);
     });
 }
-
 // ============================================
 // بارگذاری رم‌ها در مودال ویرایش
 // ============================================
 
 function loadEditRams(rams) {
-    const container = document.getElementById('edit_rams_container');
-    container.innerHTML = '';
+
+    const container = document.getElementById("edit_rams_container");
+
+    container.innerHTML = "";
 
     if (!rams || rams.length === 0) {
-        addEditRamRow();
+
+        container.innerHTML = createEditRamRow(0);
+
         return;
     }
 
-    rams.forEach((ram, index) => {
-        const row = document.createElement('div');
-        row.className = 'ram-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>رم</label>
-                <select name="edit_ram_id_${index}" class="ram-select">
-                    <option value="">-- انتخاب --</option>
-                    ${getRamOptions(ram.ram_id)}
-                </select>
-            </div>
-            <div class="form-group">
-                
-                <button type="button" class="btn-remove-ram" onclick="removeEditRamRow(this)">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
-    });
-}
+    rams.forEach((ram,index)=>{
 
-function getRamOptions(selectedId) {
-    // این تابع باید در PHP ساخته شود و در JS به صورت داده ارسال شود
-    // برای سادگی، از داده‌های موجود در صفحه استفاده می‌کنیم
-    const select = document.querySelector('select[name="ram_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+        container.innerHTML += createEditRamRow(index, ram.ram_id);
+
+    });
+
 }
 
 // ============================================
@@ -415,74 +544,48 @@ function getRamOptions(selectedId) {
 // ============================================
 
 function loadEditStorages(storages) {
-    const container = document.getElementById('edit_storages_container');
-    container.innerHTML = '';
+
+    const container = document.getElementById("edit_storages_container");
+
+    container.innerHTML = "";
 
     if (!storages || storages.length === 0) {
-        addEditStorageRow();
+
+        container.innerHTML = createEditStorageRow(0);
+
         return;
+
     }
 
-    storages.forEach((storage, index) => {
-        const row = document.createElement('div');
-        row.className = 'storage-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>هارد</label>
-                <select name="edit_storage_id_${index}" class="storage-select">
-                    <option value="">-- انتخاب --</option>
-                    ${getStorageOptions(storage.storage_id)}
-                </select>
-            </div>
-            <div class="form-group">
-                
-                <button type="button" class="btn-remove-storage" onclick="removeEditStorageRow(this)">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
-    });
-}
+    storages.forEach((storage,index)=>{
 
+        container.innerHTML += createEditStorageRow(index, storage.storage_id);
+
+    });
+
+}
 // ============================================
 // بارگذاری IPها در مودال ویرایش
 // ============================================
 
 function loadEditIps(ips) {
-    const container = document.getElementById('edit_ips_container');
-    container.innerHTML = '';
-
+    const container = document.getElementById("edit_ips_container");
+    container.innerHTML = "";
     if (!ips || ips.length === 0) {
-        addEditIpRow();
+        container.innerHTML = createEditIpRow(0);
         return;
     }
 
-    ips.forEach((ip, index) => {
-        const row = document.createElement('div');
-        row.className = 'ip-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>آدرس IP</label>
-                <input type="text" name="edit_ip_address_${index}" value="${ip.ip_address}" placeholder="مثلاً: 192.168.1.100">
-            </div>
-            <div class="form-group">
-                <label>شبکه</label>
-                <select name="edit_ip_network_${index}">
-                    <option value="LAN" ${ip.network_type === 'LAN' ? 'selected' : ''}>LAN</option>
-                    <option value="WAN" ${ip.network_type === 'WAN' ? 'selected' : ''}>WAN</option>
-                    <option value="VPN" ${ip.network_type === 'VPN' ? 'selected' : ''}>VPN</option>
-                    <option value="WiFi" ${ip.network_type === 'WiFi' ? 'selected' : ''}>WiFi</option>
-                    <option value="Other" ${ip.network_type === 'Other' ? 'selected' : ''}>سایر</option>
-                </select>
-            </div>
-            <div class="form-group">
-               
-                <button type="button" class="btn-remove-ip" onclick="removeEditIpRow(this)">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
+    ips.forEach((ip,index)=>{
+
+        container.innerHTML += createEditIpRow(
+            index,
+            ip.ip_address,
+            ip.network_type
+        );
+
     });
+
 }
 
 // ============================================
@@ -490,33 +593,22 @@ function loadEditIps(ips) {
 // ============================================
 
 function loadEditPeripherals(peripherals) {
-    const container = document.getElementById('edit_peripherals_container');
-    container.innerHTML = '';
-
+    const container = document.getElementById("edit_peripherals_container");
+    container.innerHTML = "";
     if (!peripherals || peripherals.length === 0) {
-        addEditPeripheralRow();
+        container.innerHTML = createEditPeripheralRow(0);
         return;
     }
 
-    peripherals.forEach((periph, index) => {
-        const row = document.createElement('div');
-        row.className = 'peripheral-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>تجهیز</label>
-                <select name="edit_peripheral_id_${index}" class="peripheral-select">
-                    <option value="">-- انتخاب --</option>
-                    ${getPeripheralOptions(periph.peripheral_id)}
-                </select>
-            </div>
-            <div class="form-group" >
-               
-                <button type="button" class="btn-remove-peripheral" onclick="removeEditPeripheralRow(this)">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
+    peripherals.forEach((periph,index)=>{
+
+        container.innerHTML += createEditPeripheralRow(
+            index,
+            periph.peripheral_id
+        );
+
     });
+
 }
 
 // ============================================
@@ -524,27 +616,36 @@ function loadEditPeripherals(peripherals) {
 // ============================================
 
 function addEditRamRow() {
-    const container = document.getElementById('edit_rams_container');
-    const rowCount = container.querySelectorAll('.ram-row').length;
-    addEditRow(container, 'ram', rowCount, 'ram-row', 'edit_ram_id_', 'edit_ram_primary_');
+
+    const container = document.getElementById("edit_rams_container");
+
+    const first = container.querySelector(".ram-row");
+
+    const clone = first.cloneNode(true);
+
+    clone.querySelector("select").value = "";
+
+    clone.querySelector(".btn-remove-ram").style.display = "inline-block";
+
+    container.appendChild(clone);
 }
 
 function addEditStorageRow() {
-    const container = document.getElementById('edit_storages_container');
-    const rowCount = container.querySelectorAll('.storage-row').length;
-    addEditRow(container, 'storage', rowCount, 'storage-row', 'edit_storage_id_', 'edit_storage_primary_');
+    const container = document.getElementById("edit_storages_container");
+    const index = container.querySelectorAll(".storage-row").length;
+    container.innerHTML += createEditStorageRow(index);
 }
 
 function addEditIpRow() {
-    const container = document.getElementById('edit_ips_container');
-    const rowCount = container.querySelectorAll('.ip-row').length;
-    addEditRow(container, 'ip', rowCount, 'ip-row', 'edit_ip_address_', 'edit_ip_primary_');
+    const container = document.getElementById("edit_ips_container");
+    const index = container.querySelectorAll(".ip-row").length;
+    container.innerHTML += createEditIpRow(index);
 }
 
 function addEditPeripheralRow() {
-    const container = document.getElementById('edit_peripherals_container');
-    const rowCount = container.querySelectorAll('.peripheral-row').length;
-    addEditRow(container, 'peripheral', rowCount, 'peripheral-row', 'edit_peripheral_id_', 'edit_peripheral_default_');
+    const container = document.getElementById("edit_peripherals_container");
+    const index = container.querySelectorAll(".peripheral-row").length;
+    container.innerHTML += createEditPeripheralRow(index);
 }
 
 function addEditRow(container, type, rowCount, className, namePrefix, checkPrefix) {
@@ -783,13 +884,16 @@ function loadComponentList(type) {
         .then(response => response.json())
 
         .then(rows => {
-            const head = document.getElementById("componentTableHead");
+
+            const head = (type === "peripheral")
+                ? document.getElementById("peripheralTableHead")
+                : document.getElementById("componentTableHead");
 
             if (type === "peripheral") {
 
                 head.innerHTML = `
         <tr>
-            <th>نوع تجهیز</th>
+            <th>نوع</th>
             <th>برند</th>
             <th>مدل</th>
             <th>کد اموال</th>
@@ -797,8 +901,7 @@ function loadComponentList(type) {
         </tr>
     `;
 
-            }
-            else if (type === "ram" || type === "storage") {
+            } else if (type === "ram" || type === "storage") {
 
                 head.innerHTML = `
         <tr>
@@ -821,6 +924,7 @@ function loadComponentList(type) {
     `;
 
             }
+
             let html = "";
             if (rows.length === 0) {
 
@@ -835,7 +939,7 @@ function loadComponentList(type) {
             </td>
         </tr>
     `;
-            }else {
+            } else {
                 rows.forEach(row => {
 
                     if (type === "peripheral") {
@@ -856,9 +960,7 @@ function loadComponentList(type) {
         </tr>
     `;
 
-                    }
-
-                    else if (type === "ram" || type === "storage") {
+                    } else if (type === "ram" || type === "storage") {
 
                         html += `
             <tr>
@@ -894,11 +996,14 @@ function loadComponentList(type) {
 
                 });
             }
-            document.getElementById("componentTableBody").innerHTML = html;
-
+            if (type === "peripheral") {
+                document.getElementById("peripheralTableBody").innerHTML = html;
+            } else {
+                document.getElementById("componentTableBody").innerHTML = html;
+            }
         })
 
-        .catch(err => console.error(err));
+         .catch(err => console.error(err));
 }
 
 
@@ -1151,7 +1256,7 @@ function openPeripheralModal() {
 
     document.getElementById("peripheralForm").reset();
 
-    refreshComponentSelect("peripheral");
+    refreshComponentSelect();
 
     loadComponentList("peripheral");
 

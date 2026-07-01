@@ -9,12 +9,6 @@
     word-wrap: break-word;
 }
 
-/* فرم فاکتور */
-.invoices-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
 .form-group {
     flex: 0 0 auto;
 }
@@ -51,12 +45,6 @@
 .subject     { width: 250px; }
 .date-group{width: 120px;}
 
-.search-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #555;
-}
 
 
 

@@ -114,11 +114,6 @@
 .date-group         { width: 120px; }
 
 
-.search-group label {
-    display: block;
-    font-weight: 500;
-    color: #555;
-}
 .btn-search {
     background: #4f46e5;
     color: white;

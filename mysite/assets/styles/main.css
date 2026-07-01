@@ -73,7 +73,6 @@ body {
     border: none;
     border-radius: 10px;
     font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
     box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
@@ -336,6 +335,7 @@ input:focus, select:focus, textarea:focus {
     gap: 15px;
     flex-wrap: wrap;
     margin-top: 10px;
+    align-items: flex-end;
 }
 
 .add-card .form-row .form-group {

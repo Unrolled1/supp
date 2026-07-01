@@ -360,9 +360,11 @@ $printers = $printers->fetchAll();
                         </div>
                     </div>
 
+                    <div class="form-row">
                     <div class="form-group">
                         <label>توضیحات</label>
                         <textarea name="description" rows="3"></textarea>
+                    </div>
                     </div>
 
                     <div class="form-group">
