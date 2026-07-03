@@ -1,6 +1,6 @@
 -- ============================================
 -- پشتیبان‌گیری از دیتابیس
--- تاریخ: 1405-04-10 15:40:46
+-- تاریخ: 1405-04-12 12:57:28
 -- ============================================
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -12,9 +12,6 @@ CREATE TABLE `activities` (
   `created_at` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO `activities` (`id`, `name`, `created_at`) VALUES
-('17', 'aaa', '1405/04/03');
 
 DROP TABLE IF EXISTS `brands`;
 CREATE TABLE `brands` (
@@ -38,7 +35,10 @@ CREATE TABLE `cpus` (
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `cpus` (`id`, `brand_id`, `model_id`, `created_at`) VALUES
+('14', '39', '9', '1405-04-11');
 
 DROP TABLE IF EXISTS `departments`;
 CREATE TABLE `departments` (
@@ -47,10 +47,10 @@ CREATE TABLE `departments` (
   `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT 'active',
   `created_at` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `departments` (`id`, `name`, `status`, `created_at`) VALUES
-('12', 'd', 'active', '1405/04/05');
+('13', 'زنان', 'active', '1405/04/10');
 
 DROP TABLE IF EXISTS `invoices`;
 CREATE TABLE `invoices` (
@@ -93,10 +93,10 @@ CREATE TABLE `models` (
   `created_at` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_models_brand` (`brand_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `models` (`id`, `name`, `brand_id`, `created_at`) VALUES
-('8', 'لب', '37', '1405-04-07');
+('9', 'GDM-245LN', '39', '1405-04-11');
 
 DROP TABLE IF EXISTS `monitors`;
 CREATE TABLE `monitors` (
@@ -108,10 +108,10 @@ CREATE TABLE `monitors` (
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `monitors` (`id`, `brand_id`, `model_id`, `property_code`, `created_at`) VALUES
-('2', '39', '8', '2', '1405-04-09');
+('3', '39', '9', '', '1405-04-11');
 
 DROP TABLE IF EXISTS `motherboards`;
 CREATE TABLE `motherboards` (
@@ -122,10 +122,10 @@ CREATE TABLE `motherboards` (
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `motherboards` (`id`, `brand_id`, `model_id`, `created_at`) VALUES
-('2', '39', '8', '1405-04-09');
+('3', '39', '9', '1405-04-11');
 
 DROP TABLE IF EXISTS `peripheral_types`;
 CREATE TABLE `peripheral_types` (
@@ -159,12 +159,10 @@ CREATE TABLE `peripherals` (
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`),
   KEY `created_by` (`created_by`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `peripherals` (`id`, `type_id`, `computer_code`, `property_code`, `brand_id`, `model_id`, `connection_type`, `created_at`, `created_by`) VALUES
-('2', '1', '', '2', '37', '8', 'USB', '1405-04-09', '1'),
-('3', '1', '', '3', '39', '8', 'Network', '1405-04-09', '1'),
-('4', '2', '', '3', '37', '8', 'USB', '1405-04-09', '1');
+('5', '1', '', '1', '39', '9', 'USB', '1405-04-11', '1');
 
 DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions` (
@@ -239,10 +237,10 @@ CREATE TABLE `powers` (
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `powers` (`id`, `brand_id`, `model_id`, `created_at`) VALUES
-('2', '39', '8', '1405-04-09');
+('3', '39', '9', '1405-04-11');
 
 DROP TABLE IF EXISTS `printers`;
 CREATE TABLE `printers` (
@@ -269,10 +267,6 @@ CREATE TABLE `products` (
   KEY `brand_id` (`brand_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `products` (`id`, `brand_id`, `name`, `created_at`) VALUES
-('9', '39', 'شd', '1405/04/04'),
-('10', '37', 'ش', '1405/04/04');
-
 DROP TABLE IF EXISTS `rams`;
 CREATE TABLE `rams` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -284,10 +278,10 @@ CREATE TABLE `rams` (
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `rams` (`id`, `brand_id`, `model_id`, `type`, `capacity`, `created_at`) VALUES
-('7', '37', '8', 'DDR4', '4GB', '1405-04-09');
+('8', '39', '9', 'DDR3', '4GB', '1405-04-11');
 
 DROP TABLE IF EXISTS `service_requests`;
 CREATE TABLE `service_requests` (
@@ -325,11 +319,10 @@ CREATE TABLE `storages` (
   PRIMARY KEY (`id`),
   KEY `brand_id` (`brand_id`),
   KEY `model_id` (`model_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `storages` (`id`, `brand_id`, `model_id`, `type`, `capacity`, `created_at`) VALUES
-('1', '17', '3', 'HDD', '512GB', '1405-03-30'),
-('3', '37', '8', '', '128GB', '1405-04-09');
+('4', '39', '9', 'SSD', '256GB', '1405-04-11');
 
 DROP TABLE IF EXISTS `system_ips`;
 CREATE TABLE `system_ips` (
@@ -343,7 +336,11 @@ CREATE TABLE `system_ips` (
   PRIMARY KEY (`id`),
   KEY `system_id` (`system_id`),
   KEY `created_by` (`created_by`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `system_ips` (`id`, `system_id`, `ip_address`, `network_type`, `description`, `created_at`, `created_by`) VALUES
+('49', '17', '432', 'LAN', '', '1405-04-12', '1'),
+('48', '17', '1', 'LAN', '', '1405-04-12', '1');
 
 DROP TABLE IF EXISTS `system_peripherals`;
 CREATE TABLE `system_peripherals` (
@@ -358,7 +355,10 @@ CREATE TABLE `system_peripherals` (
   UNIQUE KEY `unique_system_peripheral` (`system_id`,`peripheral_id`),
   KEY `peripheral_id` (`peripheral_id`),
   KEY `created_by` (`created_by`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `system_peripherals` (`id`, `system_id`, `peripheral_id`, `connection_port`, `notes`, `created_at`, `created_by`) VALUES
+('53', '17', '5', NULL, NULL, '1405-04-12', '1');
 
 DROP TABLE IF EXISTS `system_rams`;
 CREATE TABLE `system_rams` (
@@ -372,10 +372,12 @@ CREATE TABLE `system_rams` (
   KEY `system_id` (`system_id`),
   KEY `ram_id` (`ram_id`),
   KEY `created_by` (`created_by`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `system_rams` (`id`, `system_id`, `ram_id`, `description`, `created_at`, `created_by`) VALUES
-('7', '13', '3', NULL, '1405-04-09', '1');
+('71', '17', '8', NULL, '1405-04-12', '1'),
+('70', '17', '8', NULL, '1405-04-12', '1'),
+('69', '17', '8', NULL, '1405-04-12', '1');
 
 DROP TABLE IF EXISTS `system_storages`;
 CREATE TABLE `system_storages` (
@@ -389,7 +391,12 @@ CREATE TABLE `system_storages` (
   KEY `system_id` (`system_id`),
   KEY `storage_id` (`storage_id`),
   KEY `created_by` (`created_by`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `system_storages` (`id`, `system_id`, `storage_id`, `description`, `created_at`, `created_by`) VALUES
+('73', '17', '4', NULL, '1405-04-12', '1'),
+('72', '17', '4', NULL, '1405-04-12', '1'),
+('71', '17', '4', NULL, '1405-04-12', '1');
 
 DROP TABLE IF EXISTS `systems`;
 CREATE TABLE `systems` (
@@ -412,7 +419,10 @@ CREATE TABLE `systems` (
   KEY `power_id` (`power_id`),
   KEY `monitor_id` (`monitor_id`),
   KEY `created_by` (`created_by`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `systems` (`id`, `computer_code`, `property_code`, `name`, `department_id`, `cpu_id`, `motherboard_id`, `power_id`, `monitor_id`, `created_at`, `created_by`) VALUES
+('17', '12', '1', 'مب', '13', '14', '3', '3', '3', '1405-04-11', '1');
 
 DROP TABLE IF EXISTS `tickets`;
 CREATE TABLE `tickets` (

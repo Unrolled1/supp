@@ -368,20 +368,15 @@ function createEditRamRow(index, selected = "") {
             ${getRamOptions(selected)}
 
         </select>
-
-    </div>
-
-    <div class="row-remove">
-
-        <button
+<button
             type="button"
             class="btn-remove-ram"
             onclick="removeEditRamRow(this)"
             ${index==0 ? 'hidden' : ''}>
             🗑️
         </button>
-
     </div>
+
 
 </div>
 `;
@@ -404,20 +399,15 @@ function createEditStorageRow(index, selected = "") {
             ${getStorageOptions(selected)}
 
         </select>
-
-    </div>
-
-    <div class="row-remove">
-
-        <button
+<button
             type="button"
             class="btn-remove-storage"
             onclick="removeEditStorageRow(this)"
             ${index==0 ? 'hidden' : ''}>
             🗑️
         </button>
-
     </div>
+
 
 </div>
 `;
@@ -448,19 +438,16 @@ function createEditIpRow(index, ip = "", network = "LAN") {
 
         </select>
 
-    </div>
 
-    <div class="row-remove">
-
-        <button
+<button
             type="button"
             class="btn-remove-ip"
             onclick="removeEditIpRow(this)"
             ${index==0 ? 'hidden' : ''}>
             🗑️
         </button>
-
     </div>
+
 
 </div>
 `;
@@ -482,19 +469,13 @@ function createEditPeripheralRow(index, selected = "") {
             ${getPeripheralOptions(selected)}
 
         </select>
-
-    </div>
-
-    <div class="row-remove">
-
-        <button
+<button
             type="button"
             class="btn-remove-peripheral"
             onclick="removeEditPeripheralRow(this)"
             ${index==0 ? 'hidden' : ''}>
             🗑️
         </button>
-
     </div>
 
 </div>
@@ -503,7 +484,7 @@ function createEditPeripheralRow(index, selected = "") {
 }
 function loadEditData(systemId) {
     // دریافت همه داده‌ها با یک درخواست
-    getSystemData(systemId, 'all', function(data) {
+    getSystemData(systemId, 'all', function (data) {
         // بارگذاری رم‌ها
         loadEditRams(data.rams || []);
         // بارگذاری هاردها
@@ -623,7 +604,12 @@ function addEditRamRow() {
 
     const clone = first.cloneNode(true);
 
-    clone.querySelector("select").value = "";
+    const index = container.querySelectorAll(".ram-row").length;
+
+    const select = clone.querySelector("select");
+
+    select.name = "edit_ram_id_" + index;
+    select.value = "";
 
     clone.querySelector(".btn-remove-ram").style.display = "inline-block";
 
@@ -812,24 +798,59 @@ function removeEditPeripheralRow(btn) {
 // توابع کمکی (با داده‌های واقعی)
 // ============================================
 
-function getRamOptions(selectedId) {
-    // این تابع باید در PHP ساخته شود
-    // برای سادگی، از داده‌های موجود در صفحه استفاده می‌کنیم
-    const select = document.querySelector('select[name="ram_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+function getRamOptions(selectedId = "") {
+
+    const source = document.querySelector('select[name="ram_id_0"]');
+    if (!source) return "";
+
+    let html = "";
+
+    source.querySelectorAll("option").forEach(opt => {
+
+        html += `<option value="${opt.value}"
+                    ${String(opt.value) === String(selectedId) ? "selected" : ""}>
+                    ${opt.text}
+                 </option>`;
+
+    });
+
+    return html;
 }
 
 function getStorageOptions(selectedId) {
-    const select = document.querySelector('select[name="storage_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+    const source = document.querySelector('select[name="storage_id_0"]');
+    if (!source) return "";
+
+    let html = "";
+
+    source.querySelectorAll("option").forEach(opt => {
+
+        html += `<option value="${opt.value}"
+                    ${String(opt.value) === String(selectedId) ? "selected" : ""}>
+                    ${opt.text}
+                 </option>`;
+
+    });
+
+    return html;
 }
 
 function getPeripheralOptions(selectedId) {
-    const select = document.querySelector('select[name="peripheral_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+    const source = document.querySelector('select[name="peripheral_id_0"]');
+    if (!source) return "";
+
+    let html = "";
+
+    source.querySelectorAll("option").forEach(opt => {
+
+        html += `<option value="${opt.value}"
+                    ${String(opt.value) === String(selectedId) ? "selected" : ""}>
+                    ${opt.text}
+                 </option>`;
+
+    });
+
+    return html;
 }
 // ============================================
 // مدیریت افزودن سریع قطعات
@@ -1342,6 +1363,37 @@ function openEditModal(system) {
     document.getElementById('editModal').style.display = 'flex';
 }
 
+function saveEditSystem() {
+
+    const form = document.getElementById("editForm");
+    const formData = new FormData(form);
+
+    fetch("assets/ajax/edit_system.php", {
+        method: "POST",
+        body: formData
+    })
+        .then(r => r.json())
+        .then(res => {
+
+            if(res.success){
+
+                updateSystemRow(res.system.id).then(() => {
+                    closeModal("editModal");
+                });
+
+            }else{
+
+                Swal.fire({
+                    icon: "error",
+                    title: res.message
+                });
+
+            }
+
+        });
+
+}
+
 // ============================================
 // حذف فاکتور
 // ============================================
@@ -1408,6 +1460,22 @@ function updateTableRowNumbers() {
     });
 }
 
+function updateSystemRow(id){
+
+    return fetch("assets/ajax/get_system_row.php?id=" + id)
+        .then(r => r.text())
+        .then(html => {
+
+            const oldRow = document.querySelector("#system-row-" + id);
+
+            if(oldRow){
+                oldRow.outerHTML = html;
+            }
+
+        });
+
+}
+
 // ============================================
 // بستن مودال
 // ============================================
@@ -1420,13 +1488,29 @@ function closeModal(modalId) {
 // راه‌اندازی اولیه
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+
     initSearch();
 
-    // بستن مودال با کلیک روی پس‌زمینه
+    const editForm = document.getElementById("editForm");
+
+    if (editForm) {
+
+        editForm.addEventListener("submit", function (e) {
+
+            e.preventDefault();
+
+            saveEditSystem();
+
+        });
+
+    }
+
+    // بستن مودال
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
     };
+
 });

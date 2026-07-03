@@ -45,9 +45,8 @@
     margin-bottom: 4px;
     border: 1px solid #4a5568;
     display: flex;
-    flex-direction: column;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: center;
     transition: all 0.2s ease;
 }
 .ip-row .row-remove{
@@ -92,7 +91,6 @@
     height:32px;
     min-width:32px;
 }
-
 .select-wrapper select:focus,
 .select-wrapper input:focus{
     border-color:#4f46e5;
@@ -184,7 +182,7 @@
    ============================================ */
 #editModal .modal-content{
     width:95%;
-    max-width:850px;
+    max-width:1300px;
 
     max-height:90vh;
     overflow-y:auto;
