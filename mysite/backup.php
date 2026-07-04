@@ -107,10 +107,6 @@ if (isset($_POST['create_backup'])) {
 
         file_put_contents($backupPath, $sql);
 
-        if (function_exists('gzcompress')) {
-            $compressed = gzcompress($sql, 9);
-            file_put_contents($backupPath . '.gz', $compressed);
-        }
 
         $_SESSION['backup_success'] = "✅ پشتیبان‌گیری با موفقیت انجام شد. فایل: " . htmlspecialchars($backupName);
 
@@ -181,27 +177,14 @@ if (isset($_POST['restore_backup']) && isset($_FILES['restore_file']) && $_FILES
     $uploadedFile = $_FILES['restore_file'];
     $fileExtension = pathinfo($uploadedFile['name'], PATHINFO_EXTENSION);
 
-    if ($fileExtension !== 'sql' && $fileExtension !== 'gz') {
-        $_SESSION['backup_error'] = "❌ فقط فایل‌های با پسوند .sql یا .gz مجاز هستند";
+    if ($fileExtension !== 'sql') {
+        $_SESSION['backup_error'] = "❌ فقط فایل‌های با پسوند .sql  مجاز هستند";
         header('Location: backup.php#backup-list');
         exit;
     }
 
     try {
-        $content = '';
-
-        if ($fileExtension === 'gz') {
-            $content = gzdecode(file_get_contents($uploadedFile['tmp_name']));
-            if ($content === false) {
-                throw new Exception('فایل فشرده معتبر نیست');
-            }
-        } else {
-            $content = file_get_contents($uploadedFile['tmp_name']);
-        }
-
-        if (empty($content)) {
-            throw new Exception('فایل پشتیبان خالی است');
-        }
+        $content = file_get_contents($uploadedFile['tmp_name']);
 
         $db->beginTransaction();
 
@@ -261,7 +244,7 @@ if (isset($_SESSION['backup_error'])) {
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock">📅 <?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock"> <?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
@@ -288,11 +271,11 @@ if (isset($_SESSION['backup_error'])) {
         <!-- ============================================ -->
         <div class="restore-card">
             <h2>🔄 بازیابی دیتابیس</h2>
-            <p class="restore-desc">فایل پشتیبان (.sql یا .sql.gz) را انتخاب کنید تا دیتابیس بازیابی شود.</p>
+            <p class="restore-desc">فایل پشتیبان (.sql ) را انتخاب کنید تا دیتابیس بازیابی شود.</p>
             <p class="restore-warning">⚠️ توجه: بازیابی اطلاعات فعلی را بازنویسی می‌کند!</p>
             <form method="post" enctype="multipart/form-data" id="restoreForm">
                 <div class="file-upload-wrapper">
-                    <input type="file" name="restore_file" id="restore_file" accept=".sql,.sql.gz" required>
+                    <input type="file" name="restore_file" id="restore_file" accept=".sql" required>
                     <label for="restore_file" class="file-label">📁 انتخاب فایل پشتیبان</label>
                 </div>
                 <button type="submit" name="restore_backup" class="btn-restore" onclick="return confirmRestore()">

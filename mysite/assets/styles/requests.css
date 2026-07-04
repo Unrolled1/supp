@@ -279,8 +279,8 @@ padding: 6px 8px;
 }
 
 .status-btn-table {
-    background: #2b6cb0;
-    color: white;
+    background: #2c5282;
+    color: #7c8bd0;
     border: none;
     padding: 5px 12px;
     border-radius: 6px;
@@ -291,7 +291,8 @@ padding: 6px 8px;
 }
 
 .status-btn-table:hover {
-    background: #2c5282;
+    background: #2b6cb0;
+    color: #ffffff;
     transform: scale(1.05);
 }
 

@@ -217,7 +217,7 @@ foreach ($services as $key => $service) {
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>مدیریت فعالیت</title>
+    <title>ثبت فعالیت</title>
     <?php load_assets(); ?>
 </head>
 <body>
@@ -231,13 +231,13 @@ foreach ($services as $key => $service) {
                 <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
             </div>
             <div>
-                <span class="clock-display" id="liveClock">📅 <?php echo fa_number(now()); ?></span>
+                <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
                 <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
 
         <div class="main-title">
-            <h1>🔧 مدیریت فعالیت</h1>
+            <h1>🔧 ثبت فعالیت</h1>
         </div>
 
         <?php if ($successMessage): ?>
@@ -442,7 +442,7 @@ foreach ($services as $key => $service) {
                             <td><?php echo fa_number(htmlspecialchars($service['created_at'])); ?></td>
                             <td>
                                 <?php if (canEditServices()): ?>
-                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($service); ?>)'>✏️</button>
+                                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($service); ?>)'>✏️ویرایش</button>
                                 <?php endif; ?>
 
                                 <?php if (canDeleteServices()): ?>
@@ -451,7 +451,7 @@ foreach ($services as $key => $service) {
                                             data-id="<?php echo $service['id']; ?>"
                                             onclick="confirmDelete(<?php echo $service['id']; ?>,
                                                     '<?php echo htmlspecialchars($service['service_name']); ?>')">
-                                        🗑️
+                                        🗑️حذف
                                     </button>
                                 <?php endif; ?>
 
@@ -478,7 +478,8 @@ foreach ($services as $key => $service) {
                 <select name="service_name" id="edit_service_name" required>
                     <option value="">-- انتخاب کنید --</option>
                     <?php foreach ($activities as $activity): ?>
-                        <option value="<?php echo htmlspecialchars($activity['name']); ?>"><?php echo htmlspecialchars($activity['name']); ?></option>
+                        <option value="<?php echo htmlspecialchars($activity['name']); ?>">
+                            <?php echo htmlspecialchars($activity['name']); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

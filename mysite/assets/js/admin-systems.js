@@ -54,279 +54,270 @@ function getSystemData(systemId, type, callback) {
         });
 }
 
+function getSelectOptions(selector) {
+    const select = document.querySelector(selector);
+
+    if (!select) return '';
+
+    return [...select.options]
+        .filter(opt => opt.value !== '')
+        .map(opt => `<option value="${opt.value}">${opt.text}</option>`)
+        .join('');
+}
+
+function createSelectRow(config) {
+
+    const container = document.getElementById(config.containerId);
+
+    const rowCount =
+        container.querySelectorAll("." + config.rowClass).length;
+
+    const firstSelect =
+        document.querySelector(config.firstSelect);
+
+    let options = "";
+
+    if (firstSelect) {
+        options = firstSelect.innerHTML;
+    }
+
+    const row = document.createElement("div");
+
+    row.className = config.rowClass;
+
+    row.dataset.row = rowCount;
+
+    row.innerHTML = `
+
+        <label class="section-label">
+            ${config.label}
+        </label>
+
+        <div class="select-wrapper">
+
+            <select
+                name="${config.name}_${rowCount}"
+                class="${config.selectClass}">
+                ${options}
+            </select>
+
+            ${config.quickButton || ""}
+
+            <button
+                type="button"
+                class="${config.removeClass}"
+                onclick="${config.removeFunction}(this)"
+                ${rowCount===0?"hidden":""}>
+                🗑️
+            </button>
+
+        </div>
+
+    `;
+
+    container.appendChild(row);
+
+}
+
+function removeDynamicRow(button, rowClass, containerId, itemName) {
+
+    const row = button.closest("." + rowClass);
+    const container = document.getElementById(containerId);
+
+    if (container.querySelectorAll("." + rowClass).length <= 1) {
+        Swal.fire({
+            title: "خطا!",
+            text: `حداقل یک ${itemName} باید وجود داشته باشد.`,
+            icon: "warning",
+            confirmButtonColor: "#ffc107"
+        });
+        return;
+    }
+
+    Swal.fire({
+        title: "آیا مطمئن هستید؟",
+        text: `این ${itemName} حذف خواهد شد!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "بله",
+        cancelButtonText: "لغو"
+    }).then(result => {
+
+        if (result.isConfirmed) {
+            row.remove();
+
+            updateRowNumbers(rowClass);
+        }
+
+    });
+
+}
+
+function createHtmlRow(containerId, rowClass, html) {
+
+    const container = document.getElementById(containerId);
+
+    const row = document.createElement("div");
+
+    row.className = rowClass;
+
+    row.dataset.row = container.querySelectorAll("." + rowClass).length;
+
+    row.innerHTML = html;
+
+    container.appendChild(row);
+
+}
+
 // ============================================
 // مدیریت رم‌ها (افزودن در فرم ثبت)
 // ============================================
 
-let ramCounter = 1;
+function addRamRow(){
 
-function addRamRow() {
-    const container = document.getElementById('rams_container');
-    const rowCount = container.querySelectorAll('.ram-row').length;
+    createSelectRow({
 
-    const newRow = document.createElement('div');
-    newRow.className = 'ram-row';
-    newRow.dataset.row = rowCount;
-    newRow.style.cssText = 'display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
+        containerId:"rams_container",
 
-    // گرفتن همه آپشن‌ها از سلکت اول (به جز آپشن خالی)
-    const firstSelect = document.querySelector('select[name="ram_id_0"]');
-    let optionsHTML = '';
-    if (firstSelect) {
-        const allOptions = firstSelect.querySelectorAll('option');
-        allOptions.forEach(opt => {
-            // فقط آپشن‌هایی که مقدار ندارن رو رد کن (آپشن خالی)
-            if (opt.value !== '') {
-                optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
-            }
-        });
-    }
+        rowClass:"ram-row",
 
-    newRow.innerHTML = `
-        <div style="flex: 1; min-width: 150px;">
-            <select name="ram_id_${rowCount}" class="ram-select" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; height: 32px;">
-                <option value="">-- انتخاب --</option>
-                ${optionsHTML}
-            </select>
-        </div>
-        <div style="flex: 0 0 auto;">
-            <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;">🗑️</button>
-        </div>
-    `;
-    container.appendChild(newRow);
-}
-function removeRamRow(btn) {
-    const row = btn.closest('.ram-row');
-    const container = document.getElementById('rams_container');
+        firstSelect:'select[name="ram_id_0"]',
 
-    if (container.querySelectorAll('.ram-row').length <= 1) {
-        Swal.fire({
-            title: 'خطا!',
-            text: 'حداقل یک رم باید وجود داشته باشد.',
-            icon: 'warning',
-            confirmButtonColor: '#ffc107'
-        });
-        return;
-    }
+        name:"ram_id",
 
-    Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'این رم حذف خواهد شد!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'بله، حذف شود',
-        cancelButtonText: 'لغو'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            row.remove();
-            updateRowNumbers('ram-row');
-        }
+        selectClass:"ram-select",
+
+        removeClass:"btn-remove-ram",
+
+        removeFunction:"removeRamRow",
+
+        label:"رم",
+
     });
+
 }
 
+function removeRamRow(button) {
+    removeDynamicRow(button, "ram-row", "rams_container", "رم");
+}
 // ============================================
 // مدیریت هاردها (افزودن در فرم ثبت)
 // ============================================
 
-let storageCounter = 1;
+function addStorageRow(){
 
-function addStorageRow() {
-    const container = document.getElementById('storages_container');
-    const rowCount = container.querySelectorAll('.storage-row').length;
+    createSelectRow({
 
-    const newRow = document.createElement('div');
-    newRow.className = 'storage-row';
-    newRow.dataset.row = rowCount;
-    newRow.style.cssText = 'display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
+        containerId:"storages_container",
 
-    const firstSelect = document.querySelector('select[name="storage_id_0"]');
-    let optionsHTML = '';
-    if (firstSelect) {
-        const allOptions = firstSelect.querySelectorAll('option');
-        allOptions.forEach(opt => {
-            if (opt.value !== '') {
-                optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
-            }
-        });
-    }
+        rowClass:"storage-row",
 
-    newRow.innerHTML = `
-        <div style="flex: 1; min-width: 150px;">
-            <select name="storage_id_${rowCount}" class="storage-select" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; height: 32px;">
-                <option value="">-- انتخاب --</option>
-                ${optionsHTML}
-            </select>
-        </div>
-        <div style="flex: 0 0 auto;">
-            <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;">🗑️</button>
-        </div>
-    `;
-    container.appendChild(newRow);
-}
-function removeStorageRow(btn) {
-    const row = btn.closest('.storage-row');
-    const container = document.getElementById('storages_container');
+        firstSelect:'select[name="storage_id_0"]',
 
-    if (container.querySelectorAll('.storage-row').length <= 1) {
-        Swal.fire({
-            title: 'خطا!',
-            text: 'حداقل یک هارد باید وجود داشته باشد.',
-            icon: 'warning',
-            confirmButtonColor: '#ffc107'
-        });
-        return;
-    }
-    Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'این هارد حذف خواهد شد!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'بله، حذف شود',
-        cancelButtonText: 'لغو'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            row.remove();
-            updateRowNumbers('storage-row');
-        }
+        name:"storage_id",
+
+        selectClass:"storage-select",
+
+        removeClass:"btn-remove-storage",
+
+        removeFunction:"removeStorageRow",
+
+        label:"هارد",
+
+
     });
+
 }
+
+function removeStorageRow(button) {
+    removeDynamicRow(button, "storage-row", "storages_container", "هارد");
+}
+
 // ============================================
 // مدیریت IPها (افزودن در فرم ثبت)
 // ============================================
 
-
-let ipCounter = 1;
-
 function addIpRow() {
-    const container = document.getElementById('ips_container');
-    const rowCount = container.querySelectorAll('.ip-row').length;
 
-    const newRow = document.createElement('div');
-    newRow.className = 'ip-row';
-    newRow.dataset.row = rowCount;
-    newRow.style.cssText = 'display: flex; gap: 10px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
+    createHtmlRow(
+        "ips_container",
+        "ip-row",
+        `
+        <label class="section-label">IP</label>
 
-    newRow.innerHTML = `
-        <div class="ip-select-wrapper">
-            <!-- حذف oninput="formatIP(this)" -->
-            <input type="text" name="ip_address_${rowCount}">
-        </div>
-        <div class="ip-network-wrapper">
-            <select name="ip_network_${rowCount}">
+        <div class="ip-inline">
+
+            <input type="text" name="ip_address_${document.querySelectorAll('#ips_container .ip-row').length}">
+
+            <select name="ip_network_${document.querySelectorAll('#ips_container .ip-row').length}">
                 <option value="LAN">LAN</option>
                 <option value="WAN">WAN</option>
                 <option value="VPN">VPN</option>
                 <option value="WiFi">WiFi</option>
                 <option value="Other">سایر</option>
             </select>
-        </div>
-        <div class="ip-remove-wrapper">
-            <button type="button" class="btn-remove-ip" onclick="removeIpRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer;">🗑️</button>
-        </div>
-    `;
-    container.appendChild(newRow);
-}function removeIpRow(btn) {
-    const row = btn.closest('.ip-row');
-    const container = document.getElementById('ips_container');
 
-    if (container.querySelectorAll('.ip-row').length <= 1) {
-        Swal.fire({
-            title: 'خطا!',
-            text: 'حداقل یک IP باید وجود داشته باشد.',
-            icon: 'warning',
-            confirmButtonColor: '#ffc107'
-        });
-        return;
-    }
+            <button
+                type="button"
+                class="btn-remove-ip"
+                onclick="removeIpRow(this)">
+                🗑️
+            </button>
 
-    Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'این IP حذف خواهد شد!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'بله، حذف شود',
-        cancelButtonText: 'لغو'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            row.remove();
-            updateRowNumbers('ip-row');
-        }
-    });
+        </div>
+        `
+    );
+
 }
 
+function removeIpRow(button) {
+    removeDynamicRow(button, "ip-row", "ips_container", "آدرس IP");
+}
 // ============================================
 // مدیریت تجهیزات جانبی (افزودن در فرم ثبت)
 // ============================================
 
-let peripheralCounter = 1;
-
 function addPeripheralRow() {
-    const container = document.getElementById('peripherals_container');
-    const rowCount = container.querySelectorAll('.peripheral-row').length;
 
-    const newRow = document.createElement('div');
-    newRow.className = 'peripheral-row';
-    newRow.dataset.row = rowCount;
-    newRow.style.cssText = 'display: flex; gap: 10px; align-items: flex-end; background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0;';
+    const row = document.querySelectorAll("#peripherals_container .peripheral-row").length;
 
-    const firstSelect = document.querySelector('select[name="peripheral_id_0"]');
-    const optionsHTML = firstSelect ? firstSelect.innerHTML : '';
+    const options =
+        document.querySelector('select[name="peripheral_id_0"]').innerHTML;
 
-    newRow.innerHTML = `
-        <div class="peripheral-select-wrapper" style="flex: 1; min-width: 180px;">
-            <label class="peripheral-label" style="display: block; font-size: 12px; font-weight: 500; color: #475569; margin-bottom: 4px;">تجهیزات جانبی</label>
-            <div style="display: flex; gap: 8px; width: 100%;">
-                <select name="peripheral_id_${rowCount}" class="peripheral-select" style="flex: 1; min-width: 120px; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; height: 32px; font-family: 'Vazir', 'Tahoma', sans-serif; font-size: 13px; background: white;">
-                    <option value="">-- انتخاب --</option>
-                    ${optionsHTML}
-                </select>
-                <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید" style="flex-shrink: 0; background: #10b981; color: white; border: none; border-radius: 6px; padding: 0 12px; font-size: 16px; cursor: pointer; height: 32px; min-width: 32px; display: flex; align-items: center; justify-content: center;">➕</button>
-            </div>
+    createHtmlRow(
+        "peripherals_container",
+        "peripheral-row",
+        `
+        <label class="section-label">تجهیزات جانبی</label>
+
+        <div class="select-wrapper">
+
+            <select
+                name="peripheral_id_${row}"
+                class="peripheral-select">
+
+                ${options}
+
+            </select>
+
+            <button
+                type="button"
+                class="btn-remove-peripheral"
+                onclick="removePeripheralRow(this)">
+                🗑️
+            </button>
+
         </div>
-        <div class="peripheral-remove-wrapper" style="flex: 0 0 auto; padding-bottom: 2px;">
-            <button type="button" class="btn-remove-peripheral" onclick="removePeripheralRow(this)" style="display: inline-block; background: #ef4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px;">🗑️</button>
-        </div>
-    `;
-    container.appendChild(newRow);
+        `
+    );
 
 }
-function removePeripheralRow(btn) {
-    const row = btn.closest('.peripheral-row');
-    const container = document.getElementById('peripherals_container');
 
-    if (container.querySelectorAll('.peripheral-row').length <= 1) {
-        Swal.fire({
-            title: 'خطا!',
-            text: 'حداقل یک تجهیز جانبی باید وجود داشته باشد.',
-            icon: 'warning',
-            confirmButtonColor: '#ffc107'
-        });
-        return;
-    }
-
-    Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'این تجهیز جانبی حذف خواهد شد!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'بله، حذف شود',
-        cancelButtonText: 'لغو'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            row.remove();
-            updateRowNumbers('peripheral-row');
-        }
-    });
+function removePeripheralRow(button) {
+    removeDynamicRow(button, "peripheral-row", "peripherals_container", "تجهیز جانبی");
 }
-
 // ============================================
 // به‌روزرسانی شمارنده ردیف‌ها
 // ============================================
@@ -342,15 +333,158 @@ function updateRowNumbers(className) {
             }
         });
     });
+    rows.forEach((row, index) => {
+
+        const removeBtn = row.querySelector(
+            ".btn-remove-ram, .btn-remove-storage, .btn-remove-ip, .btn-remove-peripheral"
+        );
+
+        if (!removeBtn) return;
+
+        if (index === 0) {
+            removeBtn.hidden = true;
+        } else {
+            removeBtn.hidden = false;
+        }
+
+    });
 }
 
 // ============================================
 // بارگذاری داده‌ها در مودال ویرایش
 // ============================================
+function createEditRamRow(index, selected = "") {
 
+    return `
+<div class="ram-row" data-row="${index}">
+
+    <label class="section-label">رم</label>
+
+    <div class="select-wrapper">
+
+        <select name="edit_ram_id_${index}" class="ram-select">
+
+
+            ${getRamOptions(selected)}
+
+        </select>
+<button
+            type="button"
+            class="btn-remove-ram"
+            onclick="removeEditRamRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+    </div>
+
+
+</div>
+`;
+}
+
+function createEditStorageRow(index, selected = "") {
+
+    return `
+<div class="storage-row" data-row="${index}">
+
+    <label class="section-label">هارد</label>
+
+    <div class="select-wrapper">
+
+        <select
+            name="edit_storage_id_${index}"
+            class="storage-select">
+
+
+            ${getStorageOptions(selected)}
+
+        </select>
+<button
+            type="button"
+            class="btn-remove-storage"
+            onclick="removeEditStorageRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+    </div>
+
+
+</div>
+`;
+
+}
+
+function createEditIpRow(index, ip = "", network = "LAN") {
+
+    return `
+<div class="ip-row" data-row="${index}">
+
+    <label class="section-label">IP</label>
+
+    <div class="select-wrapper">
+
+        <input
+            type="text"
+            name="edit_ip_address_${index}"
+            value="${ip}">
+
+        <select name="edit_ip_network_${index}">
+
+            <option value="LAN" ${network=="LAN"?"selected":""}>LAN</option>
+            <option value="WAN" ${network=="WAN"?"selected":""}>WAN</option>
+            <option value="VPN" ${network=="VPN"?"selected":""}>VPN</option>
+            <option value="WiFi" ${network=="WiFi"?"selected":""}>WiFi</option>
+            <option value="Other" ${network=="Other"?"selected":""}>سایر</option>
+
+        </select>
+
+
+<button
+            type="button"
+            class="btn-remove-ip"
+            onclick="removeEditIpRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+    </div>
+
+
+</div>
+`;
+}
+function createEditPeripheralRow(index, selected = "") {
+
+    return `
+<div class="peripheral-row" data-row="${index}">
+
+    <label class="section-label">تجهیزات جانبی</label>
+
+    <div class="select-wrapper">
+
+        <select
+            name="edit_peripheral_id_${index}"
+            class="peripheral-select">
+
+
+            ${getPeripheralOptions(selected)}
+
+        </select>
+<button
+            type="button"
+            class="btn-remove-peripheral"
+            onclick="removeEditPeripheralRow(this)"
+            ${index==0 ? 'hidden' : ''}>
+            🗑️
+        </button>
+    </div>
+
+</div>
+`;
+
+}
 function loadEditData(systemId) {
     // دریافت همه داده‌ها با یک درخواست
-    getSystemData(systemId, 'all', function(data) {
+    getSystemData(systemId, 'all', function (data) {
         // بارگذاری رم‌ها
         loadEditRams(data.rams || []);
         // بارگذاری هاردها
@@ -361,47 +495,29 @@ function loadEditData(systemId) {
         loadEditPeripherals(data.peripherals || []);
     });
 }
-
 // ============================================
 // بارگذاری رم‌ها در مودال ویرایش
 // ============================================
 
 function loadEditRams(rams) {
-    const container = document.getElementById('edit_rams_container');
-    container.innerHTML = '';
+
+    const container = document.getElementById("edit_rams_container");
+
+    container.innerHTML = "";
 
     if (!rams || rams.length === 0) {
-        addEditRamRow();
+
+        container.innerHTML = createEditRamRow(0);
+
         return;
     }
 
-    rams.forEach((ram, index) => {
-        const row = document.createElement('div');
-        row.className = 'ram-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>رم</label>
-                <select name="edit_ram_id_${index}" class="ram-select">
-                    <option value="">-- انتخاب --</option>
-                    ${getRamOptions(ram.ram_id)}
-                </select>
-            </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                
-                <button type="button" class="btn-remove-ram" onclick="removeEditRamRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
-    });
-}
+    rams.forEach((ram,index)=>{
 
-function getRamOptions(selectedId) {
-    // این تابع باید در PHP ساخته شود و در JS به صورت داده ارسال شود
-    // برای سادگی، از داده‌های موجود در صفحه استفاده می‌کنیم
-    const select = document.querySelector('select[name="ram_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+        container.innerHTML += createEditRamRow(index, ram.ram_id);
+
+    });
+
 }
 
 // ============================================
@@ -409,74 +525,48 @@ function getRamOptions(selectedId) {
 // ============================================
 
 function loadEditStorages(storages) {
-    const container = document.getElementById('edit_storages_container');
-    container.innerHTML = '';
+
+    const container = document.getElementById("edit_storages_container");
+
+    container.innerHTML = "";
 
     if (!storages || storages.length === 0) {
-        addEditStorageRow();
+
+        container.innerHTML = createEditStorageRow(0);
+
         return;
+
     }
 
-    storages.forEach((storage, index) => {
-        const row = document.createElement('div');
-        row.className = 'storage-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>هارد</label>
-                <select name="edit_storage_id_${index}" class="storage-select">
-                    <option value="">-- انتخاب --</option>
-                    ${getStorageOptions(storage.storage_id)}
-                </select>
-            </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                
-                <button type="button" class="btn-remove-storage" onclick="removeEditStorageRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
-    });
-}
+    storages.forEach((storage,index)=>{
 
+        container.innerHTML += createEditStorageRow(index, storage.storage_id);
+
+    });
+
+}
 // ============================================
 // بارگذاری IPها در مودال ویرایش
 // ============================================
 
 function loadEditIps(ips) {
-    const container = document.getElementById('edit_ips_container');
-    container.innerHTML = '';
-
+    const container = document.getElementById("edit_ips_container");
+    container.innerHTML = "";
     if (!ips || ips.length === 0) {
-        addEditIpRow();
+        container.innerHTML = createEditIpRow(0);
         return;
     }
 
-    ips.forEach((ip, index) => {
-        const row = document.createElement('div');
-        row.className = 'ip-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>آدرس IP</label>
-                <input type="text" name="edit_ip_address_${index}" value="${ip.ip_address}" placeholder="مثلاً: 192.168.1.100">
-            </div>
-            <div class="form-group">
-                <label>شبکه</label>
-                <select name="edit_ip_network_${index}">
-                    <option value="LAN" ${ip.network_type === 'LAN' ? 'selected' : ''}>LAN</option>
-                    <option value="WAN" ${ip.network_type === 'WAN' ? 'selected' : ''}>WAN</option>
-                    <option value="VPN" ${ip.network_type === 'VPN' ? 'selected' : ''}>VPN</option>
-                    <option value="WiFi" ${ip.network_type === 'WiFi' ? 'selected' : ''}>WiFi</option>
-                    <option value="Other" ${ip.network_type === 'Other' ? 'selected' : ''}>سایر</option>
-                </select>
-            </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-               
-                <button type="button" class="btn-remove-ip" onclick="removeEditIpRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
+    ips.forEach((ip,index)=>{
+
+        container.innerHTML += createEditIpRow(
+            index,
+            ip.ip_address,
+            ip.network_type
+        );
+
     });
+
 }
 
 // ============================================
@@ -484,33 +574,22 @@ function loadEditIps(ips) {
 // ============================================
 
 function loadEditPeripherals(peripherals) {
-    const container = document.getElementById('edit_peripherals_container');
-    container.innerHTML = '';
-
+    const container = document.getElementById("edit_peripherals_container");
+    container.innerHTML = "";
     if (!peripherals || peripherals.length === 0) {
-        addEditPeripheralRow();
+        container.innerHTML = createEditPeripheralRow(0);
         return;
     }
 
-    peripherals.forEach((periph, index) => {
-        const row = document.createElement('div');
-        row.className = 'peripheral-row form-row';
-        row.dataset.row = index;
-        row.innerHTML = `
-            <div class="form-group">
-                <label>تجهیز</label>
-                <select name="edit_peripheral_id_${index}" class="peripheral-select">
-                    <option value="">-- انتخاب --</option>
-                    ${getPeripheralOptions(periph.peripheral_id)}
-                </select>
-            </div>
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-               
-                <button type="button" class="btn-remove-peripheral" onclick="removeEditPeripheralRow(this)" style="${index === 0 ? 'display: none;' : 'display: inline-block;'}">🗑️</button>
-            </div>
-        `;
-        container.appendChild(row);
+    peripherals.forEach((periph,index)=>{
+
+        container.innerHTML += createEditPeripheralRow(
+            index,
+            periph.peripheral_id
+        );
+
     });
+
 }
 
 // ============================================
@@ -518,27 +597,41 @@ function loadEditPeripherals(peripherals) {
 // ============================================
 
 function addEditRamRow() {
-    const container = document.getElementById('edit_rams_container');
-    const rowCount = container.querySelectorAll('.ram-row').length;
-    addEditRow(container, 'ram', rowCount, 'ram-row', 'edit_ram_id_', 'edit_ram_primary_');
+
+    const container = document.getElementById("edit_rams_container");
+
+    const first = container.querySelector(".ram-row");
+
+    const clone = first.cloneNode(true);
+
+    const index = container.querySelectorAll(".ram-row").length;
+
+    const select = clone.querySelector("select");
+
+    select.name = "edit_ram_id_" + index;
+    select.value = "";
+
+    clone.querySelector(".btn-remove-ram").style.display = "inline-block";
+
+    container.appendChild(clone);
 }
 
 function addEditStorageRow() {
-    const container = document.getElementById('edit_storages_container');
-    const rowCount = container.querySelectorAll('.storage-row').length;
-    addEditRow(container, 'storage', rowCount, 'storage-row', 'edit_storage_id_', 'edit_storage_primary_');
+    const container = document.getElementById("edit_storages_container");
+    const index = container.querySelectorAll(".storage-row").length;
+    container.innerHTML += createEditStorageRow(index);
 }
 
 function addEditIpRow() {
-    const container = document.getElementById('edit_ips_container');
-    const rowCount = container.querySelectorAll('.ip-row').length;
-    addEditRow(container, 'ip', rowCount, 'ip-row', 'edit_ip_address_', 'edit_ip_primary_');
+    const container = document.getElementById("edit_ips_container");
+    const index = container.querySelectorAll(".ip-row").length;
+    container.innerHTML += createEditIpRow(index);
 }
 
 function addEditPeripheralRow() {
-    const container = document.getElementById('edit_peripherals_container');
-    const rowCount = container.querySelectorAll('.peripheral-row').length;
-    addEditRow(container, 'peripheral', rowCount, 'peripheral-row', 'edit_peripheral_id_', 'edit_peripheral_default_');
+    const container = document.getElementById("edit_peripherals_container");
+    const index = container.querySelectorAll(".peripheral-row").length;
+    container.innerHTML += createEditPeripheralRow(index);
 }
 
 function addEditRow(container, type, rowCount, className, namePrefix, checkPrefix) {
@@ -581,8 +674,8 @@ function getDefaultRowHtml(type, index) {
                         ${getRamOptions()}
                     </select>
                 </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <button type="button" class="btn-remove-ram" onclick="removeEditRamRow(this)" style="display: inline-block;">🗑️</button>
+                <div class="form-group">
+                    <button type="button" class="btn-remove-ram" onclick="removeEditRamRow(this)">🗑️</button>
                 </div>
             `;
         case 'storage':
@@ -594,8 +687,8 @@ function getDefaultRowHtml(type, index) {
                         ${getStorageOptions()}
                     </select>
                 </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <button type="button" class="btn-remove-storage" onclick="removeEditStorageRow(this)" style="display: inline-block;">🗑️</button>
+                <div class="form-group">
+                    <button type="button" class="btn-remove-storage" onclick="removeEditStorageRow(this)">🗑️</button>
                 </div>
             `;
         case 'ip':
@@ -614,9 +707,9 @@ function getDefaultRowHtml(type, index) {
                         <option value="Other">سایر</option>
                     </select>
                 </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                <div class="form-group" >
                   
-                    <button type="button" class="btn-remove-ip" onclick="removeEditIpRow(this)" style="display: inline-block;">🗑️</button>
+                    <button type="button" class="btn-remove-ip" onclick="removeEditIpRow(this)" >🗑️</button>
                 </div>
             `;
         case 'peripheral':
@@ -628,8 +721,8 @@ function getDefaultRowHtml(type, index) {
                         ${getPeripheralOptions()}
                     </select>
                 </div>
-                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
-                    <button type="button" class="btn-remove-peripheral" onclick="removeEditPeripheralRow(this)" style="display: inline-block;">🗑️</button>
+                <div class="form-group" >
+                    <button type="button" class="btn-remove-peripheral" onclick="removeEditPeripheralRow(this)" >🗑️</button>
                 </div>
             `;
         default:
@@ -705,24 +798,59 @@ function removeEditPeripheralRow(btn) {
 // توابع کمکی (با داده‌های واقعی)
 // ============================================
 
-function getRamOptions(selectedId) {
-    // این تابع باید در PHP ساخته شود
-    // برای سادگی، از داده‌های موجود در صفحه استفاده می‌کنیم
-    const select = document.querySelector('select[name="ram_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+function getRamOptions(selectedId = "") {
+
+    const source = document.querySelector('select[name="ram_id_0"]');
+    if (!source) return "";
+
+    let html = "";
+
+    source.querySelectorAll("option").forEach(opt => {
+
+        html += `<option value="${opt.value}"
+                    ${String(opt.value) === String(selectedId) ? "selected" : ""}>
+                    ${opt.text}
+                 </option>`;
+
+    });
+
+    return html;
 }
 
 function getStorageOptions(selectedId) {
-    const select = document.querySelector('select[name="storage_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+    const source = document.querySelector('select[name="storage_id_0"]');
+    if (!source) return "";
+
+    let html = "";
+
+    source.querySelectorAll("option").forEach(opt => {
+
+        html += `<option value="${opt.value}"
+                    ${String(opt.value) === String(selectedId) ? "selected" : ""}>
+                    ${opt.text}
+                 </option>`;
+
+    });
+
+    return html;
 }
 
 function getPeripheralOptions(selectedId) {
-    const select = document.querySelector('select[name="peripheral_id_0"]');
-    if (!select) return '';
-    return select.innerHTML;
+    const source = document.querySelector('select[name="peripheral_id_0"]');
+    if (!source) return "";
+
+    let html = "";
+
+    source.querySelectorAll("option").forEach(opt => {
+
+        html += `<option value="${opt.value}"
+                    ${String(opt.value) === String(selectedId) ? "selected" : ""}>
+                    ${opt.text}
+                 </option>`;
+
+    });
+
+    return html;
 }
 // ============================================
 // مدیریت افزودن سریع قطعات
@@ -732,7 +860,6 @@ function openComponentModal(type) {
     const modal = document.getElementById('componentModal');
     const form = document.getElementById('componentForm');
     const title = document.getElementById('componentModalTitle');
-
     // ریست فرم
     form.reset();
 
@@ -749,12 +876,346 @@ function openComponentModal(type) {
     title.textContent = titles[type] || '➕ افزودن قطعه جدید';
     document.getElementById('component_type').value = type;
 
+    document.getElementById("componentListTitle").innerText =
+        "لیست " + componentTitles[type] + " های ثبت شده";
+
+    loadComponentList(type);
+
     // نمایش فیلدهای اختصاصی
     document.getElementById('ram_fields').style.display = type === 'ram' ? 'block' : 'none';
     document.getElementById('storage_fields').style.display = type === 'storage' ? 'block' : 'none';
     document.getElementById('monitor_fields').style.display = type === 'monitor' ? 'block' : 'none';
 
     modal.style.display = 'flex';
+}
+
+const componentTitles = {
+    cpu: "CPU",
+    motherboard: "مادربرد",
+    ram: "رم",
+    storage: "هارد",
+    power: "پاور",
+    gpu: "کارت گرافیک",
+    monitor: "مانیتور"
+};
+function loadComponentList(type) {
+
+    fetch("assets/ajax/get_components.php?type=" + type)
+
+        .then(response => response.json())
+
+        .then(rows => {
+
+            const head = (type === "peripheral")
+                ? document.getElementById("peripheralTableHead")
+                : document.getElementById("componentTableHead");
+
+            if (type === "peripheral") {
+
+                head.innerHTML = `
+        <tr>
+            <th>نوع</th>
+            <th>برند</th>
+            <th>مدل</th>
+            <th>کد اموال</th>
+            <th>عملیات</th>
+        </tr>
+    `;
+
+            } else if (type === "ram" || type === "storage") {
+
+                head.innerHTML = `
+        <tr>
+            <th>برند</th>
+            <th>مدل</th>
+            <th>ظرفیت</th>
+            <th>نوع</th>
+            <th>عملیات</th>
+        </tr>
+    `;
+
+            } else {
+
+                head.innerHTML = `
+        <tr>
+            <th>برند</th>
+            <th>مدل</th>
+            <th>عملیات</th>
+        </tr>
+    `;
+
+            }
+
+            let html = "";
+            if (rows.length === 0) {
+
+                const colspan = type === "peripheral" ? 5 :
+                    (type === "ram" || type === "storage") ? 5 : 3;
+
+
+                html = `
+        <tr>
+            <td colspan="${colspan}" style="text-align:center;color:#888">
+                موردی ثبت نشده است
+            </td>
+        </tr>
+    `;
+            } else {
+                rows.forEach(row => {
+
+                    if (type === "peripheral") {
+
+                        html += `
+        <tr>
+            <td>${row.type_name}</td>
+            <td>${row.brand_name}</td>
+            <td>${row.model_name}</td>
+            <td>${row.property_code || "-"}</td>
+            <td>
+                <button
+                    class="btn-remove"
+                    onclick="deleteComponent('${type}', ${row.id})">
+                    🗑️
+                </button>
+            </td>
+        </tr>
+    `;
+
+                    } else if (type === "ram" || type === "storage") {
+
+                        html += `
+            <tr>
+                <td>${row.brand_name}</td>
+                <td>${row.model_name}</td>
+                <td>${row.capacity || "-"}</td>
+                <td>${row.type || "-"}</td>
+                <td>
+                    <button class="btn-remove"
+                        onclick="deleteComponent('${type}', ${row.id})">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+        `;
+
+                    } else {
+
+                        html += `
+            <tr>
+                <td>${row.brand_name}</td>
+                <td>${row.model_name}</td>
+                <td>
+                    <button class="btn-remove"
+                        onclick="deleteComponent('${type}', ${row.id})">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+        `;
+
+                    }
+
+                });
+            }
+            if (type === "peripheral") {
+                document.getElementById("peripheralTableBody").innerHTML = html;
+            } else {
+                document.getElementById("componentTableBody").innerHTML = html;
+            }
+        })
+
+         .catch(err => console.error(err));
+}
+
+
+
+function deleteComponent(type,id){
+
+    Swal.fire({
+
+        title:"حذف شود؟",
+        text:"این قطعه حذف خواهد شد.",
+        icon:"warning",
+
+        showCancelButton:true,
+
+        confirmButtonText:"بله",
+        cancelButtonText:"لغو",
+
+        confirmButtonColor:"#dc3545"
+
+    }).then(result=>{
+
+        if(!result.isConfirmed) return;
+
+        fetch("assets/ajax/delete_component.php",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/x-www-form-urlencoded"
+            },
+
+            body:
+                "type="+encodeURIComponent(type)+
+                "&id="+id
+
+        })
+
+            .then(r=>r.json())
+
+            .then(data=>{
+
+                if(data.success){
+                    loadComponentList(type);
+                    refreshComponentSelect(type);
+
+                    Swal.fire({
+
+                        icon:"success",
+                        title:"حذف شد",
+                        timer:1200,
+                        showConfirmButton:false
+
+                    });
+
+
+                }else{
+
+                    Swal.fire("خطا","حذف انجام نشد","error");
+
+                }
+
+            });
+
+    });
+
+}
+function refreshComponentSelect(type) {
+
+    fetch("assets/ajax/get_components.php?type=" + type)
+
+        .then(r => r.json())
+
+        .then(rows => {
+
+            let selects = [];
+
+            switch (type) {
+
+                case "ram":
+                    selects = document.querySelectorAll(".ram-select");
+                    break;
+
+                case "storage":
+                    selects = document.querySelectorAll(".storage-select");
+                    break;
+
+                case "peripheral":
+                    selects = document.querySelectorAll(".peripheral-select");
+                    break;
+
+                default:
+                    const s = document.getElementById(type + "_id");
+                    if (s) selects = [s];
+                    break;
+            }
+
+            selects.forEach(select => {
+
+                const currentValue = select.value;
+
+                let html = '<option value="">-- انتخاب --</option>';
+
+                rows.forEach(row => {
+
+                    let text;
+
+                    if (type === "peripheral") {
+
+                        text = `${row.brand_name} ${row.model_name}`;
+
+                        if (row.property_code) {
+                            text += ` (${row.property_code})`;
+                        }
+
+                    } else {
+
+                        text = `${row.brand_name} ${row.model_name}`;
+
+                        if (type === "ram" || type === "storage") {
+                            text += ` (${row.capacity} ${row.type})`;
+                        }
+                    }
+
+                    html += `<option value="${row.id}">${text}</option>`;
+                });
+
+                select.innerHTML = html;
+                select.value = currentValue;
+            });
+
+        })
+
+        .catch(console.error);
+
+}
+
+
+function refreshPeripheralSelect() {
+
+    fetch("assets/ajax/get_components.php?type=peripheral")
+
+        .then(r => r.json())
+
+        .then(rows => {
+
+            const selects = document.querySelectorAll(".peripheral-select");
+
+            selects.forEach(select => {
+
+                const currentValue = select.value;
+
+                let html = '<option value="">-- انتخاب --</option>';
+
+                let currentType = "";
+
+                rows.forEach(row => {
+
+                    if (currentType !== row.type_name) {
+
+                        if (currentType !== "") {
+                            html += "</optgroup>";
+                        }
+
+                        currentType = row.type_name;
+
+                        html += `<optgroup label="${currentType}">`;
+                    }
+
+                    let text = `${row.brand_name} ${row.model_name}`;
+
+                    if (row.property_code) {
+                        text += ` (${row.property_code})`;
+                    }
+
+                    html += `<option value="${row.id}">${text}</option>`;
+
+                });
+
+                if (currentType !== "") {
+                    html += "</optgroup>";
+                }
+
+                select.innerHTML = html;
+                select.value = currentValue;
+
+            });
+
+        })
+
+        .catch(console.error);
+
 }
 
 function saveComponent() {
@@ -770,7 +1231,7 @@ function saveComponent() {
         .then(data => {
             if (data.success) {
                 const type = document.getElementById('component_type').value;
-
+                console.log(type);
                 // پیدا کردن سلکت مربوطه
                 let selectId = type + '_id';
                 if (type === 'motherboard') selectId = 'motherboard_id';
@@ -795,6 +1256,8 @@ function saveComponent() {
                     timer: 1500,
                     showConfirmButton: false
                 });
+                refreshComponentSelect(type);
+                loadComponentList(type);
             }
         })
         .catch(error => {
@@ -811,54 +1274,74 @@ function saveComponent() {
 // ============================================
 
 function openPeripheralModal() {
-    const modal = document.getElementById('peripheralModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
+
+    document.getElementById("peripheralForm").reset();
+
+    refreshComponentSelect();
+
+    loadComponentList("peripheral");
+
+    document.getElementById("peripheralModal").style.display = "flex";
 }
 
 function savePeripheral() {
-    const form = document.getElementById('peripheralForm');
+
+    const form = document.getElementById("peripheralForm");
     const formData = new FormData(form);
 
-    fetch('admin_systems.php', {
-        method: 'POST',
+    fetch("admin_systems.php", {
+        method: "POST",
         body: formData
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // پیدا کردن آخرین سلکت تجهیزات جانبی
-                const selects = document.querySelectorAll('.peripheral-select');
-                const select = selects[selects.length - 1];
-                if (select) {
-                    const option = document.createElement('option');
-                    option.value = data.id;
-                    option.textContent = data.display_name;
-                    select.appendChild(option);
-                    select.value = data.id;
-                }
 
-                closeModal('peripheralModal');
+        .then(r => r.json())
+
+        .then(data => {
+
+            if (!data.success) {
 
                 Swal.fire({
-                    title: 'موفق!',
-                    text: 'تجهیز جانبی با موفقیت ثبت شد.',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
+                    icon: "error",
+                    title: "خطا",
+                    text: "ثبت انجام نشد."
                 });
+
+                return;
             }
-        })
-        .catch(error => {
-            Swal.fire({
-                title: 'خطا!',
-                text: 'مشکلی در ثبت تجهیز جانبی رخ داد.',
-                icon: 'error',
-                confirmButtonColor: '#dc3545'
+
+            refreshPeripheralSelect();
+            loadComponentList("peripheral");
+
+            document.querySelectorAll(".peripheral-select").forEach(select => {
+                select.value = data.id;
             });
+
+            closeModal("peripheralModal");
+
+            Swal.fire({
+                icon: "success",
+                title: "موفق",
+                text: "تجهیز جانبی ثبت شد.",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+        })
+
+        .catch(err => {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: "error",
+                title: "خطا",
+                text: "خطا در ارتباط با سرور"
+            });
+
         });
+
 }
+
 // ============================================
 // ویرایش سیستم
 // ============================================
@@ -878,6 +1361,37 @@ function openEditModal(system) {
     loadEditData(system.id);
 
     document.getElementById('editModal').style.display = 'flex';
+}
+
+function saveEditSystem() {
+
+    const form = document.getElementById("editForm");
+    const formData = new FormData(form);
+
+    fetch("assets/ajax/edit_system.php", {
+        method: "POST",
+        body: formData
+    })
+        .then(r => r.json())
+        .then(res => {
+
+            if(res.success){
+
+                updateSystemRow(res.system.id).then(() => {
+                    closeModal("editModal");
+                });
+
+            }else{
+
+                Swal.fire({
+                    icon: "error",
+                    title: res.message
+                });
+
+            }
+
+        });
+
 }
 
 // ============================================
@@ -946,6 +1460,22 @@ function updateTableRowNumbers() {
     });
 }
 
+function updateSystemRow(id){
+
+    return fetch("assets/ajax/get_system_row.php?id=" + id)
+        .then(r => r.text())
+        .then(html => {
+
+            const oldRow = document.querySelector("#system-row-" + id);
+
+            if(oldRow){
+                oldRow.outerHTML = html;
+            }
+
+        });
+
+}
+
 // ============================================
 // بستن مودال
 // ============================================
@@ -958,13 +1488,29 @@ function closeModal(modalId) {
 // راه‌اندازی اولیه
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+
     initSearch();
 
-    // بستن مودال با کلیک روی پس‌زمینه
+    const editForm = document.getElementById("editForm");
+
+    if (editForm) {
+
+        editForm.addEventListener("submit", function (e) {
+
+            e.preventDefault();
+
+            saveEditSystem();
+
+        });
+
+    }
+
+    // بستن مودال
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
     };
+
 });
