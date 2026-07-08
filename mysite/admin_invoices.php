@@ -204,6 +204,12 @@ foreach ($invoices as $key => $invoice) {
     <meta charset="UTF-8">
     <title>مدیریت فاکتورها</title>
     <?php load_assets(); ?>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/persian-date.min.js"></script>
+    <link rel="stylesheet" href="assets/styles/persian-datepicker.min.css">
+    <script src="assets/js/persian-datepicker.min.js"></script>
+    <script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
+    <script src="assets/js/admin-invoices.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -265,9 +271,9 @@ foreach ($invoices as $key => $invoice) {
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="date-group">
                             <label>تاریخ فاکتور</label>
-                            <div id="invoice_date_container"></div>
+                            <input type="text" id="add_date" name="created_at" class="form-control" >
                         </div>
                     </div>
 
@@ -323,13 +329,11 @@ foreach ($invoices as $key => $invoice) {
                     </div>
                     <div class="search-group">
                         <label>از تاریخ </label>
-                        <div id="search_date_from_container"></div>
-                        <input type="hidden" id="search_date_from" value="<?php echo htmlspecialchars($_GET['date_from'] ?? ''); ?>">
+                        <input type="text" id="date_from" name="date_from" class="form-control" placeholder="انتخاب کنید">
                     </div>
                     <div class="search-group">
                         <label>تا تاریخ </label>
-                        <div id="search_date_to_container"></div>
-                        <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_GET['date_to'] ?? ''); ?>">
+                        <input type="text" id="date_to" name="date_to" class="form-control" placeholder="انتخاب کنید" >
                     </div>
                     </div>
 
@@ -353,9 +357,8 @@ foreach ($invoices as $key => $invoice) {
                     <th>شماره فاکتور</th>
                     <th>موضوع</th>
                     <th>مبلغ</th>
-                    <th>تاریخ فاکتور</th>
                     <th>توضیحات</th>
-                    <th>تاریخ ثبت</th>
+                    <th>تاریخ</th>
                     <th>ثبت کننده</th>
                     <th>عملیات</th>
                 </tr>
@@ -433,7 +436,7 @@ foreach ($invoices as $key => $invoice) {
             <div class="form-row">
                 <div class="form-group">
                     <label>تاریخ فاکتور</label>
-                    <div id="edit_date_container"></div>
+                    <input type="text" id="add_date" name="created_at" class="form-control" placeholder="انتخاب کنید">
                 </div>
             </div>
             <div class="form-row">
@@ -449,7 +452,6 @@ foreach ($invoices as $key => $invoice) {
         </form>
     </div>
 </div>
-<script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
-<script src="assets/js/admin-invoices.js?v=<?php echo time(); ?>"></script>
+
 </body>
 </html>

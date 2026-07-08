@@ -21,16 +21,7 @@
     flex-wrap: wrap;
 }
 
-.stat-box {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px 40px;
-    border-radius: 15px;
-    text-align: center;
-    min-width: 180px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-}
+
 
 .stat-box:hover {
     transform: translateY(-5px);
@@ -144,33 +135,8 @@ padding: 6px 8px;
     border-bottom: 3px solid #667eea;
 }
 
-/* ============================================
-   کارت‌های آمار
-   ============================================ */
 
-.stats {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
 
-.stat-box {
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-    color: white;
-    padding: 20px 40px;
-    border-radius: 15px;
-    text-align: center;
-    min-width: 180px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.05);
-    transition: transform 0.3s;
-}
-
-.stat-box:hover {
-    transform: translateY(-5px);
-}
 
 .stat-number {
     font-size: 36px;

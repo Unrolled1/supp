@@ -42,9 +42,6 @@
     box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
 }
 
-.form-group textarea {
-    resize: vertical;
-}
 
 .date-select-group span {
     color: #64748b;
@@ -111,7 +108,6 @@
 .receiver-group     { width: 250px; }
 .serial-group       { width: 200px; }
 .computer-group     { width: 150px; }
-.date-group         { width: 120px; }
 
 
 .btn-search {

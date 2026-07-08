@@ -14,15 +14,7 @@ function openEditModal(service) {
         document.getElementById('edit_serial_number').value = service.serial_number || '';
         document.getElementById('edit_computer_code').value = service.computer_code || '';
         document.getElementById('edit_description').value = service.description || '';
-
-        const year = service.service_date_year || '';
-        const month = service.service_date_month || '';
-        const day = service.service_date_day || '';
-
-        const dateContainer = document.getElementById('edit_date_container');
-        if (dateContainer) {
-            dateContainer.innerHTML = renderDateSelectsForEdit(year, month, day);
-        }
+        document.getElementById('edit-date').value = fa_number(service.created_at || '');
 
         document.getElementById('editModal').style.display = 'flex';
     } catch(e) {
@@ -49,7 +41,7 @@ function confirmDelete(id, name) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch('admin_services.php', {
+            fetch(window.location.href, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -97,63 +89,58 @@ function updateRowNumbers() {
         }
     });
 }
+
 // 7. توابع جستجو
 // ============================================
 
-function initSearchDates() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const dateFrom = urlParams.get('date_from') || '';
-    const dateTo = urlParams.get('date_to') || '';
+function searchActivities() {
 
-    renderSearchDateSelects('search_date_from_container', 'search_date_from', dateFrom);
-    renderSearchDateSelects('search_date_to_container', 'search_date_to', dateTo);
+    const formData = new FormData();
+
+    formData.append("ajax", "1");
+
+    formData.append("name", document.getElementById("search_name").value);
+    formData.append("department", document.getElementById("search_department").value);
+    formData.append("brand", document.getElementById("search_brand").value);
+    formData.append("receiver", document.getElementById("search_receiver").value);
+    formData.append("computer_code", document.querySelector("input[name='computer_code']").value);
+    formData.append("date_from", faToEn(document.getElementById("date_from").value));
+    formData.append("date_to", faToEn(document.getElementById("date_to").value));
+
+    fetch(window.location.href, {
+        method: "POST",
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+
+            if (!data.success) {
+                showToast(data.message || "خطا", "error");
+                return;
+            }
+
+            document.querySelector(".services-table tbody").innerHTML = data.table;
+
+        })
+        .catch(error => {
+            console.error(error);
+            showToast("خطا در ارتباط با سرور", "error");
+        });
+
 }
 
-function initSearch() {
-    initSearchDates();
+function resetSearch() {
 
-    const searchBtn = document.getElementById('search_btn');
-    const resetBtn = document.getElementById('reset_btn');
+    document.getElementById("search_name").value = "";
+    document.getElementById("search_department").value = "";
+    document.getElementById("search_brand").value = "";
+    document.getElementById("search_receiver").value = "";
+    document.querySelector("input[name='computer_code']").value = "";
+    document.getElementById("date_from").value = "";
+    document.getElementById("date_to").value = "";
+    document.getElementById("quick_date_select").value = "";
 
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
-            const name = document.getElementById('search_name')?.value || '';
-            const department = document.getElementById('search_department')?.value || '';
-            const brand = document.getElementById('search_brand')?.value || '';
-            const status = document.getElementById('search_status')?.value || '';
-            const dateFrom = document.getElementById('search_date_from')?.value || '';
-            const dateTo = document.getElementById('search_date_to')?.value || '';
-
-            const url = 'admin_services.php?';
-            const params = [];
-
-            if (name) params.push('name=' + encodeURIComponent(name));
-            if (department) params.push('department=' + department);
-            if (brand) params.push('brand=' + brand);
-            if (status) params.push('status=' + status);
-            if (dateFrom) params.push('date_from=' + encodeURIComponent(dateFrom));
-            if (dateTo) params.push('date_to=' + encodeURIComponent(dateTo));
-
-            window.location.href = url + params.join('&');
-        });
-    }
-
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            window.location.href = 'admin_services.php';
-        });
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchName = document.getElementById('search_name');
-    const searchDept = document.getElementById('search_department');
-    const searchBrand = document.getElementById('search_brand');
-    const searchStatus = document.getElementById('search_status');
-
-    if (searchName && urlParams.has('name')) searchName.value = urlParams.get('name');
-    if (searchDept && urlParams.has('department')) searchDept.value = urlParams.get('department');
-    if (searchBrand && urlParams.has('brand')) searchBrand.value = urlParams.get('brand');
-    if (searchStatus && urlParams.has('status')) searchStatus.value = urlParams.get('status');
+    searchActivities();
 }
 
 // ============================================
@@ -170,9 +157,9 @@ window.onclick = function(event) {
 // 10. راه‌اندازی اولیه
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    const today=toJalali(new Date());
-    renderDateSelects('service_date_container',today.year,today.month,today.day);
-    initSearch();
+document.addEventListener("DOMContentLoaded", function () {
     initQuickDateSelect();
+    document.getElementById("search_btn").addEventListener("click", searchActivities);
+    document.getElementById("reset_btn").addEventListener("click", resetSearch);
+    //searchActivities(); // یا resetSearch()
 });

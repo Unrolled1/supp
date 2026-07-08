@@ -15,15 +15,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span class="text">داشبورد</span>
             </a>
         </li>
-        <!-- پنل درخواست‌ها -->
-        <?php if (canViewTickets()): ?>
-            <li>
-                <a href="requests.php" class="<?php echo $current_page == 'requests.php' ? 'active' : ''; ?>">
-                    <span class="icon">📋</span>
-                    <span class="text">درخواست‌ها</span>
-                </a>
-            </li>
-        <?php endif; ?>
+
 
         <!-- منوی تعاریف -->
         <?php
@@ -44,6 +36,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="arrow">▼</span>
                 </a>
                 <ul class="submenu">
+
+
                     <?php if (canViewActivities()): ?>
                         <li>
                             <a href="admin_activities.php" class="<?php echo $current_page == 'admin_activities.php' ? 'active' : ''; ?>">
@@ -121,10 +115,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         <!-- منوی عملیات -->
         <?php
-        if (canViewServices() || canViewInvoices() || canViewkala() || canViewPrinters() || canViewSystems()):
+        if (canViewServices() || canViewInvoices() || canViewkala() || canViewPrinters() || canViewSystems()||canViewTickets()):
 
             $operationsPages = ['admin_services.php', 'admin_invoices.php', 'admin_kala.php',
-                'admin_printers.php', 'admin_systems.php'];
+                'admin_printers.php', 'admin_systems.php','requests.php'];
             $isOperationsActive = in_array($current_page, $operationsPages);
 
             ?>
@@ -135,7 +129,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <span class="text">عملیات</span>
                     <span class="arrow">▼</span>
                 </a>
+
                 <ul class="submenu">
+                    <!-- پنل درخواست‌ها -->
+                    <?php if (canViewTickets()): ?>
+                        <li>
+                            <a href="requests.php" class="<?php echo $current_page == 'requests.php' ? 'active' : ''; ?>">
+                                <span class="icon">📋</span>
+                                <span class="text">درخواست‌ها</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
                     <?php if (canViewServices()): ?>
                         <li>
                             <a href="admin_services.php" class="<?php echo $current_page == 'admin_services.php' ? 'active' : ''; ?>">

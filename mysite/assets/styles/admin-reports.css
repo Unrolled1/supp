@@ -4,21 +4,6 @@
 
 
 
-/* کارت فیلتر */
-.filter-card {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
-}
-
-.filter-card h2 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    border-right: 4px solid #667eea;
-    padding-right: 12px;
-}
-
 .filter-form {
     display: flex;
     flex-direction: column;
@@ -32,66 +17,9 @@
 }
 
 .filter-group {
-    flex: 1;
-    min-width: 180px;
+    min-width: 250px;
+    margin-bottom: 10px;
 }
-
-.filter-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    font-size: 13px;
-}
-
-.filter-group input,
-.filter-group select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: 'Vazir', Tahoma, sans-serif;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-/* کارت آمار */
-.stats-card {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: space-around;
-}
-
-.stat-item {
-    text-align: center;
-    flex: 1;
-    min-width: 100px;
-    padding: 10px;
-    border-radius: 12px;
-    background: #f8f9fa;
-}
-
-.stat-num {
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
-}
-
-.stat-title {
-    font-size: 13px;
-    color: #666;
-    margin-top: 5px;
-}
-
 
 .status-badge {
     display: inline-block;
@@ -103,41 +31,4 @@
 
 .text-center {
     text-align: center;
-}
-
-/* ============================================
-   رفع مشکل نمایش آیتم‌های انتخابگر (select dropdown)
-   ============================================ */
-
-.filter-group select,
-.date-select {
-    background-color: #ffffff !important;
-    color: #333333 !important;
-    border: 1px solid #ddd !important;
-}
-
-.filter-group select option,
-.date-select option {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    padding: 8px 12px !important;
-    display: block !important;
-    min-height: auto !important;
-}
-
-.filter-group select option:hover,
-.date-select option:hover {
-    background-color: #667eea !important;
-    color: #ffffff !important;
-}
-
-select optgroup option {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-}
-
-select:focus option:checked,
-select:checked {
-    background-color: #667eea !important;
-    color: white !important;
 }

@@ -9,9 +9,6 @@
     word-wrap: break-word;
 }
 
-.form-group {
-    flex: 0 0 auto;
-}
 
 .btn-add {
     color: white;
@@ -43,10 +40,6 @@
 .company_name   { width: 250px; }
 .invoice_number        { width: 200px; }
 .subject     { width: 250px; }
-.date-group{width: 120px;}
-
-
-
 
 .search-actions {
     flex: 0.5;

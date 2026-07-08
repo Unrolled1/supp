@@ -7,7 +7,9 @@ function fa_number(num) {
     const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
     return num.toString().replace(/\d/g, x => persianDigits[parseInt(x)]);
 }
-
+function faToEn(str) {
+    return str.replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+}
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -227,44 +229,91 @@ function updateSearchDateHidden(containerId, hiddenId) {
         hidden.value = '';
     }
 }
+
+$(function () {
+
+    if ($("#date_from").length) {
+        $("#date_from").persianDatepicker({
+            format: "YYYY/MM/DD",
+            autoClose: true,
+            initialValue: false
+        });
+    }
+
+    if ($("#date_to").length) {
+        $("#date_to").persianDatepicker({
+            format: "YYYY/MM/DD",
+            autoClose: true,
+            initialValue: false
+        });
+    }
+
+    if ($("#add_date").length) {
+        $("#add_date").persianDatepicker({
+            format: "YYYY/MM/DD",
+            autoClose: true,
+            initialValue: true   // فقط این یکی تاریخ امروز
+        });
+    }
+
+    if ($("#edit-date").length) {
+        $("#edit-date").persianDatepicker({
+            format: "YYYY/MM/DD",
+            autoClose: true,
+            initialValue: false
+        });
+    }
+
+    if ($("#quick_date_select").length) {
+
+        $("#quick_date_select").on("change", function () {
+
+            const now = new persianDate();
+
+            switch ($(this).val()) {
+
+                case "today":
+                    $("#date_from").val(now.format("YYYY/MM/DD"));
+                    $("#date_to").val(now.format("YYYY/MM/DD"));
+                    break;
+
+                case "week":
+                    $("#date_from").val(now.clone().startOf("week").format("YYYY/MM/DD"));
+                    $("#date_to").val(now.clone().endOf("week").format("YYYY/MM/DD"));
+                    break;
+
+                case "month":
+                    $("#date_from").val(now.clone().startOf("month").format("YYYY/MM/DD"));
+                    $("#date_to").val(now.clone().endOf("month").format("YYYY/MM/DD"));
+                    break;
+
+                case "year":
+                    $("#date_from").val(now.clone().startOf("year").format("YYYY/MM/DD"));
+                    $("#date_to").val(now.clone().endOf("year").format("YYYY/MM/DD"));
+                    break;
+            }
+
+        });
+
+    }
+
+});
 // ============================================
 //انتخاب سریع و پرکردن فیلد تاریخ
 // ============================================
 
 function setDateRange(fromDate, toDate) {
 
-    // تنظیم "از تاریخ"
-    const fromContainer = document.getElementById('search_date_from_container');
+    document.getElementById("date_from").value =
+        fromDate.year + "/" +
+        String(fromDate.month).padStart(2, "0") + "/" +
+        String(fromDate.day).padStart(2, "0");
 
-    if (fromContainer) {
-        const fromYearSelect = fromContainer.querySelector('.search-date-year');
-        const fromMonthSelect = fromContainer.querySelector('.search-date-month');
-        const fromDaySelect = fromContainer.querySelector('.search-date-day');
+    document.getElementById("date_to").value =
+        toDate.year + "/" +
+        String(toDate.month).padStart(2, "0") + "/" +
+        String(toDate.day).padStart(2, "0");
 
-        if (fromYearSelect && fromMonthSelect && fromDaySelect) {
-            fromYearSelect.value = fromDate.year.toString();
-            fromMonthSelect.value = fromDate.month.toString();
-            fromDaySelect.value = fromDate.day.toString();
-
-            updateSearchDateHidden('search_date_from_container', 'search_date_from');
-        }
-    }
-
-    // تنظیم "تا تاریخ" (همینطور)
-    const toContainer = document.getElementById('search_date_to_container');
-    if (toContainer) {
-        const toYearSelect = toContainer.querySelector('.search-date-year');
-        const toMonthSelect = toContainer.querySelector('.search-date-month');
-        const toDaySelect = toContainer.querySelector('.search-date-day');
-
-        if (toYearSelect && toMonthSelect && toDaySelect) {
-            toYearSelect.value = toDate.year.toString();
-            toMonthSelect.value = toDate.month.toString();
-            toDaySelect.value = toDate.day.toString();
-
-            updateSearchDateHidden('search_date_to_container', 'search_date_to');
-        }
-    }
 }
 
 function initQuickDateSelect() {
@@ -284,29 +333,32 @@ function initQuickDateSelect() {
                 fromDate = toDate = today;
                 break;
 
-            case 'this_week': {
-                const dayOfWeek = now.getDay(); // 0=یکشنبه, 6=شنبه
+            case 'week': {
+                const dayOfWeek = now.getDay();
                 const daysBack = (dayOfWeek === 6) ? 0 : dayOfWeek + 1;
+
                 const saturday = new Date(now);
                 saturday.setDate(now.getDate() - daysBack);
+
                 const friday = new Date(saturday);
                 friday.setDate(saturday.getDate() + 6);
+
                 fromDate = toJalali(saturday);
                 toDate = toJalali(friday);
                 break;
             }
 
-            case 'this_month': {
+            case 'month': {
                 const maxDays = getJalaliMonthDays(today.year, today.month);
                 fromDate = { year: today.year, month: today.month, day: 1 };
-                toDate = { year: today.year, month: today.month, day: maxDays };
+                toDate   = { year: today.year, month: today.month, day: maxDays };
                 break;
             }
 
-            case 'this_year': {
+            case 'year': {
                 const maxDays = getJalaliMonthDays(today.year, 12);
                 fromDate = { year: today.year, month: 1, day: 1 };
-                toDate = { year: today.year, month: 12, day: maxDays };
+                toDate   = { year: today.year, month: 12, day: maxDays };
                 break;
             }
         }

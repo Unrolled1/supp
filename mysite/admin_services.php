@@ -33,6 +33,17 @@ if (!isAdmin() || !canViewServices()) {
 
 $db = getDB();
 
+$isAjax = isset($_POST['ajax']);
+
+$name          = $_POST['name'] ?? '';
+$department    = $_POST['department'] ?? '';
+$brand         = $_POST['brand'] ?? '';
+$receiver      = $_POST['receiver'] ?? '';
+$computer_code = $_POST['computer_code'] ?? '';
+$created_at = $_POST['created_at'] ?? '';
+$date_from     = $_POST['date_from'] ?? '';
+$date_to       = $_POST['date_to'] ?? '';
+
 // گرفتن لیست‌ها برای فرم
 $departments = $db->query("SELECT id, name FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
 $brands = $db->query("SELECT id, name FROM brands ORDER BY name ASC")->fetchAll();
@@ -74,24 +85,19 @@ if (isset($_POST['edit_service']) && canEditServices()) {
     $receiver_person_id = !empty($_POST['receiver_person_id']) ? filter_var($_POST['receiver_person_id'], FILTER_VALIDATE_INT) : null;
     $serial_number = htmlspecialchars(trim($_POST['serial_number']));
     $computer_code = htmlspecialchars(trim($_POST['computer_code']));
+    $created_at = faToEn($_POST['created_at'] ?? '');
     $description = htmlspecialchars(trim($_POST['description']));
 
-    // تاریخ سرویس
-    $service_date = null;
-    if (!empty($_POST['year']) && !empty($_POST['month']) && !empty($_POST['day'])) {
-        $year = (int)$_POST['year'];
-        $month = (int)$_POST['month'];
-        $day = (int)$_POST['day'];
-        $timestamp = jmktime(0, 0, 0, $month, $day, $year);
-        $service_date = date('Y-m-d', $timestamp);
-    }
 
-    $updateStmt = $db->prepare("UPDATE service_requests SET service_name = :service_name, department_id = :department_id, brand_id = :brand_id, receiver_person_id = :receiver_person_id, serial_number = :serial_number, service_date = :service_date, computer_code = :computer_code, description = :description WHERE id = :id");
+    $updateStmt = $db->prepare("UPDATE service_requests SET service_name = :service_name, department_id = :department_id,
+                            brand_id = :brand_id, receiver_person_id = :receiver_person_id, serial_number = :serial_number,
+                             computer_code = :computer_code,created_at = :created_at,
+                            description = :description WHERE id = :id");
     $updateStmt->execute([
         ':service_name' => $service_name, ':department_id' => $department_id,
         ':brand_id' => $brand_id, ':receiver_person_id' => $receiver_person_id,
-        ':serial_number' => $serial_number, ':service_date' => $service_date,
-        ':computer_code' => $computer_code, ':description' => $description, 'id' => $service_id
+        ':serial_number' => $serial_number, ':computer_code' => $computer_code,
+        ':description' => $description, ':id' => $service_id,':created_at'=>$created_at
     ]);
 
     $_SESSION['success_message'] = "✅ سرویس با موفقیت ویرایش شد";
@@ -102,7 +108,6 @@ if (isset($_POST['edit_service']) && canEditServices()) {
 // ============================================
 // پردازش فرم افزودن سرویس جدید
 // ============================================
-
 if (isset($_POST['add_service']) && canEditServices()) {
     $service_name = htmlspecialchars(trim($_POST['service_name']));
     $department_id = !empty($_POST['department_id']) ? filter_var($_POST['department_id'], FILTER_VALIDATE_INT) : null;
@@ -111,28 +116,18 @@ if (isset($_POST['add_service']) && canEditServices()) {
     $serial_number = htmlspecialchars(trim($_POST['serial_number']));
     $computer_code = htmlspecialchars(trim($_POST['computer_code']));
     $description = htmlspecialchars(trim($_POST['description']));
-    $jalaliDate = jdate('Y-m-d');
-
-
-    $service_date = null;
-    if (!empty($_POST['year']) && !empty($_POST['month']) && !empty($_POST['day'])) {
-        $year = (int)$_POST['year'];
-        $month = (int)$_POST['month'];
-        $day = (int)$_POST['day'];
-        $timestamp = jmktime(0, 0, 0, $month, $day, $year);
-        $service_date = date('Y-m-d', $timestamp);
-    }
+    $created_at = faToEn($_POST['created_at'] ?? '');
 
     $insertStmt = $db->prepare("INSERT INTO service_requests 
-    (service_name, department_id, brand_id, receiver_person_id, serial_number, service_date, computer_code, description, created_at, created_by) 
-VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_number, :service_date, :computer_code, :description, :created_at, :created_by)");
+    (service_name, department_id, brand_id, receiver_person_id, serial_number,  computer_code, description, created_at, created_by) 
+VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_number,  :computer_code, :description, :created_at, :created_by)");
 
     if ($insertStmt->execute([
         ':service_name' => $service_name, ':department_id' => $department_id,
         ':brand_id' => $brand_id, ':receiver_person_id' => $receiver_person_id,
-        ':serial_number' => $serial_number, ':service_date' => $service_date,
+        ':serial_number' => $serial_number,
         ':computer_code' => $computer_code, ':description' => $description,
-        ':created_at' => $jalaliDate, ':created_by' => $_SESSION['user_id']
+        ':created_at' => $created_at, ':created_by' => $_SESSION['user_id']
     ])) {
         // دریافت سرویس جدید اضافه شده
         $newId = $db->lastInsertId();
@@ -150,17 +145,6 @@ VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_n
         $stmt->execute([':id' => $newId]);
         $newService = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // اضافه کردن تاریخ شمسی
-        if (!empty($newService['service_date']) && $newService['service_date'] != '0000-00-00') {
-            $parts = explode('-', $newService['service_date']);
-            if (count($parts) == 3) {
-                list($jy, $jm, $jd) = gregorian_to_jalali($parts[0], $parts[1], $parts[2]);
-                $newService['service_date_jalali'] = sprintf("%04d-%02d-%02d", $jy, $jm, $jd);
-                $newService['service_date_year'] = $jy;
-                $newService['service_date_month'] = $jm;
-                $newService['service_date_day'] = $jd;
-            }
-        }
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             ob_clean();
@@ -177,40 +161,132 @@ VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_n
 // ============================================
 // گرفتن لیست سرویس‌ها
 // ============================================
-
-$services = $db->query("
-    SELECT s.*, 
-           d.name as department_name, 
-           b.name as brand_name, 
-           p.name as receiver_name,
-           u.username as creator_name
-    FROM service_requests s
-    LEFT JOIN departments d ON s.department_id = d.id
-    LEFT JOIN brands b ON s.brand_id = b.id
-    LEFT JOIN persons p ON s.receiver_person_id = p.id
-    LEFT JOIN users u ON s.created_by = u.id
-    ORDER BY s.id DESC
-")->fetchAll();
-
-
-// اضافه کردن تاریخ شمسی برای نمایش
-foreach ($services as $key => $service) {
-    if (!empty($service['service_date']) && $service['service_date'] != '0000-00-00') {
-        $parts = explode('-', $service['service_date']);
-        if (count($parts) == 3) {
-            list($jy, $jm, $jd) = gregorian_to_jalali($parts[0], $parts[1], $parts[2]);
-            $services[$key]['service_date_jalali'] = sprintf("%04d-%02d-%02d", $jy, $jm, $jd);
-            $services[$key]['service_date_year'] = $jy;
-            $services[$key]['service_date_month'] = $jm;
-            $services[$key]['service_date_day'] = $jd;
-        }
-    } else {
-        $services[$key]['service_date_jalali'] = '-';
-        $services[$key]['service_date_year'] = '';
-        $services[$key]['service_date_month'] = '';
-        $services[$key]['service_date_day'] = '';
-    }
+$where = [];
+$params = [];
+if ($name != '') {
+    $where[] = "s.service_name = :name";
+    $params[':name'] = $name;
 }
+if ($department != '') {
+    $where[] = "s.department_id = :department";
+    $params[':department'] = $department;
+}
+if ($brand != '') {
+    $where[] = "s.brand_id = :brand";
+    $params[':brand'] = $brand;
+}
+if ($receiver != '') {
+    $where[] = "s.receiver_person_id = :receiver";
+    $params[':receiver'] = $receiver;
+}
+if ($computer_code != '') {
+    $where[] = "s.computer_code LIKE :computer";
+    $params[':computer'] = "%{$computer_code}%";
+}
+if ($date_from != '') {
+    $where[] = "s.created_at >= :from";
+    $params[':from'] = $date_from;
+}
+
+if ($date_to != '') {
+    $where[] = "s.created_at <= :to";
+    $params[':to'] = $date_to;
+}
+
+$sql = "
+
+SELECT
+    s.*,
+    d.name as department_name,
+    b.name as brand_name,
+    p.name as receiver_name,
+    u.username as creator_name
+FROM service_requests s
+LEFT JOIN departments d ON s.department_id=d.id
+LEFT JOIN brands b ON s.brand_id=b.id
+LEFT JOIN persons p ON s.receiver_person_id=p.id
+LEFT JOIN users u ON s.created_by=u.id
+";
+if($where){
+    $sql .= " WHERE ".implode(" AND ",$where);
+}
+$sql .= " ORDER BY s.id DESC";
+
+$stmt=$db->prepare($sql);
+$stmt->execute($params);
+$services=$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+if ($isAjax) {
+
+    ob_start();
+    ?>
+
+    <?php if(empty($services)): ?>
+
+        <tr>
+            <td colspan="11">موردی یافت نشد</td>
+        </tr>
+
+    <?php else: ?>
+
+        <?php $row_num=1; foreach($services as $service): ?>
+
+            <tr>
+
+            <tr>
+                <td><?php echo fa_number($row_num); ?></td>
+                <td><?php echo htmlspecialchars($service['service_name']); ?></td>
+                <td><?php echo htmlspecialchars($service['department_name'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($service['brand_name'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($service['receiver_name'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($service['serial_number'] ?? '-'); ?></td>
+                <td><?php echo htmlspecialchars($service['computer_code'] ?? '-'); ?></td>
+                <td><?php echo nl2br(htmlspecialchars($service['description'] ?? '-')); ?></td>
+                <td class="date"><?php echo fa_number($service['created_at']); ?></td>
+
+
+                <td>
+                    <?php if (canEditServices()): ?>
+                        <button class="edit-btn"
+                                onclick='openEditModal(<?php echo json_encode($service); ?>)'>
+                            ✏️ویرایش
+                        </button>
+                    <?php endif; ?>
+
+                    <?php if (canDeleteServices()): ?>
+                        <button
+                                class="delete-btn"
+                                data-id="<?php echo $service['id']; ?>"
+                                onclick="confirmDelete(
+                                <?php echo $service['id']; ?>,
+                                        '<?php echo htmlspecialchars($service['service_name']); ?>'
+                                        )">
+                            🗑️حذف
+                        </button>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+            </tr>
+
+            <?php $row_num++; endforeach; ?>
+
+    <?php endif; ?>
+
+    <?php
+    $table = ob_get_clean();
+
+    header('Content-Type: application/json; charset=utf-8');
+
+    echo json_encode([
+        'success' => true,
+        'table' => $table
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -219,6 +295,12 @@ foreach ($services as $key => $service) {
     <meta charset="UTF-8">
     <title>ثبت فعالیت</title>
     <?php load_assets(); ?>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/persian-date.min.js"></script>
+    <link rel="stylesheet" href="assets/styles/persian-datepicker.min.css">
+    <script src="assets/js/persian-datepicker.min.js"></script>
+    <script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
+    <script src="assets/js/admin-services.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
 <div class="admin-wrapper">
@@ -251,7 +333,7 @@ foreach ($services as $key => $service) {
         <?php if (canEditServices()): ?>
             <div class="add-card">
                 <h2>➕ ثبت فعالیت جدید</h2>
-                <form method="post" class="services-form" >
+                <form method="post" class="services-form" id="addForm" >
                     <div class="form-row">
                         <div class="form-group">
                             <label>فعالیت *</label>
@@ -305,9 +387,9 @@ foreach ($services as $key => $service) {
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
+                        <div class="date-group">
                             <label>تاریخ </label>
-                            <div id="service_date_container"></div>
+                            <input type="text" id="add_date" name="created_at" class="form-control" >
                         </div>
                     </div>
                     <div class="form-row">
@@ -357,7 +439,7 @@ foreach ($services as $key => $service) {
                     </div>
                     <div class="receiver-group">
                         <label>تحویل گیرنده</label>
-                        <select name="receiver_person_id" id="edit_receiver_person_id">
+                        <select id="search_receiver" name="receiver_person_id">
                             <option value="">-- انتخاب --</option>
                             <?php foreach ($persons as $person): ?>
                                 <option value="<?php echo $person['id']; ?>"><?php echo htmlspecialchars($person['name']); ?></option>
@@ -376,20 +458,19 @@ foreach ($services as $key => $service) {
                         <select id="quick_date_select">
                             <option value="">-- انتخاب کنید --</option>
                             <option value="today">📅 روز جاری</option>
-                            <option value="this_week">📅 هفته جاری</option>
-                            <option value="this_month">📅 ماه جاری</option>
-                            <option value="this_year">📅 سال جاری</option>
+                            <option value="week">📅 هفته جاری</option>
+                            <option value="month">📅 ماه جاری</option>
+                            <option value="year">📅 سال جاری</option>
                         </select>
                     </div>
                     <div class="search-group">
                         <label>از تاریخ </label>
-                        <div id="search_date_from_container"></div>
-                        <input type="hidden" id="search_date_from" value="<?php echo htmlspecialchars($_GET['date_from'] ?? ''); ?>">
+                        <input type="text" id="date_from" name="date_from" class="form-control" placeholder="انتخاب کنید">
+
                     </div>
                     <div class="search-group">
                         <label>تا تاریخ </label>
-                        <div id="search_date_to_container"></div>
-                        <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_GET['date_to'] ?? ''); ?>">
+                        <input type="text" id="date_to" name="date_to" class="form-control" placeholder="انتخاب کنید" >
                     </div>
 
                 </div>
@@ -411,7 +492,6 @@ foreach ($services as $key => $service) {
                     <th>برند</th>
                     <th>تحویل گیرنده</th>
                     <th>سریال</th>
-                    <th>تاریخ فعالیت</th>
                     <th>کد رایانه</th>
                     <th>توضیحات</th>
                     <th>تاریخ ثبت</th>
@@ -430,12 +510,7 @@ foreach ($services as $key => $service) {
                             <td><?php echo htmlspecialchars($service['brand_name'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($service['receiver_name'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($service['serial_number'] ?? '-'); ?></td>
-                            <td class="date">
-                                <?php
-                                $date = $service['service_date_jalali'] ?? $service['service_date'] ?? '-';
-                                echo fa_number($date);
-                                ?>
-                            </td>
+
                             <td><?php echo htmlspecialchars($service['computer_code'] ?? '-'); ?></td>
                             <td><?php echo nl2br(htmlspecialchars($service['description'] ?? '-')); ?></td>
 
@@ -524,9 +599,9 @@ foreach ($services as $key => $service) {
             </div>
 
             <div class="form-row">
-                <div class="form-group-group">
+                <div class="form-group">
                     <label>تاریخ </label>
-                    <div id="edit_date_container"></div>
+                        <input type="text" id="edit-date" name="created_at" class="form-control" placeholder="انتخاب کنید" >
                 </div>
             </div>
             <div class="form-row">
@@ -543,9 +618,5 @@ foreach ($services as $key => $service) {
         </form>
     </div>
 </div>
-
-<script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
-<script src="assets/js/admin-services.js?v=<?php echo time(); ?>"></script>
-
 </body>
 </html>

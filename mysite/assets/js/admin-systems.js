@@ -134,23 +134,15 @@ function removeDynamicRow(button, rowClass, containerId, itemName) {
         return;
     }
 
+    row.remove();
+    updateRowNumbers(rowClass);
+
     Swal.fire({
-        title: "آیا مطمئن هستید؟",
-        text: `این ${itemName} حذف خواهد شد!`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#dc3545",
-        cancelButtonColor: "#6c757d",
-        confirmButtonText: "بله",
-        cancelButtonText: "لغو"
-    }).then(result => {
-
-        if (result.isConfirmed) {
-            row.remove();
-
-            updateRowNumbers(rowClass);
-        }
-
+        title: "حذف شد!",
+        text: `${itemName} با موفقیت حذف شد.`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1000
     });
 
 }

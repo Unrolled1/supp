@@ -67,7 +67,7 @@ body {
 }
 
 
-.add-card .btn-add {
+.add-card .btn-add,.btn-pdf {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
     border: none;
@@ -81,7 +81,8 @@ body {
     padding: 10px 20px;
 }
 
-.add-card .btn-add:hover {
+
+.add-card .btn-add:hover,.btn-pdf:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 25px rgba(72, 187, 120, 0.4);
 }
@@ -211,11 +212,10 @@ input:focus, select:focus, textarea:focus {
    هدر مشترک (در همه صفحات)
    ============================================ */
 .header {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     color: white;
     border-radius: 16px;
-    padding: 1rem 2rem;
-    margin-bottom: 2rem;
+    /* padding: 1rem 2rem;*/
+     /*margin-bottom: 2rem;*/
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -273,7 +273,7 @@ input:focus, select:focus, textarea:focus {
    کارت‌ها
    ============================================ */
 
-.add-card {
+.add-card, .filter-card {
     background: #2d3748;
     border-radius: 16px;
     padding: 25px 30px;
@@ -283,14 +283,14 @@ input:focus, select:focus, textarea:focus {
     transition: all 0.3s ease;
 }
 
-.add-card h2 {
+.add-card,.filter-card h2 {
     color: #f7fafc;
     font-size: 20px;
     margin: 0 0 20px 0;
     border-right: 4px solid #667eea;
 }
 
-.add-card label {
+.add-card,.filter-card label {
     display: block;
     font-weight: 500;
     font-size: 14px;
@@ -298,9 +298,7 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 5px;
 }
 
-.add-card input,
-.add-card select,
-.add-card textarea {
+:is(.add-card, .filter-card) :is(input, select, textarea) {
     width: 100%;
     padding: 10px 14px;
     border: 2px solid #4a5568;
@@ -313,24 +311,25 @@ input:focus, select:focus, textarea:focus {
 }
 .add-card input:focus,
 .add-card select:focus,
-.add-card textarea:focus {
+.add-card textarea:focus,
+.filter-card input:focus,
+.filter-card select:focus,
+.filter-card textarea:focus {
     border-color: #667eea;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 0 3px rgba(102,126,234,.2);
     background: #1a202c;
 }
 
-.add-card select option {
+.add-card select option,
+.filter-card select option {
     background: #2d3748;
     color: #e2e8f0;
 }
 
-.add-card textarea {
-    resize: vertical;
-    min-height: 80px;
-}
 
-.add-card .form-row {
+.add-card .form-row,
+.filter-card .form-row {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
@@ -338,12 +337,14 @@ input:focus, select:focus, textarea:focus {
     align-items: flex-end;
 }
 
-.add-card .form-row .form-group {
+.add-card .form-row .form-group,
+.filter-card .form-row .form-group {
     flex: 1;
     min-width: 180px;
 }
 
-.add-card .form-row .full-width {
+.add-card .form-row .full-width,
+.filter-card .form-row .full-width {
     flex: 0 0 100%;
     width: 100%;
 }
@@ -425,7 +426,7 @@ input:focus, select:focus, textarea:focus {
     flex-wrap: wrap;
 }
 
-.search-card .btn-search {
+.search-card .btn-search,.btn-filter {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -439,12 +440,13 @@ input:focus, select:focus, textarea:focus {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.search-card .btn-search:hover {
+.search-card .btn-search:hover,
+.btn-filter:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
 }
 
-.search-card .btn-reset-search {
+.search-card .btn-reset-search,.btn-reset{
     background: #4a5568;
     color: white;
     border: none;
@@ -457,55 +459,10 @@ input:focus, select:focus, textarea:focus {
     transition: 0.3s;
 }
 
-.search-card .btn-reset-search:hover {
+.search-card .btn-reset-search:hover,.btn-reset:hover {
     background: #5a6a7e;
     transform: translateY(-2px);
 }
-
-/* ============================================
-   ریسپانسیو
-   ============================================ */
-
-@media (max-width: 768px) {
-    .add-card {
-        padding: 15px;
-    }
-
-    .add-card .form-row {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .add-card .form-row .form-group {
-        min-width: unset;
-        width: 100%;
-    }
-
-    .search-card {
-        padding: 15px;
-    }
-
-    .search-card .search-row {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .search-card .search-row .form-group {
-        min-width: unset;
-        width: 100%;
-    }
-
-    .search-card .search-actions {
-        flex-direction: column;
-    }
-
-    .search-card .search-actions button {
-        width: 100%;
-    }
-}
-
-
-
 
 /* ============================================
    جدول‌ها (یکسان برای همه)
@@ -528,7 +485,6 @@ input:focus, select:focus, textarea:focus {
     color: #cbd5e0;
     padding: 15px;
     text-align: center;
-    font-weight: 600;
     font-size: 14px;
     border-bottom: 2px solid #4a5568;
 }
@@ -573,6 +529,10 @@ input:focus, select:focus, textarea:focus {
     border-color: #4f46e5;
 }
 
+.date-group {
+    width: 200px;
+    direction: ltr;
+}
 /* ============================================
    هدر در محتوای اصلی (سایدبار)
    ============================================ */
@@ -923,7 +883,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .modal-content .form-row .form-group {
-    flex: 1;
+
     min-width: 150px;
 }
 
@@ -952,65 +912,6 @@ input:focus, select:focus, textarea:focus {
     width: 100%;
 }
 
-/* ============================================
-   ریسپانسیو مودال
-   ============================================ */
-
-@media (max-width: 768px) {
-    .modal-content {
-        padding: 20px;
-        max-width: 98%;
-    }
-
-    .modal-content h3 {
-        font-size: 18px;
-    }
-
-    .modal-content .form-row {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .modal-content .form-row .form-group {
-        min-width: unset;
-        width: 100%;
-    }
-
-    .modal-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .modal-buttons .btn-add,
-    .modal-buttons .btn-cancel {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-content {
-        padding: 15px;
-    }
-
-    .modal-content h3 {
-        font-size: 16px;
-        padding-right: 10px;
-    }
-
-    .modal-content input,
-    .modal-content select,
-    .modal-content textarea {
-        font-size: 13px;
-        padding: 8px 12px;
-    }
-
-    .modal-buttons .btn-add,
-    .modal-buttons .btn-cancel {
-        font-size: 13px;
-        padding: 8px 20px;
-    }
-}
 /* ============================================
    استایل مودال ویرایش کاربر
    ============================================ */
@@ -1154,4 +1055,26 @@ input:focus, select:focus, textarea:focus {
 .search-date-group select option {
     direction: rtl !important;
     text-align: right !important;
+}
+
+/* ============================================
+   کارت‌های آمار
+   ============================================ */
+
+.stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.stat-box {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 15px;
+    text-align: center;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
 }
