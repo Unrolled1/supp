@@ -19,71 +19,72 @@ function amountFormat(inputId) {
 }
 
 //جستجو
-function initSearch() {
-    const urlParams = new URLSearchParams(window.location.search);
+// ============================================
+// جستجوی فاکتورها
+// ============================================
 
-    // مقداردهی فیلدهای متنی
-    const searchCompany = document.getElementById('search_company_name');
-    const searchInvoice = document.getElementById('search_invoice_number');
-    const searchSubject = document.getElementById('search_subject');
+function searchInvoices() {
 
-    if (searchCompany && urlParams.has('company_name')) searchCompany.value = urlParams.get('company_name');
-    if (searchInvoice && urlParams.has('invoice_number')) searchInvoice.value = urlParams.get('invoice_number');
-    if (searchSubject && urlParams.has('subject')) searchSubject.value = urlParams.get('subject');
+    const formData = new FormData();
 
-    // مقداردهی سلکت‌های تاریخ
-    renderSearchDateSelects('search_date_from_container', 'search_date_from', urlParams.get('date_from') || '');
-    renderSearchDateSelects('search_date_to_container', 'search_date_to', urlParams.get('date_to') || '');
+    formData.append("ajax", "1");
 
-    // دکمه جستجو
-    const searchBtn = document.getElementById('search_btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const params = new URLSearchParams();
-            const companyName = document.getElementById('search_company_name')?.value;
-            const invoiceNumber = document.getElementById('search_invoice_number')?.value;
-            const subject = document.getElementById('search_subject')?.value;
-            const dateFrom = document.getElementById('search_date_from')?.value;
-            const dateTo = document.getElementById('search_date_to')?.value;
+    formData.append("company_name", document.getElementById("search_company_name").value);
+    formData.append("invoice_number", document.getElementById("search_invoice_number").value);
+    formData.append("subject", document.getElementById("search_subject").value);
+    formData.append("date_from", document.getElementById("date_from").value);
+    formData.append("date_to", document.getElementById("date_to").value);
 
-            if (companyName) params.set('company_name', companyName);
-            if (invoiceNumber) params.set('invoice_number', invoiceNumber);
-            if (subject) params.set('subject', subject);
-            if (dateFrom) params.set('date_from', dateFrom);
-            if (dateTo) params.set('date_to', dateTo);
+    fetch(window.location.href, {
+        method: "POST",
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
 
-            window.location.href = 'admin_invoices.php?' + params.toString();
+            if (!data.success) {
+                alert(data.message || "خطا");
+                return;
+            }
+
+            document.querySelector(".invoice-table tbody").innerHTML = data.table;
+
+        })
+        .catch(error => {
+            console.error(error);
         });
-    }
 
-    // دکمه reset
-    const resetBtn = document.getElementById('reset_btn');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            window.location.href = 'admin_invoices.php';
-        });
-    }
+}
+
+function resetInvoiceSearch() {
+
+    document.getElementById("search_company_name").value = "";
+    document.getElementById("search_invoice_number").value = "";
+    document.getElementById("search_subject").value = "";
+    document.getElementById("date_from").value = "";
+    document.getElementById("date_to").value = "";
+    document.getElementById("quick_date_select").value = "";
+
+    searchInvoices();
+
 }
 
 //ویرایش
 function openEditModal(invoice) {
+    try {
     document.getElementById('edit_invoice_id').value = invoice.id;
     document.getElementById('edit_company_name').value = invoice.company_name;
     document.getElementById('edit_invoice_number').value = invoice.invoice_number;
     document.getElementById('edit_subject').value = invoice.subject || '';
     document.getElementById('edit_amount').value =  Number(invoice.amount).toLocaleString('en-US');
     document.getElementById('edit_description').value = invoice.description || '';
-
-    const year = invoice.invoice_date_year || '';
-    const month = invoice.invoice_date_month || '';
-    const day = invoice.invoice_date_day || '';
-
-    const dateContainer = document.getElementById('edit_date_container');
-    if (dateContainer) {
-        dateContainer.innerHTML = renderDateSelectsForEdit(year, month, day);
-    }
+    document.getElementById('edit_date').value = fa_number(invoice.created_at || '');
 
     document.getElementById('editModal').style.display = 'flex';
+} catch(e){
+    console.error('Error in openEditModal:', e);
+    alert('خطا در باز کردن فرم ویرایش: ' + e.message);
+}
 }
 
 //حذف
@@ -148,9 +149,8 @@ function updateRowNumbers() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const today=toJalali(new Date());
-    renderDateSelects('invoice_date_container',today.year,today.month,today.day);
-    initSearch();
+    document.getElementById("search_btn").addEventListener("click", searchInvoices);
+    document.getElementById("reset_btn").addEventListener("click", resetInvoiceSearch);
     initQuickDateSelect();
     amountFormat('amount');
     amountFormat('edit_amount');

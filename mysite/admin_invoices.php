@@ -107,29 +107,20 @@ if (isset($_POST['add_invoice']) && canEditInvoices()) {
     $amount = str_replace(',', '', $_POST['amount']);
     $amount = (int)$amount;
     $description = htmlspecialchars(trim($_POST['description']));
-    $jalaliDate = jdate('Y-m-d');
+    $created_at = faToEn($_POST['created_at'] ?? '');
 
-    // تاریخ فاکتور
-    $invoice_date = null;
-    if (!empty($_POST['year']) && !empty($_POST['month']) && !empty($_POST['day'])) {
-        $year = (int)$_POST['year'];
-        $month = (int)$_POST['month'];
-        $day = (int)$_POST['day'];
-        $timestamp = jmktime(0, 0, 0, $month, $day, $year);
-        $invoice_date = date('Y-m-d', $timestamp);
-    }
 
-    $insertStmt = $db->prepare("INSERT INTO invoices (company_name, invoice_number, subject, amount, invoice_date, description, created_at, created_by) 
-VALUES (:company_name, :invoice_number, :subject, :amount, :invoice_date, :description, :created_at, :created_by)");
+
+    $insertStmt = $db->prepare("INSERT INTO invoices (company_name, invoice_number, subject, amount,  description, created_at, created_by) 
+VALUES (:company_name, :invoice_number, :subject, :amount,  :description, :created_at, :created_by)");
 
     if ($insertStmt->execute([
         ':company_name' => $company_name,
         ':invoice_number' => $invoice_number,
         ':subject' => $subject,
         ':amount' => $amount,
-        ':invoice_date' => $invoice_date,
         ':description' => $description,
-        ':created_at' => $jalaliDate,
+        ':created_at' => $created_at,
         ':created_by' => $_SESSION['user_id']
     ])) {
         $_SESSION['success_message'] = "✅ فاکتور با موفقیت اضافه شد";
@@ -140,6 +131,12 @@ VALUES (:company_name, :invoice_number, :subject, :amount, :invoice_date, :descr
     header('Location: admin_invoices.php');
     exit;
 }
+$isAjax         = isset($_POST['ajax']);
+$company_name   = $_POST['company_name'] ?? '';
+$invoice_number = $_POST['invoice_number'] ?? '';
+$subject        = $_POST['subject'] ?? '';
+$date_from      = $_POST['date_from'] ?? '';
+$date_to        = $_POST['date_to'] ?? '';
 
 // ============================================
 // گرفتن لیست فاکتورها با فیلتر
@@ -160,41 +157,82 @@ if (isset($_GET['subject']) && !empty($_GET['subject'])) {
     $where[] = "subject LIKE :subject";
     $params[':subject'] = '%' . $_GET['subject'] . '%';
 }
-if (isset($_GET['date_from']) && !empty($_GET['date_from'])) {
-    $where[] = "invoice_date >= :date_from";
-    $params[':date_from'] = $_GET['date_from'];
-}
-if (isset($_GET['date_to']) && !empty($_GET['date_to'])) {
-    $where[] = "invoice_date <= :date_to";
-    $params[':date_to'] = $_GET['date_to'];
+if ($date_from != '') {
+    $where[] = "i.created_at >= :from";
+    $params[':from'] = $date_from;
 }
 
-$whereClause = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
+if ($date_to != '') {
+    $where[] = "i.created_at <= :to";
+    $params[':to'] = $date_to;
+}
 
-$invoices = $db->prepare("
-    SELECT i.*, u.fullname as creator_name 
-    FROM invoices i
-    LEFT JOIN users u ON i.created_by = u.id
-    $whereClause
-    ORDER BY i.id DESC
-");
-$invoices->execute($params);
-$invoices = $invoices->fetchAll();
+$sql = "
+SELECT
+    i.*,
+    u.username AS creator_name
+FROM invoices i
+LEFT JOIN users u ON i.created_by = u.id
+";
 
-// اضافه کردن تاریخ شمسی برای نمایش
-foreach ($invoices as $key => $invoice) {
-    if (!empty($invoice['invoice_date']) && $invoice['invoice_date'] != '0000-00-00') {
-        $parts = explode('-', $invoice['invoice_date']);
-        if (count($parts) == 3) {
-            list($jy, $jm, $jd) = gregorian_to_jalali($parts[0], $parts[1], $parts[2]);
-            $invoices[$key]['invoice_date_jalali'] = sprintf("%04d-%02d-%02d", $jy, $jm, $jd);
-            $invoices[$key]['invoice_date_year'] = $jy;
-            $invoices[$key]['invoice_date_month'] = $jm;
-            $invoices[$key]['invoice_date_day'] = $jd;
-        }
-    } else {
-        $invoices[$key]['invoice_date_jalali'] = '-';
-    }
+if ($where) {
+    $sql .= " WHERE " . implode(" AND ", $where);
+}
+
+$sql .= " ORDER BY i.id DESC";
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
+
+$invoices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+if ($isAjax) {
+
+ob_start();
+?>
+<?php if(empty($invoices)): ?>
+
+    <tr>
+        <td colspan="8">موردی یافت نشد</td>
+    </tr>
+
+<?php else: ?>
+
+    <?php $row_num=1; foreach($invoices as $invoice): ?>
+
+        <tr id="invoice_<?php echo $invoice['id']; ?>">
+            <td><?php echo fa_number($row_num); ?></td>
+            <td><?php echo htmlspecialchars($invoice['company_name']); ?></td>
+            <td><?php echo htmlspecialchars($invoice['invoice_number']); ?></td>
+            <td><?php echo htmlspecialchars($invoice['subject'] ?? '-'); ?></td>
+            <td><?php echo fa_number(number_format($invoice['amount'], 0)) . ' ریال'; ?></td>
+            <td class="description-cell"><?php echo nl2br(htmlspecialchars($invoice['description'] ?? '-')); ?></td>
+            <td class="date"><?php echo fa_number(htmlspecialchars($invoice['created_at'])); ?></td>
+            <td><?php echo htmlspecialchars($invoice['creator_name'] ?? '-'); ?></td>
+            <td class="action-buttons">
+                <?php if (canEditInvoices()): ?>
+                    <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($invoice); ?>)'>✏️ویرایش</button>
+                <?php endif; ?>
+                <?php if (canDeleteInvoices()): ?>
+                    <button class="delete-btn" onclick="confirmDelete(<?php echo $invoice['id']; ?>, '<?php echo htmlspecialchars($invoice['company_name']); ?>')">🗑️حذف</button>
+                <?php endif; ?>
+            </td>
+        </tr>
+
+    <?php $row_num++; endforeach; ?>
+
+<?php endif; ?>
+    <?php
+    $table = ob_get_clean();
+
+    header('Content-Type: application/json; charset=utf-8');
+
+    echo json_encode([
+        'success' => true,
+        'table' => $table
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
 }
 ?>
 
@@ -322,9 +360,9 @@ foreach ($invoices as $key => $invoice) {
                         <select id="quick_date_select">
                             <option value="">-- انتخاب کنید --</option>
                             <option value="today">📅 روز جاری</option>
-                            <option value="this_week">📅 هفته جاری</option>
-                            <option value="this_month">📅 ماه جاری</option>
-                            <option value="this_year">📅 سال جاری</option>
+                            <option value="week">📅 هفته جاری</option>
+                            <option value="month">📅 ماه جاری</option>
+                            <option value="year">📅 سال جاری</option>
                         </select>
                     </div>
                     <div class="search-group">
@@ -374,7 +412,6 @@ foreach ($invoices as $key => $invoice) {
                             <td><?php echo htmlspecialchars($invoice['invoice_number']); ?></td>
                             <td><?php echo htmlspecialchars($invoice['subject'] ?? '-'); ?></td>
                             <td><?php echo fa_number(number_format($invoice['amount'], 0)) . ' ریال'; ?></td>
-                            <td class="date"><?php echo fa_number($invoice['invoice_date_jalali'] ?? $invoice['invoice_date'] ?? '-'); ?></td>
                             <td class="description-cell"><?php echo nl2br(htmlspecialchars($invoice['description'] ?? '-')); ?></td>
                             <td class="date"><?php echo fa_number(htmlspecialchars($invoice['created_at'])); ?></td>
                             <td><?php echo htmlspecialchars($invoice['creator_name'] ?? '-'); ?></td>
@@ -436,7 +473,7 @@ foreach ($invoices as $key => $invoice) {
             <div class="form-row">
                 <div class="form-group">
                     <label>تاریخ فاکتور</label>
-                    <input type="text" id="add_date" name="created_at" class="form-control" placeholder="انتخاب کنید">
+                    <input type="text" id="edit_date" name="created_at" class="form-control" placeholder="انتخاب کنید">
                 </div>
             </div>
             <div class="form-row">

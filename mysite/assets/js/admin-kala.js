@@ -3,147 +3,77 @@
 // ============================================
 
 // ============================================
-// رندر سلکت‌های تاریخ برای مودال ویرایش
-// ============================================
-function renderDateSelectsForEdit(year, month, day) {
-    const currentYear = 1405;
-    const y = year || currentYear;
-    const m = month || 1;
-    const d = day || 1;
-    const maxDays = getJalaliMonthDays(parseInt(y), parseInt(m));
-
-    let html = '<div class="date-select-group">';
-
-    // سال
-    html += '<select class="edit-date-year date-select" name="edit_year">';
-    for (let i = 1390; i <= 1410; i++) {
-        const selected = (i == y) ? 'selected' : '';
-        html += `<option value="${i}" ${selected}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '<span class="date-separator">/</span>';
-
-    // ماه
-    html += '<select class="edit-date-month date-select" name="edit_month">';
-    for (let i = 1; i <= 12; i++) {
-        const selected = (i == m) ? 'selected' : '';
-        html += `<option value="${i}" ${selected}>${getMonthName(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '<span class="date-separator">/</span>';
-
-    // روز
-    html += '<select class="edit-date-day date-select" name="edit_day">';
-    for (let i = 1; i <= maxDays; i++) {
-        const selected = (i == d) ? 'selected' : '';
-        html += `<option value="${i}" ${selected}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-    html += '</div>';
-    return html;
-}
-
-// ============================================
-// جستجو
+// جستجوی کالا
 // ============================================
 
-function initSearch() {
-    const searchBtn = document.getElementById('search_btn');
-    const resetBtn = document.getElementById('reset_btn');
+function searchKala() {
 
-    const urlParams = new URLSearchParams(window.location.search);
+    const formData = new FormData();
 
-    // مقداردهی سلکت‌های تاریخ
-    const dateFrom = urlParams.get('date_from') || '';
-    const dateTo = urlParams.get('date_to') || '';
+    formData.append("ajax", "1");
 
-    renderSearchDateSelects('search_date_from_container', 'search_date_from', dateFrom);
-    renderSearchDateSelects('search_date_to_container', 'search_date_to', dateTo);
-    // پر کردن فیلدهای جستجو از URL
-    const fields = {
-        'search_name': 'name',
-        'search_computer_code': 'computer_code',
-        'search_property_code': 'property_code',
-        'search_department': 'department',
-        'search_brand': 'brand'
-    };
-    for (const [id, param] of Object.entries(fields)) {
-        const el = document.getElementById(id);
-        if (el && urlParams.has(param)) {
-            el.value = urlParams.get(param);
-        }
-    }
+    formData.append("name", document.getElementById("search_name").value);
+    formData.append("computer_code", document.getElementById("search_computer_code").value);
+    formData.append("property_code", document.getElementById("search_property_code").value);
+    formData.append("department", document.getElementById("search_department").value);
+    formData.append("brand", document.getElementById("search_brand").value);
+    formData.append("date_from", faToEn(document.getElementById("date_from").value));
+    formData.append("date_to", faToEn(document.getElementById("date_to").value));
 
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
-            const params = new URLSearchParams();
+    fetch(window.location.href, {
+        method: "POST",
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
 
-            // فیلدهای متنی
-            const fields = {
-                'search_name': 'name',
-                'search_computer_code': 'computer_code',
-                'search_property_code': 'property_code',
-                'search_department': 'department',
-                'search_brand': 'brand'
-            };
-
-            for (const [id, param] of Object.entries(fields)) {
-                const el = document.getElementById(id);
-                if (el && el.value) {
-                    params.set(param, el.value);
-                }
+            if (!data.success) {
+                alert(data.message || "خطا");
+                return;
             }
-            // تاریخ‌ها
-            const dateFrom = document.getElementById('search_date_from')?.value;
-            const dateTo = document.getElementById('search_date_to')?.value;
-            if (dateFrom) params.set('date_from', dateFrom);
-            if (dateTo) params.set('date_to', dateTo);
 
-            window.location.href = 'admin_kala.php?' + params.toString();
-        });
-    }
+            document.querySelector(".kala-table tbody").innerHTML = data.table;
 
-    if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            window.location.href = 'admin_kala.php';
+        })
+        .catch(error => {
+            console.error(error);
         });
-    }
+
 }
 
+
+function resetKalaSearch() {
+
+    document.getElementById("search_name").value = "";
+    document.getElementById("search_computer_code").value = "";
+    document.getElementById("search_property_code").value = "";
+    document.getElementById("search_department").value = "";
+    document.getElementById("search_brand").value = "";
+    document.getElementById("date_from").value = "";
+    document.getElementById("date_to").value = "";
+    document.getElementById("quick_date_select").value = "";
+
+    searchKala();
+
+}
 // ============================================
 // ویرایش
 // ============================================
-function openEditModal(kala) {
-    document.getElementById('edit_kala_id').value = kala.id;
-    document.getElementById('edit_name').value = kala.name;
-    document.getElementById('edit_computer_code').value = kala.computer_code || '';
-    document.getElementById('edit_property_code').value = kala.property_code || '';
-    document.getElementById('edit_department_id').value = kala.department_id || '';
-    document.getElementById('edit_brand_id').value = kala.brand_id || '';
-    document.getElementById('edit_quantity').value = kala.quantity || 1;
-    document.getElementById('edit_serial_number').value = kala.serial_number || '';
-    document.getElementById('edit_receiver_person_id').value = kala.receiver_person_id || '';
+function openEditModal(item) {
 
-    // تاریخ ثبت
-    let year = '', month = '', day = '';
-    if (kala.created_at) {
-        const parts = kala.created_at.split('-');
-        if (parts.length === 3) {
-            year = parts[0];
-            month = parseInt(parts[1]);
-            day = parseInt(parts[2]);
-        }
-    }
+    document.getElementById("edit_id").value = item.id;
+    document.getElementById("edit_computer_code").value = item.computer_code || "";
+    document.getElementById("edit_property_code").value = item.property_code || "";
+    document.getElementById("edit_name").value = item.name || "";
+    document.getElementById("edit_department_id").value = String(item.department_id || "");
+    document.getElementById("edit_brand_id").value = String(item.brand_id || "");
+    document.getElementById("edit_receiver_person_id").value = String(item.receiver_person_id || "");
+    document.getElementById("edit_quantity").value = item.quantity || "";
+    document.getElementById("edit_serial_number").value = item.serial_number || "";
+    document.getElementById("edit_date").value = fa_number(item.created_at || "");
+    document.getElementById("edit_description").value = item.description || "";
 
-    const dateContainer = document.getElementById('edit_date_container');
-    if (dateContainer) {
-        dateContainer.innerHTML = renderDateSelectsForEdit(year, month, day);
-    }
-
-    document.getElementById('editModal').style.display = 'flex';
+    document.getElementById("editModal").style.display = "flex";
 }
 
 // ============================================
@@ -151,20 +81,10 @@ function openEditModal(kala) {
 // ============================================
 function confirmDelete(id, name) {
     Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'کالا "' + name + '" حذف خواهد شد!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'بله، حذف شود',
-        cancelButtonText: 'لغو',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch('admin_kala.php', {
-                method: 'POST',
-                headers: {
+        title: 'آیا مطمئن هستید؟', text: 'کالا "' + name + '" حذف خواهد شد!', icon: 'warning', showCancelButton: true,
+        confirmButtonColor: '#dc3545', cancelButtonColor: '#6c757d', confirmButtonText: 'بله، حذف شود',
+        cancelButtonText: 'لغو', reverseButtons: true}).then((result) => {
+        if (result.isConfirmed) {fetch('admin_kala.php', {method: 'POST', headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-Requested-With': 'XMLHttpRequest'
                 },
@@ -200,6 +120,7 @@ function confirmDelete(id, name) {
         }
     });
 }
+
 function updateRowNumbers() {
     const rows = document.querySelectorAll('.kala-table tbody tr');
     rows.forEach((row, index) => {
@@ -213,8 +134,8 @@ function updateRowNumbers() {
 // مقداردهی اولیه (اختصاصی)
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    const today=toJalali(new Date());
-    renderDateSelects('kala_date_container',today.year,today.month,today.day);
-    initSearch();
     initQuickDateSelect();
+    document.getElementById("search_btn").addEventListener("click", searchKala);
+    document.getElementById("reset_btn").addEventListener("click", resetKalaSearch);
+
 });

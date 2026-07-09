@@ -51,6 +51,59 @@ $persons = $db->query("SELECT id, name FROM persons ORDER BY name ASC")->fetchAl
 $activities = $db->query("SELECT id, name FROM activities ORDER BY name ASC")->fetchAll();
 
 // ============================================
+// پردازش فرم افزودن سرویس جدید
+// ============================================
+if (isset($_POST['add_service']) && canEditServices()) {
+    $service_name = htmlspecialchars(trim($_POST['service_name']));
+    $department_id = !empty($_POST['department_id']) ? filter_var($_POST['department_id'], FILTER_VALIDATE_INT) : null;
+    $brand_id = !empty($_POST['brand_id']) ? filter_var($_POST['brand_id'], FILTER_VALIDATE_INT) : null;
+    $receiver_person_id = !empty($_POST['receiver_person_id']) ? filter_var($_POST['receiver_person_id'], FILTER_VALIDATE_INT) : null;
+    $serial_number = htmlspecialchars(trim($_POST['serial_number']));
+    $computer_code = htmlspecialchars(trim($_POST['computer_code']));
+    $description = htmlspecialchars(trim($_POST['description']));
+    $created_at = faToEn($_POST['created_at'] ?? '');
+
+    $insertStmt = $db->prepare("INSERT INTO service_requests 
+    (service_name, department_id, brand_id, receiver_person_id, serial_number,  computer_code, description, created_at, created_by) 
+VALUES (:service_name, :department_id, :brand_id, :receiver_person_id, :serial_number,  :computer_code, :description, :created_at, :created_by)");
+
+    if ($insertStmt->execute([
+        ':service_name' => $service_name, ':department_id' => $department_id,
+        ':brand_id' => $brand_id, ':receiver_person_id' => $receiver_person_id,
+        ':serial_number' => $serial_number,
+        ':computer_code' => $computer_code, ':description' => $description,
+        ':created_at' => $created_at, ':created_by' => $_SESSION['user_id']
+    ])) {
+        // دریافت سرویس جدید اضافه شده
+        $newId = $db->lastInsertId();
+        $stmt = $db->prepare("
+            SELECT s.*, 
+                   d.name as department_name, 
+                   b.name as brand_name, 
+                   p.name as receiver_name
+            FROM service_requests s
+            LEFT JOIN departments d ON s.department_id = d.id
+            LEFT JOIN brands b ON s.brand_id = b.id
+            LEFT JOIN persons p ON s.receiver_person_id = p.id
+            WHERE s.id = :id
+        ");
+        $stmt->execute([':id' => $newId]);
+        $newService = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            ob_clean();
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'service' => $newService]);
+            exit;
+        }
+    }
+
+    header('Location: admin_services.php');
+    exit;
+}
+
+// ============================================
 // پردازش فرم حذف
 // ============================================
 
@@ -233,8 +286,6 @@ if ($isAjax) {
         <?php $row_num=1; foreach($services as $service): ?>
 
             <tr>
-
-            <tr>
                 <td><?php echo fa_number($row_num); ?></td>
                 <td><?php echo htmlspecialchars($service['service_name']); ?></td>
                 <td><?php echo htmlspecialchars($service['department_name'] ?? '-'); ?></td>
@@ -267,9 +318,6 @@ if ($isAjax) {
                     <?php endif; ?>
                 </td>
             </tr>
-
-            </tr>
-
             <?php $row_num++; endforeach; ?>
 
     <?php endif; ?>
@@ -601,7 +649,7 @@ if ($isAjax) {
             <div class="form-row">
                 <div class="form-group">
                     <label>تاریخ </label>
-                        <input type="text" id="edit-date" name="created_at" class="form-control" placeholder="انتخاب کنید" >
+                        <input type="text" id="edit_date" name="created_at" class="form-control" placeholder="انتخاب کنید" >
                 </div>
             </div>
             <div class="form-row">

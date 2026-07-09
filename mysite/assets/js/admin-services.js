@@ -14,7 +14,7 @@ function openEditModal(service) {
         document.getElementById('edit_serial_number').value = service.serial_number || '';
         document.getElementById('edit_computer_code').value = service.computer_code || '';
         document.getElementById('edit_description').value = service.description || '';
-        document.getElementById('edit-date').value = fa_number(service.created_at || '');
+        document.getElementById('edit_date').value = fa_number(service.created_at || '');
 
         document.getElementById('editModal').style.display = 'flex';
     } catch(e) {
@@ -161,5 +161,4 @@ document.addEventListener("DOMContentLoaded", function () {
     initQuickDateSelect();
     document.getElementById("search_btn").addEventListener("click", searchActivities);
     document.getElementById("reset_btn").addEventListener("click", resetSearch);
-    //searchActivities(); // یا resetSearch()
 });

@@ -327,6 +327,7 @@ input:focus, select:focus, textarea:focus {
     color: #e2e8f0;
 }
 
+.form-group:has(textarea) { width: 100%; }
 
 .add-card .form-row,
 .filter-card .form-row {

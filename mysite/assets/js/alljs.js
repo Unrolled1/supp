@@ -256,8 +256,8 @@ $(function () {
         });
     }
 
-    if ($("#edit-date").length) {
-        $("#edit-date").persianDatepicker({
+    if ($("#edit_date").length) {
+        $("#edit_date").persianDatepicker({
             format: "YYYY/MM/DD",
             autoClose: true,
             initialValue: false

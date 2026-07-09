@@ -31,7 +31,6 @@
 .form-group:has(input[name="serial_number"]) { width: 200px; }
 .form-group:has(input[name="computer_code"]) { width: 200px; }
 .form-group:has(.date-select-group) { width: 320px; }
-.form-group:has(textarea) { width: 100%; }
 
 
 .form-group input:focus,
