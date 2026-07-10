@@ -570,6 +570,7 @@ foreach ($systems as $key => $system) {
 <head>
     <meta charset="UTF-8">
     <title>مدیریت سیستم‌ها</title>
+
     <?php load_assets(); ?>
 </head>
 <body>

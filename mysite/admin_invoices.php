@@ -241,13 +241,11 @@ ob_start();
 <head>
     <meta charset="UTF-8">
     <title>مدیریت فاکتورها</title>
-    <?php load_assets(); ?>
     <script src="assets/js/jquery.min.js"></script>
     <script src="assets/js/persian-date.min.js"></script>
     <link rel="stylesheet" href="assets/styles/persian-datepicker.min.css">
     <script src="assets/js/persian-datepicker.min.js"></script>
-    <script src="assets/js/alljs.js?v=<?php echo time(); ?>"></script>
-    <script src="assets/js/admin-invoices.js?v=<?php echo time(); ?>"></script>
+    <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">

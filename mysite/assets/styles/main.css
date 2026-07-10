@@ -414,7 +414,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .search-card .search-row .form-group {
-    flex: 1;
+
     min-width: 150px;
 }
 
@@ -1021,14 +1021,6 @@ input:focus, select:focus, textarea:focus {
     font-weight: bold !important;
     background: transparent !important;
 }
-/*تمام پنل جستجو*/
-.search-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    align-items:flex-end;
-}
-
 .invoices-form select option {
     font-family: 'Vazir', 'Tahoma', sans-serif ;
     font-size: 13px ;
