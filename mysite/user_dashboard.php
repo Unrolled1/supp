@@ -16,8 +16,8 @@ $db = getDB();
 $message = '';
 
 // گرفتن بخش‌ها و موضوعات
-$departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
-$topics = $db->query("SELECT * FROM topics WHERE status = 'active' ORDER BY name ASC")->fetchAll();
+$departments = $db->query("SELECT id,name FROM departments ORDER BY name ASC")->fetchAll();
+$topics = $db->query("SELECT name FROM topics ORDER BY name ASC")->fetchAll();
 
 // ============================================
 // پردازش AJAX - ثبت درخواست
@@ -33,7 +33,7 @@ if ($fullname && $department_id && $subject && $message) {
 $trackingCode = 'TK-' . jdate('Ymd') . '-' . rand(1000, 9999);
 $stmt = $db->prepare("INSERT INTO tickets 
     (tracking_code, user_id, fullname, department_id, subject, message, status, created_at) 
-VALUES (:code, :uid, :name, :did, :sub, :msg, 'جدید', :date)");
+VALUES (:code, :uid, :name, :did, :sub, :msg, 'درحال بررسی', :date)");
 
 $success = $stmt->execute([
     ':code' => $trackingCode,
@@ -114,10 +114,10 @@ if (isset($_SESSION['message'])) {
 <div class="container">
     <div class="header">
         <div><span>👤</span> خوش آمدید <strong><?php echo htmlspecialchars($_SESSION['fullname']); ?></strong></div>
-        <div><span class="dynamic-time" id="liveClock"><?php echo fa_number(now()); ?></span><a href="logout.php" class="logout-btn">🚪 خروج</a></div>
+        <div><span class="dynamic-time" id="liveClock"><?php echo fa_number(now()); ?></span><a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a></div>
     </div>
 
-    <div class="form-box">
+    <div class="add-card">
         <h2>📧 ثبت تیکت جدید</h2>
         <div id="form_message"></div>
         <?php if($message): ?><div class="alert alert-success"><?php echo $message; ?></div><?php endif; ?>

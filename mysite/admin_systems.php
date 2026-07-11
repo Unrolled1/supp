@@ -32,16 +32,22 @@ if (!isAdmin() || !canViewSystems()) {
 
 $db = getDB();
 
+$isAjax = isset($_POST['ajax']);
+
+$computer_code = $_POST['computer_code'] ?? '';
+$name          = $_POST['name'] ?? '';
+$department    = $_POST['department'] ?? '';
+$created_at = $_POST['created_at'] ?? '';
+$date_from     = $_POST['date_from'] ?? '';
+$date_to       = $_POST['date_to'] ?? '';
 // ============================================
 // گرفتن لیست‌های مورد نیاز برای فرم‌ها
 // ============================================
 
 // بخش‌ها
 $departments = $db->query("SELECT id, name FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
-
 // برندها
 $brands = $db->query("SELECT id, name FROM brands ORDER BY name ASC")->fetchAll();
-
 // مدل‌ها
 $models = $db->query("SELECT id, name FROM models ORDER BY name ASC")->fetchAll();
 
@@ -274,7 +280,6 @@ if (isset($_POST['add_peripheral']) && canEditSystems()) {
     exit;
 }
 
-
 // ============================================
 // پردازش فرم افزودن سیستم
 // ============================================
@@ -291,7 +296,7 @@ if (isset($_POST['add_system']) && canEditSystems()) {
         $motherboard_id = !empty($_POST['motherboard_id']) ? filter_var($_POST['motherboard_id'], FILTER_VALIDATE_INT) : null;
         $power_id = !empty($_POST['power_id']) ? filter_var($_POST['power_id'], FILTER_VALIDATE_INT) : null;
         $monitor_id = !empty($_POST['monitor_id']) ? filter_var($_POST['monitor_id'], FILTER_VALIDATE_INT) : null;
-        $jalaliDate = jdate('Y-m-d');
+        $jalaliDate = jdate('Y/m/d');
 
         // ثبت سیستم
         $insertStmt = $db->prepare("
@@ -444,14 +449,17 @@ if (isset($_GET['motherboard']) && !empty($_GET['motherboard'])) {
     $where[] = "s.motherboard_id = :motherboard";
     $params[':motherboard'] = filter_var($_GET['motherboard'], FILTER_VALIDATE_INT);
 }
-
-$whereClause = '';
-
-if (!empty($where)) {
-    $whereClause = 'WHERE ' . implode(' AND ', $where);
+if ($date_from != '') {
+    $where[] = "s.created_at >= :from";
+    $params[':from'] = $date_from;
 }
 
-$stmt = $db->prepare("
+if ($date_to != '') {
+    $where[] = "s.created_at <= :to";
+    $params[':to'] = $date_to;
+}
+
+$sql = "
 SELECT
     s.*,
     d.name AS department_name,
@@ -492,15 +500,16 @@ LEFT JOIN models mon_m ON mon.model_id = mon_m.id
 LEFT JOIN brands mon_b ON mon_m.brand_id = mon_b.id
 
 LEFT JOIN users u ON s.created_by = u.id
+";
+if($where){
+    $sql .= " WHERE ".implode(" AND ",$where);
+}
 
-$whereClause
+$sql .= "ORDER BY s.id DESC";
 
-ORDER BY s.id DESC
-");
-
+$stmt=$db->prepare($sql);
 $stmt->execute($params);
-
-$systems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$systems=$stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 foreach ($systems as $key => $system) {
@@ -561,7 +570,40 @@ foreach ($systems as $key => $system) {
     $periphStmt->execute([':id'=>$system['id']]);
     $systems[$key]['peripherals']=$periphStmt->fetchAll();
 }
+if ($isAjax) {
+    ob_start();
+    ?>
 
+    <?php if (empty($systems)): ?>
+
+        <tr>
+            <td colspan="11">موردی یافت نشد</td>
+        </tr>
+
+    <?php else: ?>
+
+        <?php
+        $rownum = 1;
+        foreach ($systems as $rowData) {
+            include "assets/includes/system_row.php";
+            $rownum++;
+        }
+        ?>
+
+    <?php endif; ?>
+
+    <?php
+    $table = ob_get_clean();
+
+    header('Content-Type: application/json; charset=utf-8');
+
+    echo json_encode([
+        'success' => true,
+        'table'   => $table
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
 
 ?>
 
@@ -570,7 +612,10 @@ foreach ($systems as $key => $system) {
 <head>
     <meta charset="UTF-8">
     <title>مدیریت سیستم‌ها</title>
-
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/persian-date.min.js"></script>
+    <link rel="stylesheet" href="assets/styles/persian-datepicker.min.css">
+    <script src="assets/js/persian-datepicker.min.js"></script>
     <?php load_assets(); ?>
 </head>
 <body>

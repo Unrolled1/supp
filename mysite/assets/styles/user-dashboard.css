@@ -37,20 +37,6 @@ body.user-page {
     border: 1px solid rgba(255,255,255,0.05);
 }
 
-.header a.logout-btn {
-    background: rgba(255,255,255,0.1);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 25px;
-    text-decoration: none;
-    transition: 0.3s;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.header a.logout-btn:hover {
-    background: rgba(255,255,255,0.2);
-    transform: translateY(-2px);
-}
 
 /* ============================================
    فرم ثبت درخواست
