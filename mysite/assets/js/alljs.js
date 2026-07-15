@@ -51,93 +51,272 @@ function toJalali(date) {
 }
 
 // ============================================
-// رندر سلکت‌های تاریخ برای فرم ثبت (عمومی)
+// توابع گزارشات
 // ============================================
+function openPrintWindow(config) {
 
-function renderDateSelects(containerId, defaultYear = '', defaultMonth = '', defaultDay = '') {
+    const form = document.getElementById("filterform");
+    if (!form) return;
 
-    let html = '<div class="date-select-group">';
-// سال
-    html += '<select name="year" class="date-select">';
-    html += '<option value="">سال</option>';
-    for (let i = 1405; i <= 1420; i++) {
-        html += `<option value="${i}" ${defaultYear == i ? 'selected' : ''}>${fa_number(i)}</option>`;
+    const params = new URLSearchParams(new FormData(form));
+
+    params.append("print", "1");
+
+    window.open(
+        config.printUrl + "?" + params.toString(),
+        "_blank",
+        "width=1000,height=800,scrollbars=yes"
+    );
+
+}
+function applyReportFilters(config) {
+
+    const form = document.getElementById("filterform");
+    if (!form) return;
+
+    const formData = new FormData(form);
+    formData.append("ajax", "1");
+
+    showLoading(true);
+
+    fetch(config.url, {
+        method: "POST",
+        body: formData
+    })
+        .then(res => res.json())
+        .then(data => {
+
+            showLoading(false);
+
+            if (!data.success) {
+                showToast(data.message || "خطا", "error");
+                return;
+            }
+
+            updateTable(config.table, data.table);
+
+            if (config.stats && data.stats)
+                updateStats(data.stats);
+
+            if (config.filterInfo && data.filterInfo)
+                updateFilterInfo(data.filterInfo);
+
+        })
+        .catch(err => {
+            showLoading(false);
+            console.error(err);
+            showToast("خطا در ارتباط با سرور", "error");
+        });
+
+}
+/**
+ * اعمال فیلترها با استفاده از Ajax
+ * بدون رفرش صفحه، لیست تیکت‌ها را به‌روز میکند
+ */
+function applyReportFilters(config) {
+
+    const form = document.getElementById("filterform");
+    if (!form) return;
+
+    const formData = new FormData(form);
+    formData.append("ajax", "1");
+
+    showLoading(true);
+
+    fetch(config.url, {
+        method: "POST",
+        body: formData
+    })
+        .then(res => res.json())
+        .then(data => {
+
+            showLoading(false);
+
+            if (!data.success) {
+                showToast(data.message || "خطا", "error");
+                return;
+            }
+
+            updateTable(config.table, data.table);
+
+            if (config.stats)
+                updateStats(data.stats);
+
+            if (config.filterInfo)
+                updateFilterInfo(data.filterInfo);
+
+        })
+        .catch(err => {
+            showLoading(false);
+            console.error(err);
+            showToast("خطا در ارتباط با سرور", "error");
+        });
+
+}
+
+
+function resetReportFilters(config) {
+
+    const form = document.getElementById("filterform");
+    if (!form) return;
+
+    form.reset();
+
+    applyReportFilters(config);
+
+}
+
+function applyFiltersAjax() {
+    // گرفتن مقادیر فیلترها
+    const department_id = document.querySelector('select[name="department_id"]')?.value || '';
+    const status = document.querySelector('select[name="status"]')?.value || '';
+    const from_day = document.querySelector('select[name="from_day"]')?.value || '';
+    const from_month = document.querySelector('select[name="from_month"]')?.value || '';
+    const from_year = document.querySelector('select[name="from_year"]')?.value || '';
+    const to_day = document.querySelector('select[name="to_day"]')?.value || '';
+    const to_month = document.querySelector('select[name="to_month"]')?.value || '';
+    const to_year = document.querySelector('select[name="to_year"]')?.value || '';
+
+    // اعتبارسنجی تاریخ
+    if (from_year && from_month && from_day && to_year && to_month && to_day) {
+        const fromDate = new Date(from_year, from_month - 1, from_day);
+        const toDate = new Date(to_year, to_month - 1, to_day);
+        if (fromDate > toDate) {
+            showToast('تاریخ "از" نمیتواند بزرگتر از تاریخ "تا" باشد!', 'error');
+            return;
+        }
     }
-    html += '</select>';
 
-    // اسلش بین سال و ماه
-    html += '<span class="date-separator">/</span>';
-
-    // ماه
-    html += '<select name="month" class="date-select">';
-    html += '<option value="">ماه</option>';
-    for (let i = 1; i <= 12; i++) {
-        html += `<option value="${i}" ${defaultMonth == i ? 'selected' : ''}>${getMonthName(i)}</option>`;
+    // ساخت داده برای ارسال
+    const formData = new FormData();
+    if (department_id) formData.append('department_id', department_id);
+    if (status) formData.append('status', status);
+    if (from_year && from_month && from_day) {
+        formData.append('from_year', from_year);
+        formData.append('from_month', from_month);
+        formData.append('from_day', from_day);
     }
-    html += '</select>';
-
-    // اسلش بین ماه و روز
-    html += '<span class="date-separator">/</span>';
-
-// روز
-    html += '<select name="day" class="date-select">';
-    html += '<option value="">روز</option>';
-    for (let i = 1; i <= 31; i++) {
-        html += `<option value="${i}" ${defaultDay == i ? 'selected' : ''}>${fa_number(i)}</option>`;
+    if (to_year && to_month && to_day) {
+        formData.append('to_year', to_year);
+        formData.append('to_month', to_month);
+        formData.append('to_day', to_day);
     }
-    html += '</select>';
+    formData.append('ajax', '1'); // مشخص کردن درخواست Ajax
 
-    html += '</div>';
+    // نمایش وضعیت بارگذاری
+    showLoading(true);
 
-    const container = document.getElementById(containerId);
-    if (container) {
-        container.innerHTML = html;
+    // ارسال درخواست Ajax
+    fetch('admin_ticketrep.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            showLoading(false);
+            if(!data.success){
+                showToast(data.message || "خطا", "error");
+                return;
+            }
+
+            updateTable(data.table);
+            updateStats(data.stats);
+            updateFilterInfo(data.filterInfo);
+
+        })
+        .catch(error => {
+            showLoading(false);
+            console.error('Error:', error);
+            showToast('خطا در ارتباط با سرور', 'error');
+        });
+}
+
+function updateTable(selector, html) {
+
+    const table = document.querySelector(selector);
+
+    if (table)
+        table.innerHTML = html;
+
+}
+/**
+ * به‌روز کردن آمار
+ */
+function updateStats(stats) {
+    if (!stats) return;
+
+    const statBoxes = document.querySelectorAll('.stat-box .stat-num');
+    if (statBoxes.length >= 4) {
+        statBoxes[0].textContent = stats.total || '0';
+        statBoxes[1].textContent = stats.review || '0';
+        statBoxes[2].textContent = stats.answered || '0';
+        statBoxes[3].textContent = stats.closed || '0';
     }
 }
 
-// ============================================
-// رندر سلکت‌های تاریخ برای مودال ویرایش
-// ============================================
-
-function renderDateSelectsForEdit(year, month, day) {
-    let html = '<div class="date-select-group">';
-// سال
-    html += '<select name="year" class="date-select">';
-    html += '<option value="">سال</option>';
-    for (let i = 1390; i <= 1420; i++) {
-        html += `<option value="${i}" ${year == i ? 'selected' : ''}>${fa_number(i)}</option>`;
+/**
+ * به‌روز کردن اطلاعات فیلترها
+ */
+function updateFilterInfo(html) {
+    const filterInfo = document.querySelector('.filters-info');
+    if (filterInfo) {
+        filterInfo.innerHTML = html;
     }
-    html += '</select>';
-
-
-    // اسلش بین سال و ماه
-    html += '<span class="date-separator">/</span>';
-
-    // ماه
-    const months = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
-    html += '<select name="month" class="date-select">';
-    html += '<option value="">ماه</option>';
-    for (let i = 1; i <= 12; i++) {
-        html += `<option value="${i}" ${month == i ? 'selected' : ''}>${months[i-1]}</option>`;
-    }
-    html += '</select>';
-
-    // اسلش بین ماه و روز
-    html += '<span class="date-separator">/</span>';
-
-// روز
-    html += '<select name="day" class="date-select">';
-    html += '<option value="">روز</option>';
-    for (let i = 1; i <= 31; i++) {
-        html += `<option value="${i}" ${day == i ? 'selected' : ''}>${fa_number(i)}</option>`;
-    }
-    html += '</select>';
-
-
-    html += '</div>';
-    return html;
 }
 
+/**
+ * نمایش/مخفی کردن وضعیت بارگذاری
+ */
+function showLoading(show) {
+    const loadingElement = document.getElementById('loading-overlay');
+    if (loadingElement) {
+        loadingElement.style.display = show ? 'flex' : 'none';
+    }
+}
+
+/**
+ * نمایش پیام toast
+ */
+function showToast(message, type = 'info') {
+    if (typeof toastr !== 'undefined') {
+        switch(type) {
+            case 'success': toastr.success(message); break;
+            case 'error': toastr.error(message); break;
+            case 'warning': toastr.warning(message); break;
+            default: toastr.info(message);
+        }
+        return;
+    }
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            text: message,
+            icon: type,
+            timer: 3000,
+            showConfirmButton: false
+        });
+        return;
+    }
+
+    alert(message);
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    if (!window.reportConfig)
+        return;
+
+    document.querySelector(".btn-filter")
+        ?.addEventListener("click", () => applyReportFilters(reportConfig));
+
+    document.querySelector(".btn-reset")
+        ?.addEventListener("click", () => resetReportFilters(reportConfig));
+
+    document.querySelector(".btn-pdf")
+        ?.addEventListener("click", openPrintWindow);
+
+});
 // ============================================
 // رندر سلکت‌های تاریخ برای جستجو
 // ============================================
@@ -379,8 +558,6 @@ function closeModal(modalId) {
     }
 }
 
-
-
 // ============================================
 // بستن مودال با کلیک روی پس‌زمینه
 // ============================================
@@ -403,25 +580,43 @@ function setCursorToEnd(input) {
         }, 0);
     }
 }
+document.addEventListener("DOMContentLoaded", () => {
 
-// وقتی کاربر روی فیلد کلیک میکنه
-document.addEventListener('DOMContentLoaded', function() {
-    // همه فیلدهای ورودی
+    // انتقال کرسر به آخر متن
     const inputs = document.querySelectorAll('input[type="text"], input[type="number"]');
 
-    inputs.forEach(function(input) {
-        // وقتی کاربر کلیک میکنه
-        input.addEventListener('focus', function() {
+    inputs.forEach(input => {
+
+        input.addEventListener("focus", function () {
             setCursorToEnd(this);
         });
 
-        // وقتی کاربر با Tab میاد
-        input.addEventListener('click', function() {
+        input.addEventListener("click", function () {
             setCursorToEnd(this);
         });
+
     });
-});
-document.addEventListener('DOMContentLoaded', function() {
-    renderSearchDateSelects('search_date_from_container', 'search_date_from');
-    renderSearchDateSelects('search_date_to_container', 'search_date_to');
+
+    // ساخت انتخابگرهای تاریخ (اگر وجود داشته باشند)
+    if (document.getElementById("search_date_from_container"))
+        renderSearchDateSelects("search_date_from_container", "search_date_from");
+
+    if (document.getElementById("search_date_to_container"))
+        renderSearchDateSelects("search_date_to_container", "search_date_to");
+
+
+    // گزارش‌ها
+    if (window.reportConfig) {
+
+        document.querySelector(".btn-filter")
+            ?.addEventListener("click", () => applyReportFilters(reportConfig));
+
+        document.querySelector(".btn-reset")
+            ?.addEventListener("click", () => resetReportFilters(reportConfig));
+
+        document.querySelector(".btn-pdf")
+            ?.addEventListener("click", () => openPrintWindow(reportConfig));
+
+    }
+
 });

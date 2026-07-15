@@ -209,14 +209,39 @@ $stats['systems'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
                 </div>
             </div>
 
-            <!-- ردیف سوم: گزارشات -->
+            <!-- ردیف سوم: گزارش‌ها -->
             <div class="quick-row">
                 <h2 class="quick-title">📈 گزارشات</h2>
                 <div class="quick-grid">
                     <?php if (canViewReports()): ?>
-                        <a href="admin_reports.php" class="quick-card">
+                        <a href="admin_ticketrep.php" class="quick-card">
                             <span class="icon">📋</span>
                             <span class="label">گزارش درخواست‌ها</span>
+                        </a>
+
+                        <a href="admin_servicerep.php" class="quick-card">
+                            <span class="icon">📋</span>
+                            <span class="label">گزارش فعالیت</span>
+                        </a>
+
+                        <a href="admin_invoicerep.php" class="quick-card">
+                            <span class="icon">📋</span>
+                            <span class="label">گزارش فاکتور</span>
+                        </a>
+
+                        <a href="admin_kalarep.php" class="quick-card">
+                            <span class="icon">📋</span>
+                            <span class="label">گزارش کالا</span>
+                        </a>
+
+                        <a href="admin_printerrep.php" class="quick-card">
+                            <span class="icon">📋</span>
+                            <span class="label">گزارش پرینتر</span>
+                        </a>
+
+                        <a href="admin_systemrep.php" class="quick-card">
+                            <span class="icon">📋</span>
+                            <span class="label">گزارش سیستم</span>
                         </a>
                     <?php endif; ?>
 

@@ -24,10 +24,14 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 $css_common = [
     'main.css',
     'sidebar.css',
-    'sweetalert2.min.css'
+    'sweetalert2.min.css',
+    'persian-datepicker.min.css'
 ];
 
 $js_common = [
+    'jquery.min.js',
+    'persian-date.min.js',
+    'persian-datepicker.min.js',
     'alljs.js',
     'sweetalert2.min.js'
 ];
@@ -49,7 +53,6 @@ $css_pages = [
     'admin_systems' => ['admin-systems.css'],
     'admin_topics' => ['admin-topics.css'],
     'admin_activities' => ['admin-activities.css'],
-    'admin_reports' => ['admin-reports.css'],
     'admin_kala' => ['admin-kala.css'],
     'dashboard' => ['dashboard.css'],
     'login' => ['login.css'],
@@ -74,7 +77,8 @@ $js_pages = [
     'admin_systems' => ['admin-systems.js'],
     'admin_topics' => ['admin-topics.js'],
     'admin_activities' => ['admin-activities.js'],
-    'admin_reports' => ['admin-reports.js'],
+    'admin_ticketrep' => ['admin-ticketrep.js'],
+
     'admin_kala' => ['admin-kala.js'],
     'dashboard' => ['dashboard.js'],
     'login' => ['login.js'],

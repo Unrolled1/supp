@@ -190,8 +190,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php endif; ?>
 
         <!-- منوی گزارش‌ها -->
-        <?php if (canViewReports()): ?>
-            <li class="has-submenu">
+        <?php if (canViewReports()):
+            $operationsPages = ['admin_ticketrep.php', 'admin_servicerep.php', 'admin_invoicerep.php',
+                'admin_kalarep.php', 'admin_printerrep.php','admin_systemrep.php'];
+            $isOperationsActive = in_array($current_page, $operationsPages);
+            ?>
+
+
+            <li class="has-submenu <?php echo $isOperationsActive ? 'open' : ''; ?>" >
                 <a href="javascript:void(0)" class="submenu-toggle">
                     <span class="icon">📊</span>
                     <span class="text">گزارشات</span>
@@ -199,11 +205,47 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
                 <ul class="submenu">
                     <li>
-                        <a href="admin_reports.php" class="<?php echo $current_page == 'admin_reports.php' ? 'active' : ''; ?>">
+                        <a href="admin_ticketrep.php" class="<?php echo $current_page == 'admin_ticketrep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش درخواست‌ها</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a href="admin_servicerep.php" class="<?php echo $current_page == 'admin_servicerep.php' ? 'active' : ''; ?>">
+                            <span class="icon">📋</span>
+                            <span class="text">گزارش فعالیت</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="admin_invoicerep.php" class="<?php echo $current_page == 'admin_invoicerep.php' ? 'active' : ''; ?>">
+                            <span class="icon">📋</span>
+                            <span class="text">گزارش فاکتور</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="admin_kalarep.php" class="<?php echo $current_page == 'admin_kalarep.php' ? 'active' : ''; ?>">
+                            <span class="icon">📋</span>
+                            <span class="text">گزارش کالا</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="admin_printerrep.php" class="<?php echo $current_page == 'admin_printerrep.php' ? 'active' : ''; ?>">
+                            <span class="icon">📋</span>
+                            <span class="text">گزارش پرینتر</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="admin_systemrep.php" class="<?php echo $current_page == 'admin_systemrep.php' ? 'active' : ''; ?>">
+                            <span class="icon">📋</span>
+                            <span class="text">گزارش سیستم</span>
+                        </a>
+                    </li>
+
                 </ul>
             </li>
         <?php endif; ?>

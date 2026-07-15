@@ -11,100 +11,66 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true 
 }
 
 $db = getDB();
+$type = $_GET['type'] ?? '';
+$tableHeaders = [
+    'ردیف',
+    'کد پیگیری',
+    'بخش',
+    'نام و نام خانوادگی',
+    'کاربر',
+    'موضوع',
+    'وضعیت',
+    'تاریخ ثبت'
+];
+$tableRows = [];
 
-// دریافت پارامترها از GET
-$department_id = $_GET['department_id'] ?? '';
-$status = $_GET['status'] ?? '';
+$i = 1;
 
-// دریافت تاریخ از پارامترهای جداگانه
-$from_day = $_GET['from_day'] ?? '';
-$from_month = $_GET['from_month'] ?? '';
-$from_year = $_GET['from_year'] ?? '';
-$to_day = $_GET['to_day'] ?? '';
-$to_month = $_GET['to_month'] ?? '';
-$to_year = $_GET['to_year'] ?? '';
+foreach ($rows as $row) {
 
-// بررسی آیا پرینت خودکار فعال است
-$autoPrint = isset($_GET['print']) && $_GET['print'] == '1';
+    $tableRows[] = [
+        fa_number($i++),
+        fa_number($row['tracking_code']),
+        htmlspecialchars($row['department_name'] ?? '-'),
+        htmlspecialchars($row['fullname']),
+        htmlspecialchars($row['username'] ?? '-'),
+        htmlspecialchars($row['subject']),
+        htmlspecialchars($row['status']),
+        fa_number($row['created_at'])
+    ];
 
-// ساخت تاریخ کامل برای کوئری
-$date_from = '';
-$date_to = '';
-
-if (!empty($from_year) && !empty($from_month) && !empty($from_day)) {
-    $date_from = sprintf("%04d-%02d-%02d", $from_year, $from_month, $from_day);
-}
-if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
-    $date_to = sprintf("%04d-%02d-%02d", $to_year, $to_month, $to_day);
-}
-
-// ساخت کوئری شرطی
-$whereConditions = [];
-$params = [];
-
-if (!empty($department_id)) {
-    $whereConditions[] = "t.department_id = :department_id";
-    $params[':department_id'] = $department_id;
-}
-if (!empty($status)) {
-    $whereConditions[] = "t.status = :status";
-    $params[':status'] = $status;
-}
-if (!empty($date_from)) {
-    $whereConditions[] = "t.created_at >= :date_from";
-    $params[':date_from'] = $date_from . ' 00:00:00';
-}
-if (!empty($date_to)) {
-    $whereConditions[] = "t.created_at <= :date_to";
-    $params[':date_to'] = $date_to . ' 23:59:59';
 }
 
-$whereSql = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
+switch ($type) {
 
-$sql = "
-    SELECT t.*, d.name as department_name, u.username, u.fullname as user_fullname
-    FROM tickets t
-    LEFT JOIN departments d ON t.department_id = d.id
-    LEFT JOIN users u ON t.user_id = u.id
-    $whereSql
-    ORDER BY t.created_at DESC
-";
+    case 'ticket':
+        $pageTitle = 'گزارش درخواست‌ها';
+        break;
 
-$stmt = $db->prepare($sql);
-$stmt->execute($params);
-$tickets = $stmt->fetchAll();
+    case 'service':
+        $pageTitle = 'گزارش ثبت فعالیت';
+        break;
 
-// آمار
-$total = count($tickets);
-$reviewCount = 0;
-$answeredCount = 0;
-$closedCount = 0;
+    case 'system':
+        $pageTitle = 'گزارش سیستم‌ها';
+        break;
 
-foreach ($tickets as $t) {
-    switch($t['status']) {
-        case 'در حال بررسی': $reviewCount++; break;
-        case 'پاسخ داده شده': $answeredCount++; break;
-        case 'بسته شده': $closedCount++; break;
-    }
+    case 'printer':
+        $pageTitle = 'گزارش پرینترها';
+        break;
+
+    case 'kala':
+        $pageTitle = 'گزارش کالاها';
+        break;
+
+    case 'invoice':
+        $pageTitle = 'گزارش فاکتورها';
+        break;
+
+    default:
+        die('نوع گزارش نامعتبر است.');
 }
 
-// گرفتن نام بخش برای نمایش
-$department_name = '';
-if (!empty($department_id)) {
-    $deptStmt = $db->prepare("SELECT name FROM departments WHERE id = :id");
-    $deptStmt->execute([':id' => $department_id]);
-    $department_name = $deptStmt->fetchColumn();
-}
-
-// ساخت تاریخ نمایشی برای فیلترها
-$display_date_from = '';
-$display_date_to = '';
-if (!empty($from_year) && !empty($from_month) && !empty($from_day)) {
-    $display_date_from = fa_number($from_year) . '/' . fa_number($from_month) . '/' . fa_number($from_day);
-}
-if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
-    $display_date_to = fa_number($to_year) . '/' . fa_number($to_month) . '/' . fa_number($to_day);
-}
 ?>
 
 <!DOCTYPE html>
@@ -112,7 +78,7 @@ if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>چاپ گزارش تیکت‌ها</title>
+    <title>چاپ گزارش </title>
     <style>
         * {
             margin: 0;
@@ -120,30 +86,6 @@ if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
             box-sizing: border-box;
         }
 
-        @media print {
-            body {
-                padding: 0px;
-                background: white;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .stat-box {
-                border: 1px solid #ccc !important;
-                background: #f9f9f9 !important;
-            }
-            th {
-                background: #667eea !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .print-header h1 {
-                color: #667eea !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
 
         body {
             font-family: 'Vazir', 'Segoe UI', Tahoma, Arial, sans-serif;
@@ -357,7 +299,7 @@ if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
 
     <!-- هدر گزارش -->
     <div class="print-header">
-        <h1>📊 گزارش تیکت‌های پشتیبانی</h1>
+        <h1>📊 <?php echo $pageTitle; ?></h1>
         <div class="date">
             تاریخ چاپ: <?php echo fa_number(now()); ?>
         </div>
@@ -405,44 +347,38 @@ if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
         <table>
             <thead>
             <tr>
-                <th>#</th>
-                <th>کد پیگیری</th>
-                <th>بخش</th>
-                <th>نام و نام خانوادگی</th>
-                <th>کاربر</th>
-                <th>موضوع</th>
-                <th>وضعیت</th>
-                <th>تاریخ ثبت</th>
+                <?php foreach ($tableHeaders as $header): ?>
+                    <th><?= htmlspecialchars($header) ?></th>
+                <?php endforeach; ?>
             </tr>
             </thead>
             <tbody>
-            <?php if (empty($tickets)): ?>
-                <tr>
-                    <td colspan="8" class="no-data">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
-                </tr>
-            <?php else: ?>
-                <?php $i = 1; ?>
-                <?php foreach ($tickets as $t): ?>
+
+                <?php if (empty($tableRows)): ?>
+
                     <tr>
-                        <td><?php echo fa_number($i++); ?></td>
-                        <td><?php echo fa_number($t['tracking_code']); ?></td>
-                        <td><?php echo htmlspecialchars($t['department_name'] ?? '-'); ?></td>
-                        <td><?php echo htmlspecialchars($t['fullname']); ?></td>
-                        <td><?php echo htmlspecialchars($t['username'] ?? '-'); ?></td>
-                        <td><?php echo htmlspecialchars($t['subject']); ?></td>
-                        <td>
-                            <?php
-                            $statusClass = '';
-                            if ($t['status'] == 'در حال بررسی') $statusClass = '🔄';
-                            elseif ($t['status'] == 'پاسخ داده شده') $statusClass = '✅';
-                            elseif ($t['status'] == 'بسته شده') $statusClass = '🔒';
-                            echo $statusClass . ' ' . htmlspecialchars($t['status']);
-                            ?>
+                        <td colspan="<?= count($tableHeaders) ?>" class="no-data">
+                            📭 هیچ موردی یافت نشد
                         </td>
-                        <td><?php echo fa_number($t['created_at']); ?></td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
+
+                <?php else: ?>
+
+                    <?php foreach ($tableRows as $row): ?>
+
+                        <tr>
+
+                            <?php foreach ($row as $cell): ?>
+
+                                <td><?= $cell ?></td>
+
+                            <?php endforeach; ?>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                <?php endif; ?>
             </tbody>
         </table>
     </div>

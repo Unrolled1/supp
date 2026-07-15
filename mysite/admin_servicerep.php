@@ -25,38 +25,18 @@ $isReset = isset($_POST['reset']) && $_POST['reset'] == '1';
 
 // دریافت پارامترهای فیلتر
 $department_id = $_POST['department_id'] ?? '';
-$status = $_POST['status'] ?? '';
 // تاریخ شمسی از لیست‌ها
-$from_year = $_POST['from_year'] ?? '';
-$from_month = $_POST['from_month'] ?? '';
-$from_day = $_POST['from_day'] ?? '';
-$to_year = $_POST['to_year'] ?? '';
-$to_month = $_POST['to_month'] ?? '';
-$to_day = $_POST['to_day'] ?? '';
+$date_from = faToEn($_POST['date_from'] ?? '');
+$date_to   = faToEn($_POST['date_to'] ?? '');
 
 
 // اگر reset باشد، همه پارامترها را خالی کن
 if ($isReset) {
     $department_id = '';
-    $status = '';
-    $from_day = '';
-    $from_month = '';
-    $from_year = '';
-    $to_day = '';
-    $to_month = '';
-    $to_year = '';
+    $date_from = '';
+    $date_to = '';
 }
 
-// ساخت تاریخ کامل برای کوئری
-$date_from = '';
-$date_to = '';
-
-if (!empty($from_year) && !empty($from_month) && !empty($from_day)) {
-    $date_from = sprintf("%04d-%02d-%02d", $from_year, $from_month, $from_day);
-}
-if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
-    $date_to = sprintf("%04d-%02d-%02d", $to_year, $to_month, $to_day);
-}
 
 // ساخت کوئری شرطی
 $whereConditions = [];
@@ -65,10 +45,6 @@ $params = [];
 if (!empty($department_id)) {
     $whereConditions[] = "t.department_id = :department_id";
     $params[':department_id'] = $department_id;
-}
-if (!empty($status)) {
-    $whereConditions[] = "t.status = :status";
-    $params[':status'] = $status;
 }
 if (!empty($date_from)) {
     $whereConditions[] = "t.created_at >= :date_from";
@@ -101,15 +77,8 @@ $reviewCount = 0;
 $answeredCount = 0;
 $closedCount = 0;
 
-foreach ($tickets as $t) {
-    switch($t['status']) {
-        case 'در حال بررسی': $reviewCount++; break;
-        case 'پاسخ داده شده': $answeredCount++; break;
-        case 'بسته شده': $closedCount++; break;
-    }
-}
 
-$departments = $db->query("SELECT * FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
+$departments = $db->query("SELECT id,name FROM departments  ORDER BY name ASC")->fetchAll();
 $department_name = '';
 
 if (!empty($department_id)) {
@@ -118,20 +87,13 @@ if (!empty($department_id)) {
     $department_name = $stmt->fetchColumn();
 }
 // ساخت تاریخ نمایشی
-$display_date_from = '';
-$display_date_to = '';
-if (!empty($from_year) && !empty($from_month) && !empty($from_day)) {
-    $display_date_from = fa_number($from_year) . '/' . fa_number($from_month) . '/' . fa_number($from_day);
-}
-if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
-    $display_date_to = fa_number($to_year) . '/' . fa_number($to_month) . '/' . fa_number($to_day);
-}
+$display_date_from = !empty($date_from) ? fa_number($date_from) : '';
+$display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
 
 // ساخت اطلاعات فیلترها برای نمایش
 $filterText = '';
 $filters = [];
 if (!empty($department_name)) $filters[] = "<span>بخش:</span> " . htmlspecialchars($department_name);
-if (!empty($status)) $filters[] = "<span>وضعیت:</span> " . htmlspecialchars($status);
 if (!empty($display_date_from)) $filters[] = "<span>از تاریخ:</span> " . htmlspecialchars($display_date_from);
 if (!empty($display_date_to)) $filters[] = "<span>تا تاریخ:</span> " . htmlspecialchars($display_date_to);
 
@@ -144,44 +106,39 @@ if (!empty($filters)) {
 // اگر درخواست Ajax است، فقط داده‌های JSON را برگردان
 if ($isAjax) {
 // ساخت HTML جدول
-ob_start();
+    ob_start();
 
-?>
-<table>
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>کد پیگیری</th>
-        <th>بخش</th>
-        <th>نام و نام خانوادگی</th>
-        <th>کاربر</th>
-        <th>موضوع</th>
-        <th>وضعیت</th>
-        <th>تاریخ ثبت</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php if (empty($tickets)): ?>
+    ?>
+    <table>
+        <thead>
         <tr>
-            <td colspan="8" class="no-data">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
+            <th>#</th>
+            <th>کد پیگیری</th>
+            <th>بخش</th>
+            <th>نام و نام خانوادگی</th>
+            <th>کاربر</th>
+            <th>موضوع</th>
+            <th>وضعیت</th>
+            <th>تاریخ ثبت</th>
         </tr>
-    <?php else: ?>
-        <?php $i = 1; ?>
-        <?php foreach ($tickets as $t): ?>
+        </thead>
+        <tbody>
+        <?php if (empty($tickets)): ?>
             <tr>
-                <td><?php echo fa_number($i++); ?></td>
-                <td><?php echo fa_number($t['tracking_code']); ?></td>
-                <td><?php echo htmlspecialchars($t['department_name'] ?? '-'); ?></td>
-                <td><?php echo htmlspecialchars($t['fullname']); ?></td>
-                <td><?php echo htmlspecialchars($t['username'] ?? '-'); ?></td>
-                <td><?php echo htmlspecialchars($t['subject']); ?></td>
-                <td><?php echo htmlspecialchars($t['status']); ?></td>
-                <td><?php echo fa_number($t['created_at']); ?></td>
+                <td colspan="8" class="no-data">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
             </tr>
-        <?php endforeach; ?>
-    <?php endif; ?>
-    </tbody>
-</table>
+        <?php else: ?>
+            <?php $i = 1; ?>
+            <?php foreach ($tickets as $t): ?>
+                <tr>
+                    <td><?php echo fa_number($i++); ?></td>
+                    <td><?php echo htmlspecialchars($t['department_name'] ?? '-'); ?></td>
+                    <td><?php echo fa_number($t['created_at']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        </tbody>
+    </table>
     <?php
     $tableHtml = ob_get_clean();
 
@@ -207,7 +164,7 @@ ob_start();
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>گزارشات تیکت‌ها</title>
+    <title>گزارشات فعالیت</title>
     <?php load_assets(); ?>
 
 </head>
@@ -228,7 +185,7 @@ ob_start();
         </div>
 
         <div class="main-title">
-            <h1>📊 گزارشات تیکت‌ها</h1>
+            <h1>📊 گزارشات فعالیت</h1>
         </div>
 
         <div class="filter-card">
@@ -247,32 +204,21 @@ ob_start();
                         </select>
                     </div>
 
-                    <div class="filter-group">
-                        <label>وضعیت:</label>
-                        <select name="status">
-                            <option value="">همه وضعیت‌ها</option>
-                            <option value="در حال بررسی" <?php echo $status == 'در حال بررسی' ? 'selected' : ''; ?>>در حال بررسی</option>
-                            <option value="پاسخ داده شده" <?php echo $status == 'پاسخ داده شده' ? 'selected' : ''; ?>>پاسخ داده شده</option>
-                            <option value="بسته شده" <?php echo $status == 'بسته شده' ? 'selected' : ''; ?>>بسته شده</option>
-                        </select>
-                    </div>
-
-
                 </div>
                 <div class="filter-row">
-                <!-- انتخابگر تاریخ سه سطحی -->
+                    <!-- انتخابگر تاریخ سه سطحی -->
 
-                <div class="search-group">
-                    <label>از تاریخ </label>
-                    <div id="search_date_from_container"></div>
-                    <input type="hidden" id="search_date_from" value="<?php echo htmlspecialchars($_POST['date_from'] ?? ''); ?>">
-                </div>
+                    <div class="search-group">
+                        <label>از تاریخ </label>
+                        <input type="text" id="date_from" name="date_from" class="form-control" placeholder="انتخاب کنید">
+                        
+                    </div>
 
-                <div class="search-group">
-                    <label>تا تاریخ </label>
-                    <div id="search_date_to_container"></div>
-                    <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_POST['date_to'] ?? ''); ?>">
-                </div>
+                    <div class="search-group">
+                        <label>تا تاریخ </label>
+                        <input type="text" id="date_to" name="date_to" class="form-control" placeholder="انتخاب کنید" >
+
+                    </div>
                 </div>
                 <div class="filter-actions">
                     <button type="button" class="btn-filter">🔍 اعمال فیلتر</button>
@@ -283,38 +229,13 @@ ob_start();
             </form>
         </div>
 
-        <!-- کارت آمار -->
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-num"><?php echo fa_number($total); ?></div>
-                <div class="stat-title">کل تیکت‌ها</div>
-            </div>
-            <div class="stat-box review">
-                <div class="stat-num"><?php echo fa_number($reviewCount); ?></div>
-                <div class="stat-title">در حال بررسی</div>
-            </div>
-            <div class="stat-box answered">
-                <div class="stat-num"><?php echo fa_number($answeredCount); ?></div>
-                <div class="stat-title">پاسخ داده شده</div>
-            </div>
-            <div class="stat-box closed">
-                <div class="stat-num"><?php echo fa_number($closedCount); ?></div>
-                <div class="stat-title">بسته شده</div>
-            </div>
-        </div>
-
         <!-- جدول نتایج -->
         <div class="reports-table data-table">
             <table>
                 <thead>
                 <tr>
                     <th>ردیف</th>
-                    <th>کد پیگیری</th>
                     <th>بخش</th>
-                    <th>نام و نام خانوادگی</th>
-                    <th>کاربر</th>
-                    <th>موضوع</th>
-                    <th>وضعیت</th>
                     <th>تاریخ ثبت</th>
                 </tr>
                 </thead>
@@ -326,22 +247,9 @@ ob_start();
                 <?php else: ?>
                     <?php $i = 1; ?>
                     <?php foreach ($tickets as $t): ?>
-                        <?php
-                        $statusClass = '';
-                        switch($t['status']) {
-                            case 'در حال بررسی': $statusClass = 'status-review'; break;
-                            case 'پاسخ داده شده': $statusClass = 'status-answered'; break;
-                            case 'بسته شده': $statusClass = 'status-closed'; break;
-                        }
-                        ?>
                         <tr>
                             <td><?php echo fa_number($i++); ?></td>
-                            <td><?php echo fa_number($t['tracking_code']); ?></td>
                             <td><?php echo htmlspecialchars($t['department_name'] ?? '-'); ?></td>
-                            <td><?php echo htmlspecialchars($t['fullname']); ?></td>
-                            <td><?php echo htmlspecialchars($t['username'] ?? '-'); ?></td>
-                            <td><?php echo htmlspecialchars($t['subject']); ?></td>
-                            <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo $t['status']; ?></span></td>
                             <td><?php echo fa_number($t['created_at']); ?></td>
                         </tr>
                     <?php endforeach; ?>
@@ -351,7 +259,6 @@ ob_start();
         </div>
     </div>
 </div>
-
 
 </body>
 </html>
