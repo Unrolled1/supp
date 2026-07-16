@@ -6,73 +6,7 @@
 // ثبت درخواست با AJAX
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    const submitBtn = document.getElementById('submitTicket');
-    const form = document.getElementById('ticketForm');
 
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function() {
-            // جمع‌آوری داده‌ها
-            const fullname = document.getElementById('fullname').value;
-            const department_id = document.getElementById('department_id').value;
-            const subject = document.getElementById('subject').value;
-            const message = document.getElementById('message').value;
-
-            // اعتبارسنجی ساده
-            if (!fullname || !department_id || !subject || !message) {
-                showFormMessage('❌ لطفاً همه فیلدها را پر کنید.', 'error');
-                return;
-            }
-
-            // غیرفعال کردن دکمه
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ در حال ارسال...';
-
-            // ارسال درخواست AJAX
-            const formData = new FormData();
-            formData.append('add_ticket_ajax', '1');
-            formData.append('fullname', fullname);
-            formData.append('department_id', department_id);
-            formData.append('subject', subject);
-            formData.append('message', message);
-
-            fetch('user_dashboard.php', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showFormMessage('✅ ' + data.message + ' - کد پیگیری: ' + fa_number(data.tracking_code), 'success');
-
-                        // اضافه کردن تیکت جدید به جدول
-                        addTicketToTable(data.ticket);
-
-                        // ریست فرم
-                        form.reset();
-
-                        Swal.fire({
-                            title: 'موفق!',
-                            text: 'درخواست شما با موفقیت ثبت شد. کد پیگیری: ' + fa_number(data.tracking_code),
-                            icon: 'success',
-                            confirmButtonColor: '#28a745',
-                            timer: 3000
-                        });
-                    } else {
-                        showFormMessage('❌ ' + data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    showFormMessage('❌ خطا در ارتباط با سرور', 'error');
-                    console.error('Error:', error);
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '📨 ارسال درخواست';
-                });
-        });
-    }
-});
 
 // ============================================
 // حذف درخواست با AJAX
@@ -107,11 +41,12 @@ function deleteTicket(ticketId) {
                         if (row) {
                             row.remove();
                             updateRowNumbers();
+                            updateTicketCount();
                         }
 
                         Swal.fire({
                             title: 'حذف شد!',
-                            text: 'درخواست با موفقیت حذف شد.',
+                            text: data.message,
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
@@ -229,3 +164,70 @@ function escapeHtml(str) {
         return m;
     });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const submitBtn = document.getElementById('submitTicket');
+    const form = document.getElementById('ticketForm');
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function() {
+            // جمع‌آوری داده‌ها
+            const fullname = document.getElementById('fullname').value;
+            const department_id = document.getElementById('department_id').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            // اعتبارسنجی ساده
+            if (!fullname || !department_id || !subject || !message) {
+                showFormMessage('❌ لطفاً همه فیلدها را پر کنید.', 'error');
+                return;
+            }
+
+            // غیرفعال کردن دکمه
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ در حال ارسال...';
+
+            // ارسال درخواست AJAX
+            const formData = new FormData();
+            formData.append('add_ticket_ajax', '1');
+            formData.append('fullname', fullname);
+            formData.append('department_id', department_id);
+            formData.append('subject', subject);
+            formData.append('message', message);
+
+            fetch('user_dashboard.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+
+                        // اضافه کردن تیکت جدید به جدول
+                        addTicketToTable(data.ticket);
+
+                        // ریست فرم
+                        form.reset();
+
+                        Swal.fire({
+                            title: 'موفق!',
+                            text: 'درخواست شما با موفقیت ثبت شد. کد پیگیری: ' + fa_number(data.tracking_code),
+                            icon: 'success',
+                            confirmButtonColor: '#28a745',
+                            timer: 2000
+                        });
+                    } else {
+                        showFormMessage('❌ ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showFormMessage('❌ خطا در ارتباط با سرور', 'error');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '📨 ارسال درخواست';
+                });
+        });
+    }
+});

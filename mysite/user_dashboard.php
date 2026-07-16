@@ -71,22 +71,41 @@ $stmt2 = $db->prepare("
     echo json_encode(['success' => false, 'message' => 'خطا در ثبت درخواست']);
     exit;
 }
+
 // ============================================
 // پردازش AJAX - حذف درخواست
 // ============================================
 
 if (isset($_POST['delete_ticket_ajax'])) {
+
     $ticket_id = filter_var($_POST['ticket_id'], FILTER_VALIDATE_INT);
 
-    $stmt = $db->prepare("DELETE FROM tickets WHERE id = :id AND user_id = :uid");
-    $success = $stmt->execute([':id' => $ticket_id, ':uid' => $_SESSION['user_id']]);
-
-    header('Content-Type: application/json');
+    if (!$ticket_id) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'شناسه نامعتبر است.'
+        ]);
+        exit;
+    }
+    $stmt = $db->prepare("
+        DELETE FROM tickets
+        WHERE id = :id
+        AND user_id = :uid
+    ");
+    $stmt->execute([
+        ':id'  => $ticket_id,
+        ':uid' => $_SESSION['user_id']
+    ]);
+    $success = $stmt->rowCount() > 0;
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
         'success' => $success,
-        'id' => $ticket_id,
-        'message' => $success ? 'درخواست با موفقیت حذف شد' : 'خطا در حذف درخواست'
-    ]);
+        'id'      => $ticket_id,
+        'message' => $success
+            ? 'درخواست با موفقیت حذف شد.'
+            : 'درخواستی برای حذف پیدا نشد.'
+    ], JSON_UNESCAPED_UNICODE);
+
     exit;
 }
 
@@ -197,6 +216,5 @@ if (isset($_SESSION['message'])) {
         </div>
 </div>
 
-<script src="assets/js/user-dashboard.js"></script>
 </body>
 </html>

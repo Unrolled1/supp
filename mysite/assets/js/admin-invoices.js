@@ -60,7 +60,6 @@ function resetInvoiceSearch() {
 
     document.getElementById("search_company_name").value = "";
     document.getElementById("search_invoice_number").value = "";
-    document.getElementById("search_subject").value = "";
     document.getElementById("date_from").value = "";
     document.getElementById("date_to").value = "";
     document.getElementById("quick_date_select").value = "";

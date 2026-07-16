@@ -93,8 +93,6 @@ if (isset($_POST['edit_invoice']) && canEditInvoices()) {
     header('Location: admin_invoices.php');
     exit;
 }
-// گرفتن لیست موضوعات
-$topics = $db->query("SELECT id, name FROM topics ORDER BY name ASC")->fetchAll();
 
 // ============================================
 // پردازش فرم افزودن فاکتور جدید
@@ -152,10 +150,6 @@ if (isset($_GET['company_name']) && !empty($_GET['company_name'])) {
 if (isset($_GET['invoice_number']) && !empty($_GET['invoice_number'])) {
     $where[] = "invoice_number LIKE :invoice_number";
     $params[':invoice_number'] = '%' . $_GET['invoice_number'] . '%';
-}
-if (isset($_GET['subject']) && !empty($_GET['subject'])) {
-    $where[] = "subject LIKE :subject";
-    $params[':subject'] = '%' . $_GET['subject'] . '%';
 }
 if ($date_from != '') {
     $where[] = "i.created_at >= :from";
@@ -290,14 +284,7 @@ ob_start();
                         </div>
                         <div class="subject">
                             <label>موضوع فاکتور *</label>
-                            <select name="subject" required>
-                                <option value="">-- انتخاب کنید --</option>
-                                <?php foreach ($topics as $topic): ?>
-                                    <option value="<?php echo htmlspecialchars($topic['name']); ?>">
-                                        <?php echo htmlspecialchars($topic['name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <input type="text" name="subject" required>
                         </div>
                         <div class="amount">
                             <label>مبلغ فاکتور *</label>
@@ -339,17 +326,6 @@ ob_start();
                     <div class="invoice_number">
                         <label>شماره فاکتور</label>
                         <input type="text" id="search_invoice_number" value="<?php echo htmlspecialchars($_GET['invoice_number'] ?? ''); ?>">
-                    </div>
-                    <div class="subject">
-                        <label>موضوع فاکتور</label>
-                        <select id="search_subject" class="search-subject-select">
-                            <option value="">-- همه --</option>
-                            <?php foreach ($topics as $topic): ?>
-                                <option value="<?php echo htmlspecialchars($topic['name']); ?>" <?php echo (isset($_GET['subject']) && $_GET['subject'] == $topic['name']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($topic['name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
                     </div>
                 </div>
                 <div class="search-row">
@@ -452,14 +428,7 @@ ob_start();
 
                 <div class="subject">
                     <label>موضوع فاکتور *</label>
-                    <select name="subject" id="edit_subject" required>
-                        <option value="">-- انتخاب کنید --</option>
-                        <?php foreach ($topics as $topic): ?>
-                            <option value="<?php echo htmlspecialchars($topic['name']); ?>">
-                                <?php echo htmlspecialchars($topic['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <input type="text" name="subject" id="edit_subject" required>
                 </div>
 
                 <div class="form-group">
