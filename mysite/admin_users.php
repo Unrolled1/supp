@@ -207,9 +207,9 @@ $permissionTree = [
                 'name' => '🧾 ثبت فعالیت',
                 'key' => 'services',
                 'children' => [
-                    ['name' => '👁️ مشاهده فاکتورها', 'key' => 'invoices_view'],
-                    ['name' => '✏️ ویرایش فاکتور', 'key' => 'invoices_edit'],
-                    ['name' => '🗑️ حذف فاکتور', 'key' => 'invoices_delete']
+                    ['name' => '👁️ مشاهده فاکتورها', 'key' => 'services_view'],
+                    ['name' => '✏️ ویرایش فاکتور', 'key' => 'services_edit'],
+                    ['name' => '🗑️ حذف فاکتور', 'key' => 'services_delete']
                 ]
             ],
             // فاکتورها

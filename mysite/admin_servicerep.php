@@ -25,6 +25,8 @@ $isReset = isset($_POST['reset']) && $_POST['reset'] == '1';
 
 // دریافت پارامترهای فیلتر
 $department_id = $_POST['department_id'] ?? '';
+$service_name = $_POST['service_name'] ?? '';
+
 // تاریخ شمسی از لیست‌ها
 $date_from = faToEn($_POST['date_from'] ?? '');
 $date_to   = faToEn($_POST['date_to'] ?? '');
@@ -32,6 +34,7 @@ $date_to   = faToEn($_POST['date_to'] ?? '');
 
 // اگر reset باشد، همه پارامترها را خالی کن
 if ($isReset) {
+    $service_name = '';
     $department_id = '';
     $date_from = '';
     $date_to = '';
@@ -42,16 +45,23 @@ if ($isReset) {
 $whereConditions = [];
 $params = [];
 
+if (!empty($service_name)) {
+    $whereConditions[] = "sr.service_name = :service_name";
+    $params[':service_name'] = $service_name;
+}
+$department_name = '';
 if (!empty($department_id)) {
-    $whereConditions[] = "t.department_id = :department_id";
+    $whereConditions[] = "sr.department_id = :department_id";
     $params[':department_id'] = $department_id;
 }
+
 if (!empty($date_from)) {
-    $whereConditions[] = "t.created_at >= :date_from";
+    $whereConditions[] = "sr.created_at >= :date_from";
     $params[':date_from'] = $date_from;
 }
+
 if (!empty($date_to)) {
-    $whereConditions[] = "t.created_at <= :date_to";
+    $whereConditions[] = "sr.created_at <= :date_to";
     $params[':date_to'] = $date_to;
 }
 
@@ -59,27 +69,36 @@ $whereSql = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditi
 
 // گرفتن تیکت‌ها
 $sql = "
-    SELECT t.*, d.name as department_name, u.username, u.fullname as fullname
-    FROM tickets t
-    LEFT JOIN departments d ON t.department_id = d.id
-    LEFT JOIN users u ON t.user_id = u.id
+    SELECT
+    sr.*,
+    d.name  AS department_name,
+    b.name  AS brand_name,
+    rp.name AS receiver_name,
+    u.fullname AS creator_name
+FROM service_requests sr
+LEFT JOIN departments d
+    ON d.id = sr.department_id
+LEFT JOIN brands b
+    ON b.id = sr.brand_id
+LEFT JOIN persons rp
+    ON rp.id = sr.receiver_person_id
+LEFT JOIN users u
+    ON u.id = sr.created_by
     $whereSql
-    ORDER BY t.created_at DESC
+ORDER BY sr.created_at DESC
 ";
 
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
-$tickets = $stmt->fetchAll();
-
-// آمار
-$total = count($tickets);
-$reviewCount = 0;
-$answeredCount = 0;
-$closedCount = 0;
+$services = $stmt->fetchAll();
 
 
 $departments = $db->query("SELECT id,name FROM departments  ORDER BY name ASC")->fetchAll();
-$department_name = '';
+$servicesList = $db->query("
+SELECT DISTINCT service_name
+FROM service_requests
+ORDER BY service_name
+")->fetchAll(PDO::FETCH_COLUMN);
 
 if (!empty($department_id)) {
     $stmt = $db->prepare("SELECT name FROM departments WHERE id = ?");
@@ -93,15 +112,11 @@ $display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
 // ساخت اطلاعات فیلترها برای نمایش
 $filterText = '';
 $filters = [];
+if (!empty($service_name)) $filters[] = "<span>فعالیت:</span> " . htmlspecialchars($service_name);
 if (!empty($department_name)) $filters[] = "<span>بخش:</span> " . htmlspecialchars($department_name);
 if (!empty($display_date_from)) $filters[] = "<span>از تاریخ:</span> " . htmlspecialchars($display_date_from);
 if (!empty($display_date_to)) $filters[] = "<span>تا تاریخ:</span> " . htmlspecialchars($display_date_to);
 
-if (!empty($filters)) {
-    $filterText = "🔍 فیلترهای اعمال شده: " . implode(" | ", $filters);
-} else {
-    $filterText = "📋 نمایش همه تیکت‌ها";
-}
 
 // اگر درخواست Ajax است، فقط داده‌های JSON را برگردان
 if ($isAjax) {
@@ -112,28 +127,33 @@ if ($isAjax) {
     <table>
         <thead>
         <tr>
-            <th>#</th>
-            <th>کد پیگیری</th>
+            <th>ردیف</th>
+            <th>فعالیت</th>
             <th>بخش</th>
-            <th>نام و نام خانوادگی</th>
-            <th>کاربر</th>
-            <th>موضوع</th>
-            <th>وضعیت</th>
+            <th>برند</th>
+            <th>تحویل گیرنده</th>
+            <th>سریال</th>
+            <th>کد رایانه</th>
             <th>تاریخ ثبت</th>
         </tr>
         </thead>
         <tbody>
-        <?php if (empty($tickets)): ?>
+        <?php if (empty($services)): ?>
             <tr>
                 <td colspan="8" class="no-data">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
             </tr>
         <?php else: ?>
             <?php $i = 1; ?>
-            <?php foreach ($tickets as $t): ?>
+            <?php foreach ($services as $s): ?>
                 <tr>
-                    <td><?php echo fa_number($i++); ?></td>
-                    <td><?php echo htmlspecialchars($t['department_name'] ?? '-'); ?></td>
-                    <td><?php echo fa_number($t['created_at']); ?></td>
+                    <td><?= fa_number($i++) ?></td>
+                    <td><?= htmlspecialchars($s['service_name']) ?></td>
+                    <td><?= htmlspecialchars($s['department_name']) ?></td>
+                    <td><?= htmlspecialchars($s['brand_name']) ?></td>
+                    <td><?= htmlspecialchars($s['receiver_name']) ?></td>
+                    <td><?= htmlspecialchars($s['serial_number']) ?></td>
+                    <td><?= htmlspecialchars($s['computer_code']) ?></td>
+                    <td><?= htmlspecialchars($s['created_at']) ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
@@ -147,12 +167,6 @@ if ($isAjax) {
     echo json_encode([
         'success' => true,
         'table' => $tableHtml,
-        'stats' => [
-            'total' => fa_number($total),
-            'review' => fa_number($reviewCount),
-            'answered' => fa_number($answeredCount),
-            'closed' => fa_number($closedCount)
-        ],
         'filterInfo' => $filterText
     ]);
     exit;
@@ -192,8 +206,22 @@ if ($isAjax) {
             <h2>🔍 فیلترها</h2>
             <form method="post" id="filterform">
                 <div class="filter-row">
+
                     <div class="filter-group">
-                        <label>بخش:</label>
+                        <label>فعالیت</label>
+                        <select name="service_name">
+                            <option value="">همه فعالیت‌ها</option>
+                            <?php foreach ($servicesList as $service): ?>
+                                <option value="<?= htmlspecialchars($service) ?>"
+                                    <?= $service_name == $service ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($service) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>بخش</label>
                         <select name="department_id">
                             <option value="">همه بخش‌ها</option>
                             <?php foreach ($departments as $dept): ?>
@@ -235,22 +263,32 @@ if ($isAjax) {
                 <thead>
                 <tr>
                     <th>ردیف</th>
+                    <th>فعالیت</th>
                     <th>بخش</th>
+                    <th>برند</th>
+                    <th>تحویل گیرنده</th>
+                    <th>سریال</th>
+                    <th>کد رایانه</th>
                     <th>تاریخ ثبت</th>
                 </tr>
                 </thead>
                 <tbody>
-                <?php if (empty($tickets)): ?>
+                <?php if (empty($services)): ?>
                     <tr>
                         <td colspan="8" class="text-center">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
                     </tr>
                 <?php else: ?>
                     <?php $i = 1; ?>
-                    <?php foreach ($tickets as $t): ?>
+                    <?php foreach ($services as $s): ?>
                         <tr>
-                            <td><?php echo fa_number($i++); ?></td>
-                            <td><?php echo htmlspecialchars($t['department_name'] ?? '-'); ?></td>
-                            <td><?php echo fa_number($t['created_at']); ?></td>
+                            <td><?= fa_number($i++) ?></td>
+                            <td><?= htmlspecialchars($s['service_name'] ?? '-') ?></td>
+                            <td><?= htmlspecialchars($s['department_name'] ?? '-') ?></td>
+                            <td><?= htmlspecialchars($s['brand_name'] ?? '-') ?></td>
+                            <td><?= htmlspecialchars($s['receiver_name'] ?? '-') ?></td>
+                            <td><?= htmlspecialchars($s['serial_number'] ?? '-') ?></td>
+                            <td><?= htmlspecialchars($s['computer_code'] ?? '-') ?></td>
+                            <td><?= fa_number($s['created_at'] ?? '-') ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -259,6 +297,5 @@ if ($isAjax) {
         </div>
     </div>
 </div>
-
 </body>
 </html>
