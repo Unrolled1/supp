@@ -31,16 +31,6 @@ $service_name = $_POST['service_name'] ?? '';
 $date_from = faToEn($_POST['date_from'] ?? '');
 $date_to   = faToEn($_POST['date_to'] ?? '');
 
-
-// اگر reset باشد، همه پارامترها را خالی کن
-if ($isReset) {
-    $service_name = '';
-    $department_id = '';
-    $date_from = '';
-    $date_to = '';
-}
-
-
 // ساخت کوئری شرطی
 $whereConditions = [];
 $params = [];
@@ -65,6 +55,24 @@ if (!empty($date_to)) {
     $params[':date_to'] = $date_to;
 }
 
+$selectedColumns = $_POST['columns'] ?? [
+    'service_name',
+    'department_name',
+    'brand_name',
+    'receiver_name',
+    'serial_number',
+    'computer_code',
+    'created_at'
+];
+$availableColumns = [
+    'service_name' => 'فعالیت',
+    'department_name' => 'بخش',
+    'brand_name' => 'برند',
+    'receiver_name' => 'تحویل گیرنده',
+    'serial_number' => 'سریال',
+    'computer_code' => 'کد رایانه',
+    'created_at' => 'تاریخ ثبت'
+];
 $whereSql = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
 
 // گرفتن تیکت‌ها
@@ -128,13 +136,12 @@ if ($isAjax) {
         <thead>
         <tr>
             <th>ردیف</th>
-            <th>فعالیت</th>
-            <th>بخش</th>
-            <th>برند</th>
-            <th>تحویل گیرنده</th>
-            <th>سریال</th>
-            <th>کد رایانه</th>
-            <th>تاریخ ثبت</th>
+
+            <?php foreach ($selectedColumns as $col): ?>
+                <?php if(isset($availableColumns[$col])): ?>
+                    <th><?= $availableColumns[$col] ?></th>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </tr>
         </thead>
         <tbody>
@@ -147,13 +154,17 @@ if ($isAjax) {
             <?php foreach ($services as $s): ?>
                 <tr>
                     <td><?= fa_number($i++) ?></td>
-                    <td><?= htmlspecialchars($s['service_name']) ?></td>
-                    <td><?= htmlspecialchars($s['department_name']) ?></td>
-                    <td><?= htmlspecialchars($s['brand_name']) ?></td>
-                    <td><?= htmlspecialchars($s['receiver_name']) ?></td>
-                    <td><?= htmlspecialchars($s['serial_number']) ?></td>
-                    <td><?= htmlspecialchars($s['computer_code']) ?></td>
-                    <td><?= htmlspecialchars($s['created_at']) ?></td>
+                    <?php foreach ($selectedColumns as $col): ?>
+                        <?php if(isset($availableColumns[$col])): ?>
+                            <?php
+                            $value = $s[$col] ?? '-';
+                            if ($col == 'created_at' && $value != '-') {
+                                $value = fa_number($value);
+                            }
+                            ?>
+                            <td><?= htmlspecialchars((string)$value) ?></td>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
         <?php endif; ?>
@@ -205,34 +216,20 @@ if ($isAjax) {
         <div class="filter-card">
             <h2>🔍 فیلترها</h2>
             <form method="post" id="filterform">
-                <div class="filter-row">
+            <div class="columns-box">
+                <div class="checkbox-grid">
 
-                    <div class="filter-group">
-                        <label>فعالیت</label>
-                        <select name="service_name">
-                            <option value="">همه فعالیت‌ها</option>
-                            <?php foreach ($servicesList as $service): ?>
-                                <option value="<?= htmlspecialchars($service) ?>"
-                                    <?= $service_name == $service ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($service) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label>بخش</label>
-                        <select name="department_id">
-                            <option value="">همه بخش‌ها</option>
-                            <?php foreach ($departments as $dept): ?>
-                                <option value="<?php echo $dept['id']; ?>" <?php echo $department_id == $dept['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($dept['name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                    <label><input type="checkbox" name="columns[]" value="service_name" checked> فعالیت</label>
+                    <label><input type="checkbox" name="columns[]" value="department_name" checked> بخش</label>
+                    <label><input type="checkbox" name="columns[]" value="brand_name" checked> برند</label>
+                    <label><input type="checkbox" name="columns[]" value="receiver_name" checked> تحویل گیرنده</label>
+                    <label><input type="checkbox" name="columns[]" value="serial_number" checked> سریال</label>
+                    <label><input type="checkbox" name="columns[]" value="computer_code" checked> کد رایانه</label>
+                    <label><input type="checkbox" name="columns[]" value="created_at" checked> تاریخ ثبت</label>
 
                 </div>
+            </div>
+
                 <div class="filter-row">
                     <!-- انتخابگر تاریخ سه سطحی -->
 
@@ -249,12 +246,11 @@ if ($isAjax) {
                     </div>
                 </div>
                 <div class="filter-actions">
-                    <button type="button" class="btn-filter">🔍 اعمال فیلتر</button>
-                    <button type="button" class="btn-reset">🗑️ پاک کردن فیلترها</button>
+                    <button type="button" class="btn-filter" onclick="searchReport()" >🔍 اعمال فیلتر</button>
                     <button type="button" class="btn-pdf">🖨️ پرینت گزارش</button>
                 </div>
-
             </form>
+
         </div>
 
         <!-- جدول نتایج -->
@@ -263,13 +259,12 @@ if ($isAjax) {
                 <thead>
                 <tr>
                     <th>ردیف</th>
-                    <th>فعالیت</th>
-                    <th>بخش</th>
-                    <th>برند</th>
-                    <th>تحویل گیرنده</th>
-                    <th>سریال</th>
-                    <th>کد رایانه</th>
-                    <th>تاریخ ثبت</th>
+
+                    <?php foreach ($selectedColumns as $col): ?>
+                        <?php if(isset($availableColumns[$col])): ?>
+                            <th><?= $availableColumns[$col] ?></th>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </tr>
                 </thead>
                 <tbody>
@@ -282,13 +277,22 @@ if ($isAjax) {
                     <?php foreach ($services as $s): ?>
                         <tr>
                             <td><?= fa_number($i++) ?></td>
-                            <td><?= htmlspecialchars($s['service_name'] ?? '-') ?></td>
-                            <td><?= htmlspecialchars($s['department_name'] ?? '-') ?></td>
-                            <td><?= htmlspecialchars($s['brand_name'] ?? '-') ?></td>
-                            <td><?= htmlspecialchars($s['receiver_name'] ?? '-') ?></td>
-                            <td><?= htmlspecialchars($s['serial_number'] ?? '-') ?></td>
-                            <td><?= htmlspecialchars($s['computer_code'] ?? '-') ?></td>
-                            <td><?= fa_number($s['created_at'] ?? '-') ?></td>
+
+                            <?php foreach ($selectedColumns as $col): ?>
+                                <?php if(isset($availableColumns[$col])): ?>
+
+                                    <?php
+                                    $value = $s[$col] ?? '-';
+
+                                    if ($col == 'created_at' && $value != '-') {
+                                        $value = fa_number($value);
+                                    }
+                                    ?>
+
+                                    <td><?= htmlspecialchars((string)$value) ?></td>
+
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

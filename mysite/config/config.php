@@ -78,7 +78,7 @@ $js_pages = [
     'admin_topics' => ['admin-topics.js'],
     'admin_activities' => ['admin-activities.js'],
     'admin_ticketrep' => ['admin-ticketrep.js'],
-
+'admin_servicerep'=>['admin-servicerep.js'],
     'admin_kala' => ['admin-kala.js'],
     'dashboard' => ['dashboard.js'],
     'login' => ['login.js'],
