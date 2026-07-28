@@ -4,9 +4,10 @@
 // ============================================
 
 // تشخیص مسیر پایه
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $host = $_SERVER['HTTP_HOST'];
-define('BASE_URL', $protocol . $host . '/supp/mysite/');
+$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\') . '/';
+define('BASE_URL', $protocol . $host . $basePath);
 
 // مسیر فیزیکی پوشه assets
 define('ASSETS_PATH', __DIR__ . '/assets/');

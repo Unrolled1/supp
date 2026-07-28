@@ -1102,7 +1102,7 @@ input:focus, select:focus, textarea:focus {
     text-align: center;
 }
 .columns-box{
-    width: 40%;
+    width: 50%;
     border:1px solid #d9d9d9;
     border-radius:8px;
     padding:12px;

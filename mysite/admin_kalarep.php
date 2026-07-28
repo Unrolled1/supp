@@ -35,27 +35,27 @@ $date_to   = faToEn($_POST['date_to'] ?? '');
 $whereConditions = [];
 $params = [];
 
-if (!empty($department_id)) {
-    $whereConditions[] = "k.department_id = :department_id";
-    $params[':department_id'] = $department_id;
-}
+    if (!empty($department_id)) {
+        $whereConditions[] = "k.department_id = :department_id";
+        $params[':department_id'] = $department_id;
+    }
 
-if (!empty($brand_id)) {
-    $whereConditions[] = "k.brand_id = :brand_id";
-    $params[':brand_id'] = $brand_id;
-}
+    if (!empty($brand_id)) {
+        $whereConditions[] = "k.brand_id = :brand_id";
+        $params[':brand_id'] = $brand_id;
+    }
 
-if (!empty($date_from)) {
-    $whereConditions[] = "k.created_at >= :date_from";
-    $params[':date_from'] = $date_from;
-}
+    if (!empty($date_from)) {
+        $whereConditions[] = "k.created_at >= :date_from";
+        $params[':date_from'] = $date_from;
+    }
 
-if (!empty($date_to)) {
-    $whereConditions[] = "k.created_at <= :date_to";
-    $params[':date_to'] = $date_to;
-}
+    if (!empty($date_to)) {
+        $whereConditions[] = "k.created_at <= :date_to";
+        $params[':date_to'] = $date_to;
+    }
 
-$selectedColumns = $_POST['columns'] ?? [
+    $selectedColumns = $_POST['columns'] ?? [
     'computer_code',
     'property_code',
     'name',
@@ -65,18 +65,31 @@ $selectedColumns = $_POST['columns'] ?? [
     'brand_name',
     'serial_number',
     'created_at'
-];
+    ];
 
+    if (empty($selectedColumns)) {
+    $selectedColumns = [
+        'computer_code',
+        'property_code',
+        'name',
+        'department_name',
+        'receiver_name',
+        'quantity',
+        'brand_name',
+        'serial_number',
+        'created_at'
+    ];
+    }
 $availableColumns = [
-    'computer_code'=>'کد رایانه',
-    'property_code'=>'کد اموال',
-    'name'=>'نام کالا',
-    'department_name'=>'بخش',
-    'receiver_name'=>'تحویل گیرنده',
-    'quantity'=>'تعداد',
-    'brand_name'=>'برند',
-    'serial_number'=>'سریال',
-    'created_at'=>'تاریخ ثبت'
+    'computer_code'   => 'کد رایانه',
+    'property_code'   => 'کد اموال',
+    'name'            => 'نام کالا',
+    'department_name' => 'بخش',
+    'receiver_name'   => 'تحویل گیرنده',
+    'quantity'        => 'تعداد',
+    'brand_name'      => 'برند',
+    'serial_number'   => 'سریال',
+    'created_at'      => 'تاریخ ثبت'
 ];
 
 $whereSql = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
@@ -103,126 +116,131 @@ ON p.id=k.receiver_person_id
 LEFT JOIN users u
 ON u.id=k.created_by
     $whereSql
-ORDER BY k.created_at DESC";
+ORDER BY k.created_at DESC, k.id DESC  ";
 
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
 $kalas=$stmt->fetchAll();
 
 $departments = $db->query("SELECT id,name FROM departments  ORDER BY name ASC")->fetchAll();
-
+$brands = $db->query("
+SELECT id,name
+FROM brands
+ORDER BY name
+")->fetchAll();
+$department_name = '';
+$brand_name = '';
 
 if (!empty($department_id)) {
-    $stmt = $db->prepare("SELECT name FROM departments WHERE id = ?");
+    $stmt = $db->prepare("SELECT name FROM departments WHERE id=?");
     $stmt->execute([$department_id]);
     $department_name = $stmt->fetchColumn();
 }
-$brand_name = '';
+
 if (!empty($brand_id)) {
-    $stmt = $db->prepare("SELECT name FROM brands WHERE id = ?");
+    $stmt = $db->prepare("SELECT name FROM brands WHERE id=?");
     $stmt->execute([$brand_id]);
     $brand_name = $stmt->fetchColumn();
 }
+
 // ساخت تاریخ نمایشی
-$display_date_from = !empty($date_from) ? fa_number($date_from) : '';
-$display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
+$display_date_from = $date_from ? fa_number($date_from) : '';
+$display_date_to   = $date_to ? fa_number($date_to) : '';
 
-// ساخت اطلاعات فیلترها برای نمایش
-$filterText = '';
-$filters = [];
+$filterItems = [];
 
-if(!empty($department_name))
-    $filters[]="<span>بخش:</span> ".$department_name;
+if ($department_name)
+    $filterItems[] = "<span>بخش:</span> ".htmlspecialchars($department_name);
 
-if(!empty($brand_name))
-    $filters[]="<span>برند:</span> ".$brand_name;
+if ($brand_name)
+    $filterItems[] = "<span>برند:</span> ".htmlspecialchars($brand_name);
 
-if(!empty($display_date_from))
-    $filters[]="<span>از تاریخ:</span>".$display_date_from;
+if ($display_date_from)
+    $filterItems[] = "<span>از تاریخ:</span> ".$display_date_from;
 
-if(!empty($display_date_to))
-    $filters[]="<span>تا تاریخ:</span>".$display_date_to;
+if ($display_date_to)
+    $filterItems[] = "<span>تا تاریخ:</span> ".$display_date_to;
 
-
+$filterText = empty($filterItems)? "📋 نمایش همه کالاها" : "🔍 فیلترهای اعمال شده: ".implode(" | ", $filterItems);
+$filterItems[] = "<span>تعداد:</span> ".fa_number(count($kalas));
 // اگر درخواست Ajax است، فقط داده‌های JSON را برگردان
 if ($isAjax) {
 
     ob_start();
-?>
-<table>
-    <thead>
-    <tr>
-        <th>ردیف</th>
-
-        <?php foreach ($selectedColumns as $col): ?>
-            <?php if (isset($availableColumns[$col])): ?>
-                <th><?= $availableColumns[$col] ?></th>
-            <?php endif; ?>
-        <?php endforeach; ?>
-
-    </tr>
-    </thead>
-
-    <tbody>
-
-    <?php if (empty($kalas)): ?>
-
+    ?>
+    <table>
+        <thead>
         <tr>
-            <td colspan="<?= count($selectedColumns) + 1 ?>" class="no-data">
-                📭 هیچ کالایی با این فیلترها یافت نشد
-            </td>
+            <th>ردیف</th>
+
+            <?php foreach ($selectedColumns as $col): ?>
+                <?php if (isset($availableColumns[$col])): ?>
+                    <th><?= htmlspecialchars($availableColumns[$col]) ?></th>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
         </tr>
+        </thead>
 
-    <?php else: ?>
+        <tbody>
 
-        <?php $i = 1; ?>
-
-        <?php foreach ($kalas as $k): ?>
+        <?php if (empty($kalas)): ?>
 
             <tr>
-
-                <td><?= fa_number($i++) ?></td>
-
-                <?php foreach ($selectedColumns as $col): ?>
-
-                    <?php if (isset($availableColumns[$col])): ?>
-
-                        <?php
-                        $value = $k[$col] ?? '-';
-
-                        if ($col == 'created_at' && $value != '-') {
-                            $value = fa_number($value);
-                        }
-                        ?>
-
-                        <td><?= htmlspecialchars((string)$value) ?></td>
-
-                    <?php endif; ?>
-
-                <?php endforeach; ?>
-
+                <td colspan="<?= count($selectedColumns) + 1 ?>" class="no-data">
+                    📭 هیچ کالایی با این فیلترها یافت نشد
+                </td>
             </tr>
 
-        <?php endforeach; ?>
+        <?php else: ?>
 
-    <?php endif; ?>
+            <?php $i = 1; ?>
 
-    </tbody>
-</table>
-<?php
+            <?php foreach ($kalas as $k): ?>
+
+                <tr>
+
+                    <td><?= fa_number($i++) ?></td>
+
+                    <?php foreach ($selectedColumns as $col): ?>
+
+                        <?php if (isset($availableColumns[$col])): ?>
+
+                            <?php
+                            $value = $k[$col] ?? '-';
+
+                            if ($col == 'created_at' && $value != '-') {
+                                $value = fa_number($value);
+                            }
+                            ?>
+
+                            <td><?= htmlspecialchars((string)$value) ?></td>
+
+                        <?php endif; ?>
+
+                    <?php endforeach; ?>
+
+                </tr>
+
+            <?php endforeach; ?>
+
+        <?php endif; ?>
+
+        </tbody>
+    </table>
+    <?php
 
     $tableHtml = ob_get_clean();
 
     header('Content-Type: application/json');
 
     echo json_encode([
-        'success' => true,
-        'table' => $tableHtml,
+        'success'    => true,
+        'table'      => $tableHtml,
         'filterInfo' => $filterText
     ]);
 
     exit;
-
 }
 
 ?>
@@ -252,16 +270,17 @@ if ($isAjax) {
         </div>
 
         <div class="main-title">
-            <h1>📊 گزارشات فعالیت</h1>
+            <h1>📊 گزارشات کالا</h1>
         </div>
 
         <div class="filter-card">
             <h2>🔍 فیلترها</h2>
             <form method="post" id="filterform">
             <div class="columns-box">
+
                 <div class="checkbox-grid">
 
-                    <label><input type="checkbox" name="columns[]" value="computer_code" checked> کد رایانه</label>
+<label><input type="checkbox" name="columns[]" value="computer_code" checked> کد رایانه</label>
 
 <label><input type="checkbox" name="columns[]" value="property_code" checked> کد اموال</label>
 
@@ -279,10 +298,10 @@ if ($isAjax) {
 
 <label><input type="checkbox" name="columns[]" value="created_at" checked> تاریخ ثبت</label>
 
-                </div>
+</div>
             </div>
             <div class="filter-row">
-<div class="search-group">
+<div class="filter-group">
     <label>بخش</label>
     <select name="department_id">
         <option value="">همه</option>
@@ -294,12 +313,11 @@ if ($isAjax) {
     </select>
 </div>
 
-<div class="search-group">
+<div class="filter-group">
     <label>برند</label>
     <select name="brand_id">
         <option value="">همه</option>
         <?php
-        $brands=$db->query("SELECT id,name FROM brands ORDER BY name")->fetchAll();
         foreach($brands as $b):
         ?>
             <option value="<?= $b['id'] ?>" <?= $brand_id==$b['id']?'selected':'' ?>>
@@ -326,7 +344,7 @@ if ($isAjax) {
                 </div>
                 <div class="filter-actions">
                     <button type="button" class="btn-filter" >🔍 اعمال فیلتر</button>
-                    <button type="button" class="btn-filter"> پاک کردن </button>
+                    <button type="button" class="btn-reset"> 🗑 پاک کردن</button>
                     <button type="button" class="btn-pdf">🖨️ پرینت گزارش</button>
                 </div>
             </form>
@@ -350,7 +368,7 @@ if ($isAjax) {
                 <tbody>
                 <?php if (empty($kalas)): ?>
                     <tr>
-                        <td colspan="8" class="text-center">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
+                        <td colspan="<?= count($selectedColumns)+1 ?>">📭 هیچ کالایی با این فیلترها یافت نشد</td>
                     </tr>
                 <?php else: ?>
                     <?php $i = 1; ?>
