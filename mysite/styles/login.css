@@ -1,0 +1,94 @@
+/* ============================================
+   استایل مخصوص صفحه لاگین - فقط چیدمان
+   ============================================ */
+/* وسط چین کردن صفحه لاگین */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+.login-container {
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-container h2 {
+    margin-bottom: 0.5rem;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.login-container .subtitle {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 0.5rem 0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.login-container input:focus {
+    outline: none;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.login-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid;
+    font-size: 12px;
+}
+
+.login-footer span {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.demo-credentials {
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 1rem;
+    font-size: 12px;
+}
+
+.demo-credentials p {
+    margin: 5px 0;
+}

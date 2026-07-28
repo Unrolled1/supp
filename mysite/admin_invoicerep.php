@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 require_once 'config/config.php';
 require_once 'db.php';
@@ -23,10 +22,6 @@ $db = getDB();
 $isAjax = isset($_POST['ajax']) && $_POST['ajax'] == '1';
 $isReset = isset($_POST['reset']) && $_POST['reset'] == '1';
 
-// دریافت پارامترهای فیلتر
-$department_id = $_POST['department_id'] ?? '';
-$service_name = $_POST['service_name'] ?? '';
-
 // تاریخ شمسی از لیست‌ها
 $date_from = faToEn($_POST['date_from'] ?? '');
 $date_to   = faToEn($_POST['date_to'] ?? '');
@@ -35,84 +30,52 @@ $date_to   = faToEn($_POST['date_to'] ?? '');
 $whereConditions = [];
 $params = [];
 
-if (!empty($service_name)) {
-    $whereConditions[] = "sr.service_name = :service_name";
-    $params[':service_name'] = $service_name;
-}
-$department_name = '';
-if (!empty($department_id)) {
-    $whereConditions[] = "sr.department_id = :department_id";
-    $params[':department_id'] = $department_id;
-}
-
 if (!empty($date_from)) {
-    $whereConditions[] = "sr.created_at >= :date_from";
+    $whereConditions[] = "i.created_at >= :date_from";
     $params[':date_from'] = $date_from;
 }
 
 if (!empty($date_to)) {
-    $whereConditions[] = "sr.created_at <= :date_to";
+    $whereConditions[] = "i.created_at <= :date_to";
     $params[':date_to'] = $date_to;
 }
 
 $selectedColumns = $_POST['columns'] ?? [
-    'service_name',
-    'department_name',
-    'brand_name',
-    'receiver_name',
-    'serial_number',
-    'computer_code',
-    'created_at'
-];
-$availableColumns = [
-    'service_name' => 'فعالیت',
-    'department_name' => 'بخش',
-    'brand_name' => 'برند',
-    'receiver_name' => 'تحویل گیرنده',
-    'serial_number' => 'سریال',
-    'computer_code' => 'کد رایانه',
-    'created_at' => 'تاریخ ثبت'
-];
+        'company_name',
+        'invoice_number',
+        'subject',
+        'amount',
+        'description',
+        'created_at'
+    ];
+     $availableColumns = [
+        'company_name'    => 'نام شرکت',
+        'invoice_number' => 'شماره فاکتور',
+        'subject'      => 'موضوع فاکتور',
+        'amount'   => 'مبلغ فاکتور',
+        'description'   => 'توضیحات',
+        'created_at'      => 'تاریخ ثبت'
+    ];
+
 $whereSql = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
 
 // گرفتن تیکت‌ها
 $sql = "
     SELECT
-    sr.*,
-    d.name  AS department_name,
-    b.name  AS brand_name,
-    rp.name AS receiver_name,
-    u.fullname AS creator_name
-FROM service_requests sr
-LEFT JOIN departments d
-    ON d.id = sr.department_id
-LEFT JOIN brands b
-    ON b.id = sr.brand_id
-LEFT JOIN persons rp
-    ON rp.id = sr.receiver_person_id
+    i.*,
+ u.fullname AS creator_name
+FROM invoices i
 LEFT JOIN users u
-    ON u.id = sr.created_by
+    ON u.id = i.created_by
     $whereSql
-ORDER BY sr.created_at DESC
+ORDER BY i.created_at DESC
 ";
 
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
-$services = $stmt->fetchAll();
+$invoices = $stmt->fetchAll();
 
 
-$departments = $db->query("SELECT id,name FROM departments  ORDER BY name ASC")->fetchAll();
-$servicesList = $db->query("
-SELECT DISTINCT service_name
-FROM service_requests
-ORDER BY service_name
-")->fetchAll(PDO::FETCH_COLUMN);
-
-if (!empty($department_id)) {
-    $stmt = $db->prepare("SELECT name FROM departments WHERE id = ?");
-    $stmt->execute([$department_id]);
-    $department_name = $stmt->fetchColumn();
-}
 // ساخت تاریخ نمایشی
 $display_date_from = !empty($date_from) ? fa_number($date_from) : '';
 $display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
@@ -120,8 +83,8 @@ $display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
 // ساخت اطلاعات فیلترها برای نمایش
 $filterText = '';
 $filters = [];
-if (!empty($service_name)) $filters[] = "<span>فعالیت:</span> " . htmlspecialchars($service_name);
-if (!empty($department_name)) $filters[] = "<span>بخش:</span> " . htmlspecialchars($department_name);
+if (!empty($company_name)) $filters[] = "<span>نام شرکت:</span> " . htmlspecialchars($company_name);
+if (!empty($invoice_number)) $filters[] = "<span>شماره فاکتور:</span> " . htmlspecialchars($invoice_number);
 if (!empty($display_date_from)) $filters[] = "<span>از تاریخ:</span> " . htmlspecialchars($display_date_from);
 if (!empty($display_date_to)) $filters[] = "<span>تا تاریخ:</span> " . htmlspecialchars($display_date_to);
 
@@ -145,19 +108,19 @@ if ($isAjax) {
         </tr>
         </thead>
         <tbody>
-        <?php if (empty($services)): ?>
+        <?php if (empty($invoices)): ?>
             <tr>
                 <td colspan="8" class="no-data">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
             </tr>
         <?php else: ?>
             <?php $i = 1; ?>
-            <?php foreach ($services as $s): ?>
+            <?php foreach ($invoices as $invoice): ?>
                 <tr>
                     <td><?= fa_number($i++) ?></td>
                     <?php foreach ($selectedColumns as $col): ?>
                         <?php if(isset($availableColumns[$col])): ?>
                             <?php
-                            $value = $s[$col] ?? '-';
+                            $value = $invoice[$col] ?? '-';
                             if ($col == 'created_at' && $value != '-') {
                                 $value = fa_number($value);
                             }
@@ -189,7 +152,7 @@ if ($isAjax) {
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>گزارشات فعالیت</title>
+    <title>گزارشات فاکتور</title>
     <?php load_assets(); ?>
 
 </head>
@@ -210,7 +173,7 @@ if ($isAjax) {
         </div>
 
         <div class="main-title">
-            <h1>📊 گزارشات فعالیت</h1>
+            <h1>📊 گزارشات فاکتور</h1>
         </div>
 
         <div class="filter-card">
@@ -219,12 +182,11 @@ if ($isAjax) {
             <div class="columns-box">
                 <div class="checkbox-grid">
 
-                    <label><input type="checkbox" name="columns[]" value="service_name" checked> فعالیت</label>
-                    <label><input type="checkbox" name="columns[]" value="department_name" checked> بخش</label>
-                    <label><input type="checkbox" name="columns[]" value="brand_name" checked> برند</label>
-                    <label><input type="checkbox" name="columns[]" value="receiver_name" checked> تحویل گیرنده</label>
-                    <label><input type="checkbox" name="columns[]" value="serial_number" checked> سریال</label>
-                    <label><input type="checkbox" name="columns[]" value="computer_code" checked> کد رایانه</label>
+                    <label><input type="checkbox" name="columns[]" value="company_name" checked> نام شرکت</label>
+                    <label><input type="checkbox" name="columns[]" value="invoice_number" checked> شماره فاکتور</label>
+                    <label><input type="checkbox" name="columns[]" value="subject" checked> موضوع</label>
+                    <label><input type="checkbox" name="columns[]" value="amount" checked> مبلغ فاکتور</label>
+                    <label><input type="checkbox" name="columns[]" value="description" checked> توضیحات</label>
                     <label><input type="checkbox" name="columns[]" value="created_at" checked> تاریخ ثبت</label>
 
                 </div>
@@ -268,13 +230,13 @@ if ($isAjax) {
                 </tr>
                 </thead>
                 <tbody>
-                <?php if (empty($services)): ?>
+                <?php if (empty($invoices)): ?>
                     <tr>
                         <td colspan="8" class="text-center">📭 هیچ تیکتی با این فیلترها یافت نشد</td>
                     </tr>
                 <?php else: ?>
                     <?php $i = 1; ?>
-                    <?php foreach ($services as $s): ?>
+                    <?php foreach ($invoices as $invoice): ?>
                         <tr>
                             <td><?= fa_number($i++) ?></td>
 
@@ -282,7 +244,7 @@ if ($isAjax) {
                                 <?php if(isset($availableColumns[$col])): ?>
 
                                     <?php
-                                    $value = $s[$col] ?? '-';
+                                    $value = $invoice[$col] ?? '-';
 
                                     if ($col == 'created_at' && $value != '-') {
                                         $value = fa_number($value);
@@ -303,11 +265,11 @@ if ($isAjax) {
  </div>
  <script>
     window.reportConfig = {
-    url: "admin_servicerep.php",
+    url: "admin_invoicerep.php",
     printUrl: "assets/print_report.php",
     table: ".reports-table",
     filterInfo: true,
-    type: "service"
+    type: "invoice"
  };
     </script>
 </body>

@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once 'config/config.php';
 require_once 'db.php';
 require_once 'assets/jdf.php';
 require_once 'functions.php';
@@ -21,7 +20,6 @@ if (!isAdmin()) {
 $db = getDB();
 $successMessage = '';
 $errorMessage = '';
-
 
 $stmt = $db->query("
     SELECT t.*, u.username, u.fullname as user_fullname, d.name as department_name
@@ -67,7 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
 <head>
     <meta charset="UTF-8">
     <title>پنل مدیریت درخواست‌ها</title>
-    <?php load_assets(); ?>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/admin.css">
+    <link rel="stylesheet" href="styles/admin-sidebar.css">
 </head>
 <body>
 <div class="admin-wrapper">
@@ -112,16 +113,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
             <div class="alert alert-error"><?php echo $errorMessage; ?></div>
         <?php endif; ?>
 
-        <div class="tickets-table data-table">
+        <div class="tickets-table">
             <table>
                 <thead>
                 <tr>
-                    <th>ردیف</th>
+                    <th>#</th>
                     <th>کد پیگیری</th>
                     <th>بخش</th>
                     <th>نام کاربر</th>
                     <th>موضوع</th>
-                    <th>متن درخواست</th>
                     <th>وضعیت</th>
                     <th>تاریخ ثبت</th>
                     <th>عملیات</th>
@@ -133,27 +133,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ticket']) && c
                 <?php else: ?>
                     <?php $row_num = 1; ?>
                     <?php foreach ($tickets as $ticket): ?>
-                        <?php
-$statusClass = 'status-closed';
-
-if ($ticket['status'] == 'جدید') {
-    $statusClass = 'status-new';
-} elseif ($ticket['status'] == 'در حال بررسی') {
-    $statusClass = 'status-review';
-} elseif ($ticket['status'] == 'پاسخ داده شده') {
-    $statusClass = 'status-answered';
-}
-?>
+                        <?php $statusClass = match($ticket['status']) {
+                            'جدید' => 'status-new',
+                            'در حال بررسی' => 'status-review',
+                            'پاسخ داده شده' => 'status-answered',
+                            default => 'status-closed'
+                        }; ?>
                         <tr>
                             <td><?php echo fa_number($row_num); ?></td>
                             <td><?php echo fa_number(htmlspecialchars($ticket['tracking_code'])); ?></td>
                             <td>🏥 <?php echo htmlspecialchars($ticket['department_name'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($ticket['fullname']); ?></td>
                             <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
-                            <td class="message-cell"><?php echo nl2br(htmlspecialchars($ticket['message'])); ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo $ticket['status']; ?></span></td>
                             <td class="date-ltr"><?php echo fa_number(htmlspecialchars($ticket['created_at'])); ?></td>
-
                             <td class="action-buttons">
                                 <?php if (canEditTickets()): ?>
                                     <form method="post" style="display:inline;">
@@ -183,5 +176,17 @@ if ($ticket['status'] == 'جدید') {
     </div>
 </div>
 
+<script>
+    function updateClock() {
+        fetch('get_time.php')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('liveClock').innerHTML = '📅 ' + data.datetime;
+            })
+            .catch(error => console.log('خطا:', error));
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
 </body>
 </html>

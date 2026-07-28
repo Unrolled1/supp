@@ -39,6 +39,12 @@ $to_day = $_POST['to_day'] ?? '';
 if ($isReset) {
     $department_id = '';
     $status = '';
+    $from_day = '';
+    $from_month = '';
+    $from_year = '';
+    $to_day = '';
+    $to_month = '';
+    $to_year = '';
 }
 
 // ساخت تاریخ کامل برای کوئری
@@ -112,8 +118,14 @@ if (!empty($department_id)) {
     $department_name = $stmt->fetchColumn();
 }
 // ساخت تاریخ نمایشی
-$display_date_from = !empty($date_from) ? fa_number($date_from) : '';
-$display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
+$display_date_from = '';
+$display_date_to = '';
+if (!empty($from_year) && !empty($from_month) && !empty($from_day)) {
+    $display_date_from = fa_number($from_year) . '/' . fa_number($from_month) . '/' . fa_number($from_day);
+}
+if (!empty($to_year) && !empty($to_month) && !empty($to_day)) {
+    $display_date_to = fa_number($to_year) . '/' . fa_number($to_month) . '/' . fa_number($to_day);
+}
 
 // ساخت اطلاعات فیلترها برای نمایش
 $filterText = '';
@@ -252,16 +264,15 @@ ob_start();
 
                 <div class="search-group">
                     <label>از تاریخ </label>
-                    <input type="text" id="date_from" name="date_from" class="form-control" placeholder="انتخاب کنید">
-
+                    <div id="search_date_from_container"></div>
+                    <input type="hidden" id="search_date_from" value="<?php echo htmlspecialchars($_POST['date_from'] ?? ''); ?>">
                 </div>
 
                 <div class="search-group">
                     <label>تا تاریخ </label>
-                    <input type="text" id="date_to" name="date_to" class="form-control" placeholder="انتخاب کنید" >
-
+                    <div id="search_date_to_container"></div>
+                    <input type="hidden" id="search_date_to" value="<?php echo htmlspecialchars($_POST['date_to'] ?? ''); ?>">
                 </div>
-
                 </div>
                 <div class="filter-actions">
                     <button type="button" class="btn-filter">🔍 اعمال فیلتر</button>
@@ -340,16 +351,7 @@ ob_start();
         </div>
     </div>
 </div>
-<script>
-window.reportConfig = {
-    url: "admin_ticketrep.php",
-    printUrl: "assets/print_report.php",
-    table: ".reports-table",
-    stats: true,
-    filterInfo: true,
-     type: "ticket"
-};
-</script>
+
 
 </body>
 </html>

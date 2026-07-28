@@ -6,13 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <style>
+        @font-face {
+    font-family: 'Vazir';
+    src: url('fonts/Vazir.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
         * {
+            font-family: 'Vazir',  sans-serif;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            font-family: 'Vazir', 'Segoe UI', Tahoma, Arial, sans-serif;
+font-family: 'Vazir', 'Tahoma', sans-serif;
             padding: 10px;
             background: #f0f2f5;
             direction: rtl;
@@ -199,9 +207,7 @@
     </style>
 </head>
 <body>
-
 <div class="print-container">
-
     <!-- دکمه‌های عملیاتی (فقط در صفحه نمایش) -->
     <div class="action-buttons no-print">
         <button class="btn-print" onclick="window.print();">
@@ -211,16 +217,6 @@
             ✖ بستن
         </button>
     </div>
-
-    <!-- تذکر پرینت خودکار (فقط در صفحه نمایش) -->
-    <?php if ($autoPrint): ?>
-        <div class="print-notice no-print">
-            <strong>⏳ در حال باز کردن پنجره پرینت...</strong>
-            <br>
-            اگر پنجره پرینت باز نشد، روی دکمه <strong>"🖨️ پرینت گزارش"</strong> کلیک کنید.
-        </div>
-    <?php endif; ?>
-
     <!-- هدر گزارش -->
     <div class="print-header">
         <h1>📊 <?php echo $pageTitle; ?></h1>
@@ -228,25 +224,22 @@
             تاریخ چاپ: <?php echo fa_number(now()); ?>
         </div>
     </div>
-
     <!-- اطلاعات فیلترها -->
     <div class="filters-info">
         <?= $filterInfo ?? '📋 نمایش همه اطلاعات' ?>
     </div>
-
     <!-- آمار -->
-    <div class="stats">
-        <?php foreach ($stats as $key => $item): ?>
-            <?php if ($key == 'labels') continue; ?>
-
-            <div class="stat-box">
-                <div class="stat-num"><?= fa_number($item) ?></div>
-                <div class="stat-title"><?= $stats['labels'][$key] ?></div>
-            </div>
-
-        <?php endforeach; ?>
-    </div>
-
+    <?php if (!empty($stats)): ?>
+<div class="stats">
+    <?php foreach ($stats as $key => $item): ?>
+        <?php if ($key == 'labels') continue; ?>
+        <div class="stat-box">
+            <div class="stat-num"><?= fa_number($item) ?></div>
+            <div class="stat-title"><?= $stats['labels'][$key] ?></div>
+        </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
     <!-- جدول تیکت‌ها -->
     <div class="table-wrapper">
         <table>
@@ -258,55 +251,28 @@
             </tr>
             </thead>
             <tbody>
-
             <?php if (empty($tableRows)): ?>
-
                 <tr>
                     <td colspan="<?= count($tableHeaders) ?>" class="no-data">
                         📭 هیچ موردی یافت نشد
                     </td>
                 </tr>
-
             <?php else: ?>
-
                 <?php foreach ($tableRows as $row): ?>
-
                     <tr>
-
                         <?php foreach ($row as $cell): ?>
-
                             <td><?= $cell ?></td>
-
                         <?php endforeach; ?>
-
                     </tr>
-
                 <?php endforeach; ?>
-
             <?php endif; ?>
             </tbody>
         </table>
     </div>
-
     <!-- فوتر -->
     <div class="print-footer">
         سیستم پشتیبانی بیمارستان | چاپ شده در <?php echo fa_number(now()); ?>
     </div>
-
 </div>
-
-<!-- اسکریپت پرینت خودکار -->
-<?php if ($autoPrint): ?>
-    <script>
-        // وقتی صفحه کامل لود شد، پرینت را باز کن
-        window.onload = function() {
-            // کمی تاخیر برای اطمینان از لود کامل
-            setTimeout(function() {
-                window.print();
-            }, 500);
-        };
-    </script>
-<?php endif; ?>
-
 </body>
 </html>

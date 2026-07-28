@@ -15,7 +15,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Vazir', Tahoma, sans-serif;
+    font-family: 'Vazir',  sans-serif;
 }
 
 body {
@@ -156,10 +156,6 @@ body {
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 
 }
-.action-buttons {
-
-}
-
 
 /* ============================================
    رنگ‌های مدرن برای دکمه‌ها
@@ -198,7 +194,6 @@ body {
     background: #7c3aed !important;
     transform: translateY(-1px);
 }
-/* خاکستری (لغو) */
 
 /* ============================================
    استایل فرم‌ها

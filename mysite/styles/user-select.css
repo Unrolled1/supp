@@ -1,0 +1,64 @@
+/* ============================================
+   استایل مدرن برای انتخاب بخش
+   ============================================ */
+
+/* استایل اصلی select */
+.department-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    background-size: 16px;
+}
+
+.department-select:hover {
+    border-color: #667eea;
+}
+
+.department-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* استایل گزینه‌ها داخل select */
+.department-select option {
+    padding: 12px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    font-size: 14px;
+    background: white;
+    color: #333;
+}
+
+.department-select optgroup {
+    font-weight: bold;
+    color: #667eea;
+    background: #f8f9fa;
+}
+
+/* دکمه پاک کردن اختیاری */
+.department-clear {
+    position: absolute;
+    left: 45px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #999;
+    font-size: 14px;
+    background: white;
+    padding: 0 5px;
+}
+
+.department-clear:hover {
+    color: #dc3545;
+}

@@ -58,17 +58,16 @@ function openPrintWindow(config) {
     const form = document.getElementById("filterform");
     if (!form) return;
 
-    const params = new URLSearchParams(new FormData(form));
+    form.action = config.printUrl + "?type=" + config.type;
+    form.method = "POST";
+    form.target = "_blank";
 
-    params.append("print", "1");
+    form.submit();
 
-    window.open(
-        config.printUrl + "?" + params.toString(),
-        "_blank",
-        "width=1000,height=800,scrollbars=yes"
-    );
-
+    form.removeAttribute("action");
+    form.removeAttribute("target");
 }
+
 function applyReportFilters(config) {
 
     const form = document.getElementById("filterform");
@@ -301,22 +300,6 @@ function showToast(message, type = 'info') {
     alert(message);
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    if (!window.reportConfig)
-        return;
-
-    document.querySelector(".btn-filter")
-        ?.addEventListener("click", () => applyReportFilters(reportConfig));
-
-    document.querySelector(".btn-reset")
-        ?.addEventListener("click", () => resetReportFilters(reportConfig));
-
-    document.querySelector(".btn-pdf")
-        ?.addEventListener("click", openPrintWindow);
-
-});
 // ============================================
 // رندر سلکت‌های تاریخ برای جستجو
 // ============================================
