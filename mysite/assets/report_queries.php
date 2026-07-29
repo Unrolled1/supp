@@ -578,4 +578,167 @@ $display_date_from = !empty($date_from) ? fa_number($date_from) : '';
         'filterInfo'   => $filterText
     ];
 }
+
+function getPrinterReport($db, $filters)
+{
+    $department_id = $filters['department_id'] ?? '';
+    $brand_id      = $filters['brand_id'] ?? '';
+    $activity_id   = $filters['activity_id'] ?? '';
+    $date_from     = $filters['date_from'] ?? '';
+    $date_to       = $filters['date_to'] ?? '';
+
+    $selectedColumns = $filters['columns'] ?? [
+        'computer_code',
+        'property_code',
+        'activity_name',
+        'department_name',
+        'brand_name',
+        'serial_number',
+        'description',
+        'created_at'
+    ];
+
+    $availableColumns = [
+        'computer_code'  => 'کد رایانه',
+        'property_code'  => 'کد اموال',
+        'activity_name'  => 'فعالیت',
+        'department_name'=> 'بخش',
+        'brand_name'     => 'برند',
+        'serial_number'  => 'سریال',
+        'description'    => 'توضیحات',
+        'created_at'     => 'تاریخ ثبت'
+    ];
+
+    $where = [];
+    $params = [];
+
+    if(!empty($department_id)){
+        $where[] = "p.department_id = :department_id";
+        $params[':department_id'] = $department_id;
+    }
+
+    if(!empty($brand_id)){
+        $where[] = "p.brand_id = :brand_id";
+        $params[':brand_id'] = $brand_id;
+    }
+
+    if(!empty($activity_id)){
+        $where[] = "p.activity_id = :activity_id";
+        $params[':activity_id'] = $activity_id;
+    }
+
+    if(!empty($date_from)){
+        $where[] = "p.created_at >= :date_from";
+        $params[':date_from'] = $date_from;
+    }
+
+    if(!empty($date_to)){
+        $where[] = "p.created_at <= :date_to";
+        $params[':date_to'] = $date_to;
+    }
+
+    $whereSql = $where ? "WHERE ".implode(" AND ",$where) : "";
+
+    $sql = "
+        SELECT
+            p.*,
+            d.name AS department_name,
+            b.name AS brand_name,
+            a.name AS activity_name,
+            u.fullname AS creator_name
+        FROM printers p
+        LEFT JOIN departments d ON d.id = p.department_id
+        LEFT JOIN brands b ON b.id = p.brand_id
+        LEFT JOIN activities a ON a.id = p.activity_id
+        LEFT JOIN users u ON u.id = p.created_by
+        $whereSql
+        ORDER BY p.created_at DESC
+    ";
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $printers = $stmt->fetchAll();
+
+    $department_name = '';
+    if(!empty($department_id)){
+        $stmt = $db->prepare("SELECT name FROM departments WHERE id=?");
+        $stmt->execute([$department_id]);
+        $department_name = $stmt->fetchColumn();
+    }
+
+    $brand_name = '';
+    if(!empty($brand_id)){
+        $stmt = $db->prepare("SELECT name FROM brands WHERE id=?");
+        $stmt->execute([$brand_id]);
+        $brand_name = $stmt->fetchColumn();
+    }
+
+    $activity_name = '';
+    if(!empty($activity_id)){
+        $stmt = $db->prepare("SELECT name FROM activities WHERE id=?");
+        $stmt->execute([$activity_id]);
+        $activity_name = $stmt->fetchColumn();
+    }
+
+    $filterItems = [];
+
+    if(!empty($activity_name))
+        $filterItems[] = "<span>فعالیت:</span> ".htmlspecialchars($activity_name);
+
+    if(!empty($department_name))
+        $filterItems[] = "<span>بخش:</span> ".htmlspecialchars($department_name);
+
+    if(!empty($brand_name))
+        $filterItems[] = "<span>برند:</span> ".htmlspecialchars($brand_name);
+
+    if(!empty($date_from))
+        $filterItems[] = "<span>از تاریخ:</span> ".htmlspecialchars(fa_number($date_from));
+
+    if(!empty($date_to))
+        $filterItems[] = "<span>تا تاریخ:</span> ".htmlspecialchars(fa_number($date_to));
+
+    $filterText = empty($filterItems)
+        ? "📋 نمایش همه پرینترها"
+        : "🔍 فیلترهای اعمال شده: ".implode(" | ",$filterItems);
+
+    $headers = ['ردیف'];
+
+    foreach($selectedColumns as $col){
+        if(isset($availableColumns[$col])){
+            $headers[] = $availableColumns[$col];
+        }
+    }
+
+    $rows = [];
+    $i = 1;
+
+    foreach($printers as $printer){
+
+        $row = [fa_number($i++)];
+
+        foreach($selectedColumns as $col){
+
+            $value = $printer[$col] ?? '-';
+
+            if($col == 'created_at' && $value != '-'){
+                $value = fa_number($value);
+            }
+
+            $row[] = htmlspecialchars((string)$value);
+        }
+
+        $rows[] = $row;
+    }
+
+    return [
+        'pageTitle'    => 'گزارش پرینترها',
+        'tableHeaders' => $headers,
+        'tableRows'    => $rows,
+        'filterInfo'   => $filterText,
+        'autoPrint'    => false
+    ];
+}
+
+
+
 ?>
