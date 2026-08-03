@@ -1,9 +1,7 @@
 <?php
 session_start();
-require_once 'config/config.php';
-require_once 'db.php';
-require_once 'assets/jdf.php';
-require_once 'functions.php';
+require_once __DIR__ . '/assets/includes/autoload.php';
+
 date_default_timezone_set('Asia/Tehran');
 
 // مدیریت پیام‌ها

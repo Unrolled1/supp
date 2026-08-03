@@ -1,5 +1,6 @@
 <?php
-require_once 'config/config.php';
+require_once __DIR__ . '/assets/includes/autoload.php';
+
 // ذخیره درخواست در فایل JSON
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullname = htmlspecialchars($_POST['fullname']);
