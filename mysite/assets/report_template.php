@@ -334,22 +334,35 @@ tr:hover {
 <script>
 function savePDF(){
 
-    const content = document.querySelector('.table-wrapper').innerHTML;
-
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = 'export_pdf.php';
 
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'html';
-    input.value = content;
+    function createHidden(name, value){
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
+    }
 
-    form.appendChild(input);
+    form.appendChild(createHidden(
+        "html",
+        document.querySelector('.table-wrapper').innerHTML
+    ));
+
+    form.appendChild(createHidden(
+        "title",
+        document.querySelector('.print-header h1').innerText
+    ));
+
+    form.appendChild(createHidden(
+        "filter",
+        document.querySelector('.filters-info').innerHTML
+    ));
 
     document.body.appendChild(form);
     form.submit();
-
     form.remove();
 }
 </script>
