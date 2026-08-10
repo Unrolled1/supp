@@ -1,0 +1,652 @@
+```css
+/* =========================================================
+   FONT
+   ========================================================= */
+
+@font-face {
+    font-family: 'Vazir';
+    src: url('styles/Fonts/Vazir.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+@page {
+    size: A4 landscape;
+    margin: 5mm;
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+body {
+    font-family: 'Vazir', Tahoma, Arial, sans-serif;
+    background: #1f2937;
+    color: #e5e7eb;
+    direction: rtl;
+    padding: 10px;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.print-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    background: #111827;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.print-header {
+    text-align: center;
+
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+
+    border-bottom: 3px solid #d4af37;
+}
+
+.print-header h1 {
+    color: #d4af37;
+    font-size: 26px;
+
+    margin-bottom: 6px;
+}
+
+.print-header .date {
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FILTER INFO
+   ========================================================= */
+
+.filters-info {
+    background: #1e293b;
+
+    padding: 15px 20px;
+
+    border-radius: 10px;
+
+    margin-bottom: 10px;
+
+    font-size: 14px;
+
+    color: #e5e7eb;
+
+    border-right: 4px solid #d4af37;
+}
+
+.filters-info span {
+    color: #d4af37;
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.stats {
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    flex: 1;
+
+    min-width: 120px;
+
+    border: 1px solid #374151;
+
+    border-radius: 12px;
+
+    padding: 18px 20px;
+
+    text-align: center;
+
+    background: #1e293b;
+}
+
+.stat-num {
+    color: #d4af37;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin-bottom: 5px;
+}
+
+.stat-title {
+    color: #9ca3af;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.table-wrapper {
+    width: 100%;
+
+    border-radius: 10px;
+
+    border: 1px solid #374151;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   GENERAL DATA TABLE
+   برای جدول گزارش اصلی
+   ========================================================= */
+
+.data-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    table-layout: fixed;
+
+    font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #374151;
+
+    padding: 10px 12px;
+
+    text-align: center;
+
+    vertical-align: middle;
+}
+
+.data-table th {
+    background: #334155;
+
+    color: #f9fafb;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+.data-table td {
+    color: #e5e7eb;
+
+    background: #111827;
+}
+
+.data-table tr:nth-child(even) td {
+    background: #172033;
+}
+
+.data-table tr:hover td {
+    background: #263449;
+}
+
+
+/* =========================================================
+   PRODUCT INFORMATION TABLE
+   جدول مشخصات کالا - همیشه ۴ ستون
+   ========================================================= */
+
+.info-table {
+    width: 100% !important;
+
+    border-collapse: collapse !important;
+
+    table-layout: fixed !important;
+
+    font-size: 14px;
+}
+
+
+/* هر ردیف حتماً table-row باشد */
+.info-table tr {
+    display: table-row !important;
+}
+
+
+/* هر سلول حتماً table-cell باشد */
+.info-table th,
+.info-table td {
+    display: table-cell !important;
+
+    border: 1px solid #374151;
+
+    padding: 12px 10px;
+
+    text-align: center;
+
+    vertical-align: middle;
+}
+
+
+/* عنوان‌های جدول */
+.info-table th {
+    width: 15%;
+
+    background: #334155;
+
+    color: #f9fafb;
+
+    font-weight: bold;
+}
+
+
+/* مقدارهای جدول */
+.info-table td {
+    width: 35%;
+
+    background: #1e293b;
+
+    color: #e5e7eb;
+}
+
+
+/* ردیف‌های زوج */
+.info-table tr:nth-child(even) td {
+    background: #172033;
+}
+
+
+/* =========================================================
+   NO DATA
+   ========================================================= */
+
+.no-data {
+    padding: 20px !important;
+
+    color: #9ca3af !important;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.print-footer {
+    color: #94a3b8;
+
+    border-top: 1px solid #374151;
+
+    margin-top: 15px;
+
+    padding-top: 10px;
+
+    text-align: center;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.action-buttons {
+    display: flex;
+
+    gap: 12px;
+
+    justify-content: center;
+
+    margin-bottom: 15px;
+
+    flex-wrap: wrap;
+}
+
+.action-buttons button {
+    padding: 12px 30px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.3s ease;
+
+    font-family: 'Vazir', Tahoma, Arial, sans-serif;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+}
+
+
+/* چاپ */
+.btn-print {
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #5a67d8
+    );
+
+    color: white;
+
+    box-shadow:
+        0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-print:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+
+/* PDF */
+.btn-pdf {
+    background: #48bb78;
+
+    color: white;
+
+    padding: 12px 30px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    font-family: 'Vazir', Tahoma, Arial, sans-serif;
+}
+
+.btn-pdf:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 25px rgba(72, 187, 120, 0.4);
+}
+
+
+/* بستن */
+.btn-close {
+    background: #f0f0f0;
+
+    color: #555;
+}
+
+.btn-close:hover {
+    transform: translateY(-2px);
+
+    background: #e0e0e0;
+}
+
+
+/* =========================================================
+   PRINT NOTICE
+   ========================================================= */
+
+.print-notice {
+    background: #fff3cd;
+
+    border: 1px solid #ffc107;
+
+    color: #856404;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    margin-bottom: 10px;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+.print-notice strong {
+    color: #d39e00;
+}
+
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+
+    body {
+        background: #fff;
+
+        color: #000;
+
+        padding: 0;
+
+        margin: 0;
+    }
+
+
+    /* مخفی کردن دکمه‌ها */
+    .no-print,
+    .action-buttons,
+    .print-notice {
+        display: none !important;
+    }
+
+
+    /* کانتینر */
+    .print-container {
+        width: 100%;
+
+        max-width: none;
+
+        margin: 0;
+
+        padding: 0;
+
+        background: #fff;
+
+        border: none;
+
+        border-radius: 0;
+
+        box-shadow: none;
+    }
+
+
+    /* هدر */
+    .print-header {
+        margin-bottom: 15px;
+
+        padding-bottom: 10px;
+
+        border-bottom: 2px solid #333;
+    }
+
+    .print-header h1 {
+        color: #222;
+
+        font-size: 22px;
+    }
+
+    .print-header .date {
+        color: #555;
+    }
+
+
+    /* Wrapper */
+    .table-wrapper {
+        width: 100%;
+
+        overflow: visible;
+
+        border: none;
+
+        border-radius: 0;
+    }
+
+
+    /* =====================================================
+       DATA TABLE PRINT
+       ===================================================== */
+
+    .data-table {
+        width: 100%;
+
+        table-layout: fixed;
+
+        border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+        font-size: 10px;
+
+        padding: 4px;
+
+        white-space: normal;
+
+        word-break: break-word;
+
+        overflow-wrap: anywhere;
+
+        vertical-align: middle;
+    }
+
+    .data-table th {
+        background: #334155 !important;
+
+        color: #fff !important;
+
+        -webkit-print-color-adjust: exact;
+
+        print-color-adjust: exact;
+    }
+
+
+    /* =====================================================
+       PRODUCT TABLE PRINT
+       ===================================================== */
+
+    .info-table {
+        width: 100% !important;
+
+        display: table !important;
+
+        table-layout: fixed !important;
+
+        border-collapse: collapse !important;
+    }
+
+    .info-table tbody {
+        display: table-row-group !important;
+    }
+
+    .info-table tr {
+        display: table-row !important;
+    }
+
+    .info-table th,
+    .info-table td {
+        display: table-cell !important;
+
+        font-size: 11px !important;
+
+        padding: 7px 8px !important;
+
+        vertical-align: middle !important;
+
+        white-space: normal;
+
+        word-break: normal;
+
+        overflow-wrap: break-word;
+    }
+
+    .info-table th {
+        width: 15% !important;
+
+        background: #334155 !important;
+
+        color: #fff !important;
+
+        -webkit-print-color-adjust: exact;
+
+        print-color-adjust: exact;
+    }
+
+    .info-table td {
+        width: 35% !important;
+
+        background: #1e293b !important;
+
+        color: #fff !important;
+
+        -webkit-print-color-adjust: exact;
+
+        print-color-adjust: exact;
+    }
+
+
+    /* Footer */
+    .print-footer {
+        color: #555;
+
+        border-top: 1px solid #999;
+
+        margin-top: 10px;
+
+        padding-top: 7px;
+    }
+}

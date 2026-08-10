@@ -245,8 +245,9 @@ if ($isAjax) {
                 <td><?php echo fa_number($kala['quantity'] ?? '1'); ?></td>
                 <td><?php echo htmlspecialchars($kala['serial_number'] ?? '-'); ?></td>
                 <td><?php echo htmlspecialchars($kala['receiver_name'] ?? '-'); ?></td>
-                <td class="date"><?php echo fa_number(htmlspecialchars($kala['created_at'])); ?></td>
-                <td><?php echo htmlspecialchars($kala['creator_name'] ?? '-'); ?></td>
+<td class="date">
+    <?php echo fa_number(str_replace('-', '/', $kala['created_at'] ?? '-')); ?>
+</td>                <td><?php echo htmlspecialchars($kala['creator_name'] ?? '-'); ?></td>
 
                 <td class="action-buttons">
                     <?php if (canEditProducts()): ?>
@@ -492,9 +493,12 @@ if ($isAjax) {
                             <td><?php echo fa_number($kala['quantity'] ?? '1'); ?></td>
                             <td><?php echo htmlspecialchars($kala['serial_number'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($kala['receiver_name'] ?? '-'); ?></td>
-                            <td class="date"><?php echo fa_number(htmlspecialchars($kala['created_at'])); ?></td>
-                            <td><?php echo htmlspecialchars($kala['creator_name'] ?? '-'); ?></td>
+<td class="date">
+    <?php echo fa_number(str_replace('-', '/', $kala['created_at'] ?? '-')); ?>
+</td>                            <td><?php echo htmlspecialchars($kala['creator_name'] ?? '-'); ?></td>
                             <td class="action-buttons">
+                                
+<button class="print-btn" onclick="printKala(<?php echo (int)$kala['id']; ?>)"> 🖨️ پرینت</button>                              
                                 <?php if (canEditProducts()): ?>
                                     <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($kala); ?>)'>✏️ویرایش</button>
                                 <?php endif; ?>
@@ -594,6 +598,16 @@ if ($isAjax) {
     </div>
 </div>
 
+<script>
+function printKala(id) {
+    if (!id) return;
 
+    window.open(
+        'assets/print_kala.php?id=' + encodeURIComponent(id),
+        '_blank',
+        'width=1000,height=800,scrollbars=yes,resizable=yes'
+    );
+}
+</script>
 </body>
 </html>
