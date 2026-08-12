@@ -60,8 +60,8 @@ $date_to       = $_POST['date_to'] ?? '';
 // ============================================
 if (isset($_POST['add_printer']) && canEditPrinters()) {
 
-    $computer_code = htmlspecialchars(trim($_POST['computer_code']));
-    $property_code = htmlspecialchars(trim($_POST['property_code']));
+    $computer_code = htmlspecialchars(trim($_POST['computer_code'] ?? ''));
+    $property_code = htmlspecialchars(trim($_POST['property_code'] ?? ''));
 
     $activity_id = !empty($_POST['activity_id'])
         ? filter_var($_POST['activity_id'], FILTER_VALIDATE_INT)
@@ -75,10 +75,12 @@ if (isset($_POST['add_printer']) && canEditPrinters()) {
         ? filter_var($_POST['brand_id'], FILTER_VALIDATE_INT)
         : null;
 
-    $serial_number = htmlspecialchars(trim($_POST['serial_number']));
-    $description = htmlspecialchars(trim($_POST['description']));
+    $serial_number = htmlspecialchars(trim($_POST['serial_number'] ?? ''));
+    $description = htmlspecialchars(trim($_POST['description'] ?? ''));
 
-    $created_at = jdate('Y-m-d');
+    $created_at = !empty($_POST['created_at'])
+        ? faToEn($_POST['created_at'])
+        : jdate('Y-m-d');
 
     $stmt = $db->prepare("
         INSERT INTO printers (
@@ -105,7 +107,7 @@ if (isset($_POST['add_printer']) && canEditPrinters()) {
         )
     ");
 
-    if ($stmt->execute([
+    $success = $stmt->execute([
         ':computer_code' => $computer_code,
         ':property_code' => $property_code,
         ':activity_id' => $activity_id,
@@ -115,14 +117,40 @@ if (isset($_POST['add_printer']) && canEditPrinters()) {
         ':description' => $description,
         ':created_at' => $created_at,
         ':created_by' => $_SESSION['user_id']
-    ])) {
+    ]);
 
+    /*
+     * AJAX
+     */
+    if ($isAjax) {
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        if ($success) {
+
+            echo json_encode([
+                'success' => true,
+                'message' => '✅ پرینتر با موفقیت ثبت شد'
+            ], JSON_UNESCAPED_UNICODE);
+
+        } else {
+
+            echo json_encode([
+                'success' => false,
+                'message' => '❌ خطا در ثبت پرینتر'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+
+        exit;
+    }
+
+    /*
+     * درخواست عادی
+     */
+    if ($success) {
         $_SESSION['success_message'] = '✅ پرینتر با موفقیت ثبت شد';
-
     } else {
-
         $_SESSION['error_message'] = '❌ خطا در ثبت پرینتر';
-
     }
 
     header('Location: admin_printers.php');
@@ -339,7 +367,9 @@ ob_start();
     <td><?php echo htmlspecialchars($printer['brand_name'] ?? '-'); ?></td>
     <td><?php echo htmlspecialchars($printer['serial_number'] ?? '-'); ?></td>
     <td><?php echo nl2br(htmlspecialchars($printer['description'] ?? '-')); ?></td>
-    <td class="date"><?php echo fa_number(htmlspecialchars($printer['created_at'])); ?></td>
+<td class="date">
+    <?php echo fa_number(str_replace('-', '/', htmlspecialchars($printer['created_at']))); ?>
+</td>
     <td><?php echo htmlspecialchars($printer['creator_name'] ?? '-'); ?></td>
     <td class="action-buttons">
         <?php if (canEditPrinters()): ?>
@@ -410,7 +440,7 @@ ob_start();
         <?php if (canEditPrinters()): ?>
             <div class="add-card">
                 <h2>➕ ثبت پرینتر جدید</h2>
-                <form method="post" class="printers-form">
+<form method="post" class="printers-form" id="addPrinterForm">
 
                     <div class="form-row">
                         <div class="pc-id">
@@ -580,7 +610,9 @@ ob_start();
                             <td><?php echo htmlspecialchars($printer['brand_name'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($printer['serial_number'] ?? '-'); ?></td>
                             <td><?php echo nl2br(htmlspecialchars($printer['description'] ?? '-')); ?></td>
-                            <td class="date"><?php echo fa_number(htmlspecialchars($printer['created_at'])); ?></td>
+<td class="date">
+    <?php echo fa_number(str_replace('-', '/', htmlspecialchars($printer['created_at']))); ?>
+</td>
                             <td><?php echo htmlspecialchars($printer['creator_name'] ?? '-'); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditPrinters()): ?>
@@ -674,6 +706,7 @@ ob_start();
         </form>
     </div>
 </div>
+
 </body>
 </html>
 

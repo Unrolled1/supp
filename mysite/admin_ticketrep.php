@@ -162,7 +162,7 @@ ob_start();
                 <td><?php echo htmlspecialchars($t['username'] ?? '-'); ?></td>
                 <td><?php echo htmlspecialchars($t['subject']); ?></td>
                 <td><?php echo htmlspecialchars($t['status']); ?></td>
-                <td><?php echo fa_number($t['created_at']); ?></td>
+                <td><?php echo fa_number(str_replace('-', '/', htmlspecialchars($t['created_at'] ?? '-'))); ?></td>
             </tr>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -329,7 +329,7 @@ ob_start();
                             <td><?php echo htmlspecialchars($t['username'] ?? '-'); ?></td>
                             <td><?php echo htmlspecialchars($t['subject']); ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo $t['status']; ?></span></td>
-                            <td><?php echo fa_number($t['created_at']); ?></td>
+                <td><?php echo fa_number(str_replace('-', '/', htmlspecialchars($t['created_at'] ?? '-'))); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

@@ -120,7 +120,7 @@ if ($isAjax) {
                             <?php
                             $value = $invoice[$col] ?? '-';
                             if ($col == 'created_at' && $value != '-') {
-                                $value = fa_number($value);
+                                $value = fa_number(str_replace('-', '/', $value));
                             }
                             ?>
                             <td><?= htmlspecialchars((string)$value) ?></td>
@@ -245,7 +245,7 @@ if ($isAjax) {
                                     $value = $invoice[$col] ?? '-';
 
                                     if ($col == 'created_at' && $value != '-') {
-                                        $value = fa_number($value);
+                                        $value = fa_number(str_replace('-', '/', $value));
                                     }
                                     ?>
 

@@ -200,8 +200,11 @@ $brands = $db->query("SELECT id, name FROM brands ORDER BY name ASC")->fetchAll(
                             <td><?php echo fa_number($row_num); ?></td>
                             <td><?php echo htmlspecialchars($model['name']); ?></td>
                             <td><?php echo htmlspecialchars($model['brand_name'] ?? '-'); ?></td>
-                            <td class="date-ltr"><?php echo fa_number(htmlspecialchars($model['created_at'])); ?></td>
-                            <td class="action-buttons">
+<td class="date-ltr">
+    <?= fa_number(str_replace('-', '/', htmlspecialchars($model['created_at']))); ?>
+</td>
+
+<td class="action-buttons">
                                 <?php if (canEditModels()): ?>
                                     <button class="edit-btn" onclick='openEditModal(<?php echo $model['id']; ?>)'>✏️ویرایش</button>
                                 <?php endif; ?>

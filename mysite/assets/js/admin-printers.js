@@ -1,7 +1,86 @@
 // ============================================
 // فایل مدیریت پرینترها
 // ============================================
+// ============================================
+// ثبت پرینتر با AJAX
+// ============================================
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addForm = document.getElementById("addPrinterForm");
+
+    if (!addForm) return;
+
+    addForm.addEventListener("submit", function (e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const formData = new FormData(addForm);
+
+        formData.append("ajax", "1");
+        formData.append("add_printer", "1");
+
+        const dateInput = document.getElementById("add_date");
+
+        if (dateInput) {
+            formData.set("created_at", faToEn(dateInput.value));
+        }
+
+        fetch("admin_printers.php", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.success) {
+
+                Swal.fire({
+                    title: "ثبت شد!",
+                    text: data.message,
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                addForm.reset();
+
+                // فقط جدول را دوباره می‌گیرد
+                searchPrinter();
+
+            } else {
+
+                Swal.fire({
+                    title: "خطا!",
+                    text: data.message,
+                    icon: "error",
+                    confirmButtonText: "باشه"
+                });
+
+            }
+
+        })
+        .catch(error => {
+
+            console.error(error);
+
+            Swal.fire({
+                title: "خطا!",
+                text: "خطا در ارتباط با سرور",
+                icon: "error",
+                confirmButtonText: "باشه"
+            });
+
+        });
+
+        return false;
+    });
+
+});
 // ============================================
 // توابع جستجو
 // ============================================
@@ -121,6 +200,7 @@ function confirmDelete(id, serial) {
 
 document.addEventListener('DOMContentLoaded', function() {
     initQuickDateSelect();
+    document.getElementById("addPrinterForm").addEventListener("submit", addPrinter);
     document.getElementById("search_btn").addEventListener("click", searchPrinter);
     document.getElementById("reset_btn").addEventListener("click", resetPrinterSearch);
 });

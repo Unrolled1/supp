@@ -217,7 +217,7 @@ $filterText = !empty($filters)
                             $value = $p[$col] ?? '-';
 
                             if ($col == 'created_at' && $value != '-') {
-                                $value = fa_number($value);
+                                $value = fa_number(str_replace('-', '/', $value));
                             }
                             ?>
 
@@ -414,7 +414,7 @@ $filterText = !empty($filters)
             $value = $printer[$col] ?? '-';
 
             if($col=='created_at' && $value!='-'){
-                $value = fa_number($value);
+                $value = fa_number(str_replace('-', '/', $value));
             }
             ?>
 

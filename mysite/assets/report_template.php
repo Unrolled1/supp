@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?></title>
-<link rel="stylesheet" href="/MyPrg/supp/mysite/assets/includes/report_pdf.css">
+<link rel="stylesheet" href="/MyPrg/supp/mysite/assets/includes/report_pdf.css?v=2">
+
 </head>
 <body>
 <div class="print-container">
@@ -46,7 +47,7 @@
 <?php endif; ?>
     <!-- جدول تیکت‌ها -->
     <div class="table-wrapper">
-        <table>
+    <table class="data-table">
             <thead>
             <tr>
                 <?php foreach ($tableHeaders as $header): ?>

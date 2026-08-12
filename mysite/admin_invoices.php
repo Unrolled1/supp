@@ -199,7 +199,9 @@ ob_start();
             <td><?php echo htmlspecialchars($invoice['subject'] ?? '-'); ?></td>
             <td><?php echo fa_number(number_format($invoice['amount'], 0)) . ' ریال'; ?></td>
             <td class="description-cell"><?php echo nl2br(htmlspecialchars($invoice['description'] ?? '-')); ?></td>
-            <td class="date"><?php echo fa_number(htmlspecialchars($invoice['created_at'])); ?></td>
+<td class="date-ltr">
+    <?= fa_number(str_replace('-', '/', htmlspecialchars($invoice['created_at']))); ?>
+</td>
             <td><?php echo htmlspecialchars($invoice['creator_name'] ?? '-'); ?></td>
             <td class="action-buttons">
                 <?php if (canEditInvoices()): ?>
@@ -368,7 +370,7 @@ ob_start();
                     <th>موضوع</th>
                     <th>مبلغ</th>
                     <th>توضیحات</th>
-                    <th>تاریخ</th>
+                    <th>تاریخ فاکتور</th>
                     <th>ثبت کننده</th>
                     <th>عملیات</th>
                 </tr>
@@ -385,7 +387,9 @@ ob_start();
                             <td><?php echo htmlspecialchars($invoice['subject'] ?? '-'); ?></td>
                             <td><?php echo fa_number(number_format($invoice['amount'], 0)) . ' ریال'; ?></td>
                             <td class="description-cell"><?php echo nl2br(htmlspecialchars($invoice['description'] ?? '-')); ?></td>
-                            <td class="date"><?php echo fa_number(htmlspecialchars($invoice['created_at'])); ?></td>
+<td class="date-ltr">
+    <?= fa_number(str_replace('-', '/', htmlspecialchars($invoice['created_at']))); ?>
+</td>
                             <td><?php echo htmlspecialchars($invoice['creator_name'] ?? '-'); ?></td>
                             <td class="action-buttons">
                                 <?php if (canEditInvoices()): ?>

@@ -307,7 +307,7 @@ if (isset($_SESSION['backup_error'])) {
                             <td><?php echo fa_number($i); ?></td>
                             <td><?php echo htmlspecialchars($file['name']); ?></td>
                             <td><?php echo fa_number(number_format($file['size'] / 1024, 1)) . ' KB'; ?></td>
-                            <td class="date-ltr"><?php echo fa_number($file['date']); ?></td>
+                            <td class="date-ltr"><?php echo fa_number(str_replace('-', '/', htmlspecialchars($file['date']))); ?></td>
                             <td class="action-buttons">
                                 <a href="backup.php?download=<?php echo urlencode($file['name']); ?>" class="btn-download" title="دانلود">⬇️</a>
 

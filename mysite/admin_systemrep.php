@@ -416,7 +416,7 @@ if (in_array($col, ['rams','storages','ip_addresses','peripherals'])) {
 } else {
 
     if ($col == 'created_at' && $value != '-') {
-        $value = fa_number($value);
+        $value = fa_number(str_replace('-', '/', $value));
     }
 
     echo htmlspecialchars((string)$value);
@@ -611,7 +611,7 @@ $value = $system[$col] ?? '-';
                 }
             } else {
                 if ($col == 'created_at' && $value != '-') {
-                    $value = fa_number($value);
+                    $value = fa_number(str_replace('-', '/', $value));
                 }
                 echo htmlspecialchars((string)$value);
             }

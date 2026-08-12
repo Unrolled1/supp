@@ -150,8 +150,9 @@ if ($ticket['status'] == 'جدید') {
                             <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
                             <td class="message-cell"><?php echo nl2br(htmlspecialchars($ticket['message'])); ?></td>
                             <td><span class="status-badge <?php echo $statusClass; ?>"><?php echo $ticket['status']; ?></span></td>
-                            <td class="date-ltr"><?php echo fa_number(htmlspecialchars($ticket['created_at'])); ?></td>
-
+<td class="date-ltr">
+    <?= fa_number(str_replace('-', '/', htmlspecialchars($ticket['created_at']))); ?>
+</td>
                             <td class="action-buttons">
                                 <?php if (canEditTickets()): ?>
                                     <form method="post" style="display:inline;">

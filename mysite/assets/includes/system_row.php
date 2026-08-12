@@ -151,8 +151,8 @@ if (!isset($rowData)) {
 
     <!-- تاریخ -->
     <td class="td-date date">
-        <?php echo fa_number(htmlspecialchars($rowData['created_at'] ?? '-')); ?>
-        <br><small><?php echo htmlspecialchars($rowData['creator_name'] ?? '-'); ?></small>
+    <?php echo fa_number(str_replace('-', '/', htmlspecialchars($rowData['created_at'] ?? '-'))); ?>
+            <br><small><?php echo htmlspecialchars($rowData['creator_name'] ?? '-'); ?></small>
     </td>
 
     <!-- عملیات -->

@@ -414,7 +414,7 @@ function getInvoiceReport($db,$filters){
 }
 
 function getKalaReport($db, $filters)
- {
+{
     $department_id = $filters['department_id'] ?? '';
     $brand_id      = $filters['brand_id'] ?? '';
     $date_from     = $filters['date_from'] ?? '';
@@ -479,81 +479,129 @@ function getKalaReport($db, $filters)
             b.name AS brand_name,
             u.fullname AS creator_name
         FROM kala k
+
         LEFT JOIN departments d
             ON d.id = k.department_id
+
         LEFT JOIN persons p
             ON p.id = k.receiver_person_id
+
         LEFT JOIN brands b
             ON b.id = k.brand_id
+
         LEFT JOIN users u
             ON u.id = k.created_by
-        $whereSql
-       ORDER BY k.created_at DESC, k.id DESC  ";
 
+        $whereSql
+
+        ORDER BY k.created_at DESC, k.id DESC
+    ";
 
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
     $kalas = $stmt->fetchAll();
 
+    /* =========================
+       نام فیلترها
+       ========================= */
+
     $department_name = '';
-$brand_name = '';
+    $brand_name = '';
 
-if (!empty($department_id)) {
-    $stmt = $db->prepare("SELECT name FROM departments WHERE id=?");
-    $stmt->execute([$department_id]);
-    $department_name = $stmt->fetchColumn();
-}
+    if (!empty($department_id)) {
+        $stmt = $db->prepare(
+            "SELECT name FROM departments WHERE id=?"
+        );
+        $stmt->execute([$department_id]);
+        $department_name = $stmt->fetchColumn();
+    }
 
-if (!empty($brand_id)) {
-    $stmt = $db->prepare("SELECT name FROM brands WHERE id=?");
-    $stmt->execute([$brand_id]);
-    $brand_name = $stmt->fetchColumn();
-}
-$display_date_from = !empty($date_from) ? fa_number($date_from) : '';
-    $display_date_to   = !empty($date_to) ? fa_number($date_to) : '';
+    if (!empty($brand_id)) {
+        $stmt = $db->prepare(
+            "SELECT name FROM brands WHERE id=?"
+        );
+        $stmt->execute([$brand_id]);
+        $brand_name = $stmt->fetchColumn();
+    }
+
+    /* =========================
+       تاریخ نمایشی
+       ========================= */
+
+    $display_date_from = !empty($date_from)
+        ? fa_number($date_from)
+        : '';
+
+    $display_date_to = !empty($date_to)
+        ? fa_number($date_to)
+        : '';
+
+    /* =========================
+       اطلاعات فیلتر
+       ========================= */
+
     $filterItems = [];
 
-    if ($department_name)
-    $filterItems[] = "<span>بخش:</span> ".htmlspecialchars($department_name);
+    if ($department_name) {
+        $filterItems[] =
+            "<span>بخش:</span> " .
+            htmlspecialchars($department_name);
+    }
 
-    if ($brand_name)
-        $filterItems[] = "<span>برند:</span> ".htmlspecialchars($brand_name);
+    if ($brand_name) {
+        $filterItems[] =
+            "<span>برند:</span> " .
+            htmlspecialchars($brand_name);
+    }
 
-    if ($display_date_from)
-        $filterItems[] = "<span>از تاریخ:</span> ".$display_date_from;
+    if ($display_date_from) {
+        $filterItems[] =
+            "<span>از تاریخ:</span> " .
+            $display_date_from;
+    }
 
-    if ($display_date_to)
-    $filterItems[] = "<span>تا تاریخ:</span> ".$display_date_to;
+    if ($display_date_to) {
+        $filterItems[] =
+            "<span>تا تاریخ:</span> " .
+            $display_date_to;
+    }
 
     $filterText = !empty($filterItems)
-        ? "🔍 فیلترهای اعمال شده: " . implode(" | ", $filterItems)
+        ? "🔍 فیلترهای اعمال شده: " .
+          implode(" | ", $filterItems)
         : "📋 نمایش همه کالاها";
+
+    /* =========================
+       هدر جدول
+       ========================= */
 
     $headers = ['ردیف'];
 
     foreach ($selectedColumns as $col) {
 
-    if (!isset($availableColumns[$col])) {
-        continue;
+        if (isset($availableColumns[$col])) {
+            $headers[] = $availableColumns[$col];
+        }
     }
 
-    $value = $kala[$col] ?? '-';
-
-    if (in_array($col, ['created_at', 'quantity']) && $value != '-') {
-        $value = fa_number($value);
-    }
-
-    $row[] = htmlspecialchars((string)$value);
-}
+    /* =========================
+       ردیف‌های جدول
+       ========================= */
 
     $rows = [];
     $i = 1;
 
     foreach ($kalas as $kala) {
 
-        $row = [fa_number($i++)];
+        $row = [
+            fa_number($i++)
+        ];
 
         foreach ($selectedColumns as $col) {
+
+            if (!isset($availableColumns[$col])) {
+                continue;
+            }
 
             $value = $kala[$col] ?? '-';
 
@@ -578,6 +626,7 @@ $display_date_from = !empty($date_from) ? fa_number($date_from) : '';
         'filterInfo'   => $filterText
     ];
 }
+
 
 function getPrinterReport($db, $filters)
 {

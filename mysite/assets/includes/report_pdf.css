@@ -1,11 +1,11 @@
-```css
+
 /* =========================================================
    FONT
    ========================================================= */
 
 @font-face {
     font-family: 'Vazir';
-    src: url('styles/Fonts/Vazir.ttf') format('truetype');
+    src: url('../../styles/Fonts/Vazir.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -37,7 +37,7 @@
    ========================================================= */
 
 body {
-    font-family: 'Vazir', Tahoma, Arial, sans-serif;
+    font-family: 'Vazir';
     background: #1f2937;
     color: #e5e7eb;
     direction: rtl;
@@ -51,7 +51,7 @@ body {
 
 .print-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1800px !important;
     margin: 0 auto;
 
     background: #111827;
