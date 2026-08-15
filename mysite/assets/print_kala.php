@@ -80,8 +80,7 @@ $date = !empty($kala['created_at'])
 
     <title>پرینت کالا - <?= h($kala['name']) ?></title>
 
-    <link rel="stylesheet"
-          href="/MyPrg/supp/mysite/assets/includes/report_pdf.css">
+    <link rel="stylesheet" href="assets/includes/report_pdf.css">
 </head>
 
 <body>
