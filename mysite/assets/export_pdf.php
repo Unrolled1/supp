@@ -148,6 +148,10 @@ $tableHtml = isset($_POST['html'])
     ? $_POST['html']
     : '';
 
+$css = isset($_POST['css'])
+    ? $_POST['css']
+    : '';
+
 $tableData = htmlTableToArray($tableHtml);
 
 $fontPath = __DIR__ . '/../styles/Fonts/Vazir.ttf';

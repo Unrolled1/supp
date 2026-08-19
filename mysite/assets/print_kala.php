@@ -80,7 +80,7 @@ $date = !empty($kala['created_at'])
 
     <title>پرینت کالا - <?= h($kala['name']) ?></title>
 
-    <link rel="stylesheet" href="assets/includes/report_pdf.css">
+<link rel="stylesheet" href="includes/report_pdf.css">
 </head>
 
 <body>
@@ -155,9 +155,6 @@ $date = !empty($kala['created_at'])
     </table>
 
 </div>
-
-
-
     <!-- فوتر -->
     <div class="print-footer">
         سیستم پشتیبانی بیمارستان |
@@ -165,8 +162,6 @@ $date = !empty($kala['created_at'])
     </div>
 
 </div>
-
-
 <script>
 function savePDF() {
 
@@ -186,13 +181,34 @@ function savePDF() {
         return input;
     }
 
+    // ارسال جدول
     form.appendChild(
         createHidden(
             'html',
-            document.querySelector('.info-table').outerHTML
+            document.querySelector('.data-table').outerHTML
         )
     );
 
+    // ارسال CSS
+    const css = `
+        ${Array.from(document.styleSheets)
+            .map(sheet => {
+                try {
+                    return Array.from(sheet.cssRules)
+                        .map(rule => rule.cssText)
+                        .join('\n');
+                } catch (e) {
+                    return '';
+                }
+            })
+            .join('\n')}
+    `;
+
+    form.appendChild(
+        createHidden('css', css)
+    );
+
+    // ارسال عنوان
     form.appendChild(
         createHidden(
             'title',
