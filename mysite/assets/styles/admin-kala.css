@@ -15,7 +15,11 @@
     border-radius: 5px;
     cursor: pointer;
 }
-
+.print-btn{
+    transition: 0.3s;
+}
 .print-btn:hover {
-    opacity: 0.85;
+    transform: translateY(-2px);
+box-shadow:
+        0 6px 25px rgba(79, 70, 229, 0.4);
 }

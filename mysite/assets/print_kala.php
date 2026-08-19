@@ -210,11 +210,11 @@ function savePDF() {
 
     // ارسال عنوان
     form.appendChild(
-        createHidden(
-            'title',
-            document.querySelector('.print-header h1').innerText
-        )
-    );
+    createHidden(
+        'title',
+        document.querySelector('.print-header h1').textContent.trim()
+    )
+);
 
     document.body.appendChild(form);
 

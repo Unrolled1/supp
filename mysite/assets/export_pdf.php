@@ -239,10 +239,13 @@ if (!empty($tableData)) {
     if ($colCount > 0) {
 
         $pageWidth = $pdf->getPageWidth();
-        $leftMargin = $pdf->getMargins()['left'];
-        $rightMargin = $pdf->getMargins()['right'];
+        $margins = $pdf->getMargins();
 
-        $usableWidth = $pageWidth - $leftMargin - $rightMargin;
+        $usableWidth =
+            $pageWidth
+            - $margins['left']
+            - $margins['right'];
+
         $colWidth = $usableWidth / $colCount;
 
         foreach ($tableData as $rowIndex => $row) {
@@ -257,41 +260,122 @@ if (!empty($tableData)) {
 
                 $pdf->SetFillColor(44, 62, 80);
                 $pdf->SetTextColor(255, 255, 255);
-                $pdf->SetFont($fontname, 'B', 10);
+                $pdf->SetFont($fontname, 'B', 9);
 
             } else {
 
                 $pdf->SetTextColor(0, 0, 0);
 
-                $pdf->SetFillColor(
-                    ($rowIndex % 2 === 0) ? 245 : 255,
-                    245,
-                    245
-                );
+                if ($rowIndex % 2 === 0) {
+                    $pdf->SetFillColor(245, 245, 245);
+                } else {
+                    $pdf->SetFillColor(255, 255, 255);
+                }
 
-                $pdf->SetFont($fontname, '', 9);
+                $pdf->SetFont($fontname, '', 8);
             }
+
+            /*
+             * ارتفاع خودکار ردیف بر اساس طول متن
+             */
+            $rowHeight = 8;
 
             foreach ($row as $cell) {
 
                 $cell = removeEmoji((string)$cell);
 
-                $pdf->Cell(
+                $height = $pdf->getStringHeight(
+                    $colWidth - 2,
+                    $cell,
+                    false,
+                    true,
+                    '',
+                    0
+                );
+
+                $rowHeight = max($rowHeight, $height + 2);
+            }
+
+            /*
+             * اگر ردیف در صفحه جا نشود،
+             * TCPDF به صفحه بعد می‌رود
+             */
+            if (
+                $pdf->GetY() + $rowHeight >
+                ($pdf->getPageHeight() - 20)
+            ) {
+                $pdf->AddPage();
+            }
+
+            /*
+             * چاپ سلول‌ها با MultiCell
+             * تا متن داخل عرض ستون شکسته شود
+             */
+            foreach ($row as $cell) {
+
+                $cell = removeEmoji((string)$cell);
+
+                $pdf->MultiCell(
                     $colWidth,
-                    8,
+                    $rowHeight,
                     $cell,
                     1,
-                    0,
                     'C',
-                    true
+                    true,
+                    0,
+                    '',
+                    '',
+                    true,
+                    0,
+                    false,
+                    true,
+                    $rowHeight,
+                    'M'
                 );
             }
 
-            $pdf->Ln();
+            $pdf->Ln($rowHeight);
         }
     }
 }
 
-$filename = 'system_report_' . date('Y-m-d_H-i-s') . '.pdf';
+$title = removeEmoji(trim($title));
 
-$pdf->Output($filename, 'D');
+if ($title === '') {
+    $title = 'گزارش';
+}
+$now = new DateTime('now', new DateTimeZone('Asia/Tehran'));
+$now->modify('-1 hour');
+
+[$fy, $fm, $fd] = gregorianToJalali(
+    (int)$now->format('Y'),
+    (int)$now->format('n'),
+    (int)$now->format('j')
+);
+
+$filename = $title . '_' .
+    sprintf(
+        '%04d-%02d-%02d_%02d-%02d-%02d',
+        $fy,
+        $fm,
+        $fd,
+        $now->format('H'),
+        $now->format('i'),
+        $now->format('s')
+    ) . '.pdf';
+
+$pdfData = $pdf->Output('', 'S');
+
+if (ob_get_length()) {
+    ob_end_clean();
+}
+
+header('Content-Type: application/pdf');
+header(
+    'Content-Disposition: attachment; filename="report.pdf"; filename*=UTF-8\'\'' .
+    rawurlencode($filename)
+);
+header('Content-Length: ' . strlen($pdfData));
+
+echo $pdfData;
+exit;
