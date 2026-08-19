@@ -261,6 +261,9 @@ if (isset($_SESSION['backup_error'])) {
                 <button type="submit" name="create_backup" class="btn-backup">
                     💾 ایجاد پشتیبان
                 </button>
+                <button type="button" class="btn-autobackup" onclick="openBackupSettings()">
+    💾   پشتیبان‌گیری خودکار
+</button>
             </form>
         </div>
 
@@ -413,6 +416,287 @@ if (isset($_SESSION['backup_error'])) {
         });
     </script>
 <?php endif; ?>
+<div id="backupModal" class="backup-modal">
 
+    <div class="backup-box">
+
+        <div class="backup-header">
+            <h2>⚙️ تنظیمات پشتیبان‌گیری</h2>
+            <button type="button" onclick="closeBackupSettings()">✖</button>
+        </div>
+
+        <div class="backup-body">
+
+            <!-- فعال سازی -->
+            <div class="backup-row switch-row">
+                <label for="autoBackup">
+                    فعال کردن پشتیبان‌گیری خودکار
+                </label>
+
+                <input
+                    type="checkbox"
+                    id="autoBackup"
+                    onchange="toggleBackupSettings()"
+                >
+            </div>
+
+            <!-- ایمیل -->
+            <div class="backup-group">
+                <label for="backupEmail">
+                    📧 ایمیل دریافت‌کننده
+                </label>
+
+                <input
+                    type="email"
+                    id="backupEmail"
+                    placeholder="example@gmail.com"
+                >
+            </div>
+
+            <!-- فاصله زمانی -->
+            <div class="backup-group">
+                <label for="backupFrequency">
+                    🔄 دوره پشتیبان‌گیری
+                </label>
+
+                <select id="backupFrequency">
+                    <option value="daily">روزانه</option>
+                    <option value="weekly">هفتگی</option>
+                    <option value="monthly">ماهانه</option>
+                </select>
+            </div>
+
+            <!-- ساعت -->
+            <div class="backup-group">
+                <label for="backupTime">
+                    🕐 ساعت اجرا
+                </label>
+
+                <input
+                    type="time"
+                    id="backupTime"
+                    value="02:00"
+                >
+            </div>
+
+            <!-- نگهداری -->
+            <div class="backup-group">
+                <label for="backupRetention">
+                    🗑️ نگهداری بکاپ‌ها
+                </label>
+
+                <select id="backupRetention">
+                    <option value="7">۷ روز</option>
+                    <option value="14">۱۴ روز</option>
+                    <option value="30" selected>۳۰ روز</option>
+                    <option value="60">۶۰ روز</option>
+                    <option value="90">۹۰ روز</option>
+                </select>
+            </div>
+
+            <!-- مسیر -->
+            <div class="backup-group">
+                <label for="backupPath">
+                    📁 مسیر ذخیره بکاپ
+                </label>
+
+                <input
+                    type="text"
+                    id="backupPath"
+                    value="C:\SQLBackups"
+                >
+            </div>
+
+        </div>
+
+        <div class="backup-footer">
+
+            <button
+                type="button"
+                class="btn-save-backup"
+                onclick="saveBackupSettings()"
+            >
+                💾 ذخیره تنظیمات
+            </button>
+
+            <button
+                type="button"
+                class="btn-test-backup"
+                onclick="testBackup()"
+            >
+                🧪 تست بکاپ
+            </button>
+
+            <button
+                type="button"
+                class="btn-cancel-backup"
+                onclick="closeBackupSettings()"
+            >
+                انصراف
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function openBackupSettings() {
+
+    document.getElementById('backupModal').style.display = 'flex';
+
+    loadBackupSettings();
+}
+
+
+function closeBackupSettings() {
+
+    document.getElementById('backupModal').style.display = 'none';
+}
+
+
+function toggleBackupSettings() {
+
+    const enabled =
+        document.getElementById('autoBackup').checked;
+
+    const fields = [
+        'backupEmail',
+        'backupFrequency',
+        'backupTime',
+        'backupRetention',
+        'backupPath'
+    ];
+
+    fields.forEach(id => {
+        document.getElementById(id).disabled = !enabled;
+    });
+}
+
+
+function loadBackupSettings() {
+
+    fetch('backup_settings.php?action=get')
+        .then(response => response.json())
+        .then(data => {
+
+            if (!data.success) {
+                return;
+            }
+
+            document.getElementById('autoBackup').checked =
+                data.enabled;
+
+            document.getElementById('backupEmail').value =
+                data.email || '';
+
+            document.getElementById('backupFrequency').value =
+                data.frequency || 'daily';
+
+            document.getElementById('backupTime').value =
+                data.time || '02:00';
+
+            document.getElementById('backupRetention').value =
+                data.retention || '30';
+
+            document.getElementById('backupPath').value =
+                data.path || 'C:\\SQLBackups';
+
+            toggleBackupSettings();
+        })
+        .catch(() => {
+            toggleBackupSettings();
+        });
+}
+
+
+function saveBackupSettings() {
+
+    const data = {
+
+        enabled:
+            document.getElementById('autoBackup').checked,
+
+        email:
+            document.getElementById('backupEmail').value.trim(),
+
+        frequency:
+            document.getElementById('backupFrequency').value,
+
+        time:
+            document.getElementById('backupTime').value,
+
+        retention:
+            document.getElementById('backupRetention').value,
+
+        path:
+            document.getElementById('backupPath').value.trim()
+    };
+
+    if (data.enabled && !data.email) {
+
+        alert('لطفاً ایمیل دریافت‌کننده را وارد کنید.');
+        return;
+    }
+
+    fetch('backup_settings.php?action=save', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify(data)
+
+    })
+    .then(response => response.json())
+    .then(result => {
+
+        if (result.success) {
+
+            alert('✅ تنظیمات با موفقیت ذخیره شد.');
+
+            closeBackupSettings();
+
+        } else {
+
+            alert(
+                '❌ خطا: ' +
+                (result.message || 'ذخیره تنظیمات ناموفق بود')
+            );
+        }
+
+    })
+    .catch(() => {
+
+        alert('❌ ارتباط با سرور برقرار نشد.');
+
+    });
+}
+
+
+function testBackup() {
+
+    if (!confirm('یک بکاپ آزمایشی ایجاد شود؟')) {
+        return;
+    }
+
+    fetch('backup_database.php?test=1')
+        .then(response => response.text())
+        .then(result => {
+
+            alert(result);
+
+        })
+        .catch(() => {
+
+            alert('❌ اجرای بکاپ ناموفق بود.');
+
+        });
+}
+
+</script>
 </body>
 </html>

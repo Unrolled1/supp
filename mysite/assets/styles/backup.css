@@ -58,7 +58,24 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 25px rgba(72, 187, 120, 0.4);
 }
+.btn-autobackup {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 25px;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
 
+.btn-autobackup:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, .3);
+}
 .btn-restore {
     background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
     color: white;
@@ -242,4 +259,122 @@
         font-size: 12px;
         padding: 10px 15px;
     }
+}
+.backup-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .65);
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+}
+
+.backup-box {
+    width: 100%;
+    max-width: 550px;
+    background: #111827;
+    color: #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, .5);
+    overflow: hidden;
+    direction: rtl;
+}
+
+.backup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #374151;
+}
+
+.backup-header h2 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.backup-header button {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.backup-body {
+    padding: 22px;
+}
+
+.backup-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.backup-group {
+    margin-bottom: 17px;
+}
+
+.backup-group label,
+.switch-row label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+}
+
+.backup-group input,
+.backup-group select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    background: #1f2937;
+    color: #fff;
+    font-family: 'Vazir', Tahoma, sans-serif;
+}
+
+.backup-group input:disabled,
+.backup-group select:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.backup-footer {
+    display: flex;
+    gap: 10px;
+    padding: 18px 22px;
+    border-top: 1px solid #374151;
+}
+
+.backup-footer button {
+    flex: 1;
+    min-height: 42px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    font-weight: bold;
+}
+
+.btn-save-backup {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-test-backup {
+    background: #16a34a;
+    color: #fff;
+}
+
+.btn-cancel-backup {
+    background: #374151;
+    color: #fff;
+}
+
+.backup-footer button:hover {
+    transform: translateY(-1px);
 }
