@@ -299,14 +299,14 @@ if ($isAjax) {
         </div>
     </div>
  </div>
- <script>
+<script>
     window.reportConfig = {
-    url: "admin_servicerep.php",
-    printUrl: "assets/print_report.php",
-    table: ".reports-table",
-    filterInfo: true,
-    type: "service"
- };
-    </script>
+        url: "admin_servicerep.php",
+        printUrl: "assets/print_report.php", // تغییر مسیر
+        table: ".reports-table",
+        filterInfo: true,
+        type: "service"
+    };
+</script>
 </body>
 </html>

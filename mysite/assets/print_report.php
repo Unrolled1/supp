@@ -6,7 +6,7 @@ require_once 'report_queries.php';
 
 $db = getDB();
 
-$type = $_GET['type'] ?? '';
+$type = $_POST['type'] ?? $_GET['type'] ?? '';
 $data = getReportData($type, $db, $_POST);
 
 

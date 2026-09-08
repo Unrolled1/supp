@@ -164,8 +164,8 @@ function getServiceReport($db, $filters){
 
     $department_id  = $filters['department_id'] ?? '';
     $service_name   = $filters['service_name'] ?? '';
-    $date_from      = $filters['date_from'] ?? '';
-    $date_to        = $filters['date_to'] ?? '';
+    $date_from = faToEn($filters['date_from'] ?? '');
+    $date_to   = faToEn($filters['date_to'] ?? '');
  
     $selectedColumns = $filters['columns'] ?? [
         'service_name',
@@ -200,14 +200,14 @@ function getServiceReport($db, $filters){
         $params[':department_id'] = $filters['department_id'];
     }
 
-    if (!empty($filters['date_from'])) {
+    if (!empty($date_from)) {
         $whereConditions[] = "sr.created_at >= :date_from";
-        $params[':date_from'] = $filters['date_from'];
+        $params[':date_from'] = $date_from;
     }
 
-    if (!empty($filters['date_to'])) {
+    if (!empty($date_to)) {
         $whereConditions[] = "sr.created_at <= :date_to";
-        $params[':date_to'] = $filters['date_to'];
+        $params[':date_to'] = $date_to;
     }
 
     $whereSql = $whereConditions
