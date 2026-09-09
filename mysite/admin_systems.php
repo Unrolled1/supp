@@ -960,9 +960,14 @@ if ($isAjax) {
                                 <label>ظرفیت</label>
                                 <select name="storage_capacity">
                                     <option value="">-- انتخاب --</option>
+                                    <option value="120GB">120GB</option>
+                                    <option value="124GB">124GB</option>
                                     <option value="128GB">128GB</option>
+                                    <option value="240GB">240GB</option>
                                     <option value="256GB">256GB</option>
+                                    <option value="500GB">500GB</option>
                                     <option value="512GB">512GB</option>
+                                    <option value="750GB">750GB</option>
                                     <option value="1TB">1TB</option>
                                     <option value="2TB">2TB</option>
                                 </select>

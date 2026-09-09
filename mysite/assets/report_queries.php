@@ -396,6 +396,7 @@ function getInvoiceReport($db,$filters){
 
         if ($col == 'created_at' && $value != '-') {
             $value = fa_number($value);
+            $value = str_replace('-', '/', $value);
         }
 
         $row[] = htmlspecialchars((string)$value);
@@ -417,8 +418,8 @@ function getKalaReport($db, $filters)
 {
     $department_id = $filters['department_id'] ?? '';
     $brand_id      = $filters['brand_id'] ?? '';
-    $date_from     = $filters['date_from'] ?? '';
-    $date_to       = $filters['date_to'] ?? '';
+    $date_from = faToEn($filters['date_from'] ?? '');
+    $date_to   = faToEn($filters['date_to'] ?? '');
 
     $selectedColumns = $filters['columns'] ?? [
         'computer_code',
@@ -607,10 +608,13 @@ function getKalaReport($db, $filters)
 
             if ($col == 'created_at' && $value != '-') {
                 $value = fa_number($value);
+                $value = str_replace('-', '/', $value);
+
             }
 
             if ($col == 'quantity' && $value != '-') {
                 $value = fa_number($value);
+
             }
 
             $row[] = htmlspecialchars((string)$value);
@@ -633,8 +637,8 @@ function getPrinterReport($db, $filters)
     $department_id = $filters['department_id'] ?? '';
     $brand_id      = $filters['brand_id'] ?? '';
     $activity_id   = $filters['activity_id'] ?? '';
-    $date_from     = $filters['date_from'] ?? '';
-    $date_to       = $filters['date_to'] ?? '';
+    $date_from = faToEn($filters['date_from'] ?? '');
+    $date_to   = faToEn($filters['date_to'] ?? '');
 
     $selectedColumns = $filters['columns'] ?? [
         'computer_code',
@@ -771,6 +775,7 @@ function getPrinterReport($db, $filters)
 
             if($col == 'created_at' && $value != '-'){
                 $value = fa_number($value);
+                $value = str_replace('-', '/', $value);
             }
 
             $row[] = htmlspecialchars((string)$value);
@@ -791,8 +796,8 @@ function getPrinterReport($db, $filters)
 function getSystemReport($db, $filters){
    $department_id = $filters['department_id'] ?? '';
 $cpu_id        = $filters['cpu_id'] ?? '';
-$date_from     = $filters['date_from'] ?? '';
-$date_to       = $filters['date_to'] ?? '';
+    $date_from = faToEn($filters['date_from'] ?? '');
+    $date_to   = faToEn($filters['date_to'] ?? '');
 
 $selectedColumns = $_POST['columns'] ?? [
     'computer_code',
@@ -1038,6 +1043,7 @@ if(!empty($date_to))
 
             if($col == 'created_at' && $value != '-'){
                 $value = fa_number($value);
+                $value = str_replace('-', '/', $value);
             }
 
             $row[] = htmlspecialchars((string)$value);
