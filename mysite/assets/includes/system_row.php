@@ -156,17 +156,24 @@ if (!isset($rowData)) {
     </td>
 
     <!-- عملیات -->
-    <td class="td-actions action-buttons">
-        <?php if (canEditSystems()): ?>
-            <button class="edit-btn" onclick='openEditModal(<?php echo json_encode($rowData); ?>)' title="ویرایش">
-                ✏️ویرایش
-            </button>
-        <?php endif; ?>
-        <?php if (canDeleteSystems()): ?>
-            <button class="delete-btn"
-                    onclick="confirmDelete(<?php echo $rowData['id']; ?>, '<?php echo htmlspecialchars($rowData['name']); ?>')"
-                    title="حذف">🗑️حذف
-            </button>
-        <?php endif; ?>
-    </td>
+        <!-- عملیات -->
+        <td class="td-actions">
+            <div class="action-buttons">
+                <?php if (canEditSystems()): ?>
+                    <button class="edit-btn"
+                            onclick='openEditModal(<?php echo json_encode($rowData); ?>)'
+                            title="ویرایش">
+                        ✏️
+                    </button>
+                <?php endif; ?>
+
+                <?php if (canDeleteSystems()): ?>
+                    <button class="delete-btn"
+                            onclick="confirmDelete(<?php echo $rowData['id']; ?>, '<?php echo htmlspecialchars($rowData['name']); ?>')"
+                            title="حذف">
+                        🗑️
+                    </button>
+                <?php endif; ?>
+            </div>
+        </td>
     </tr>

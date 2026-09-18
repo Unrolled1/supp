@@ -241,19 +241,32 @@
 .systems-table .text-muted {
     font-size: 11px;
 }
-
 /* ============================================
-   دکمه‌های عملیات در جدول
+   چیدمان افقی دکمه‌های عملیات
    ============================================ */
 
+.td-actions {
+    vertical-align: middle !important;
+    text-align: center;
+}
 
-.action-buttons button {
-    border: none;
-    border-radius: 6px;
+.td-actions .action-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.td-actions .action-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
     padding: 4px 10px;
-    cursor: pointer;
-    font-size: 13px;
-    transition: all 0.2s ease;
 }
 
 .action-buttons .edit-btn {
@@ -328,4 +341,26 @@
     border: 1px solid #cbd5e1;
     padding: 8px 10px;
     text-align: center;
+}
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.sortable:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-arrow {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 13px;
+    opacity: 0.5;
+    transition: 0.2s;
+}
+
+.sortable.active .sort-arrow {
+    opacity: 1;
+    font-weight: bold;
 }

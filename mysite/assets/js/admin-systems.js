@@ -1,38 +1,383 @@
 // ============================================
 // فایل مدیریت سیستم‌ها
 // ============================================
-
-// ============================================
-// جستجو
+// جستجو با AJAX
 // ============================================
 
 function initSearch() {
+
     const searchBtn = document.getElementById('search_btn');
     const resetBtn = document.getElementById('reset_btn');
 
+    function searchSystems(reset = false) {
+
+        const params = new URLSearchParams();
+
+        if (!reset) {
+
+            const computerCode =
+                document.getElementById('search_computer_code')?.value.trim();
+
+            const name =
+                document.getElementById('search_name')?.value.trim();
+
+            const department =
+                document.getElementById('search_department')?.value;
+            const ip =
+                document.getElementById('search_ip')?.value.trim();
+
+            if (ip) {
+                params.set('ip', ip);
+            }
+
+            if (computerCode) {
+                params.set('computer_code', computerCode);
+            }
+
+            if (name) {
+                params.set('name', name);
+            }
+
+            if (department) {
+                params.set('department', department);
+            }
+        }
+
+        // مشخص می‌کند درخواست AJAX است
+        params.set('ajax', '1');
+
+        const tbody =
+            document.querySelector('.systems-table tbody');
+
+        if (!tbody) return;
+
+        // حالت لودینگ
+        tbody.style.opacity = '0.5';
+        tbody.style.pointerEvents = 'none';
+
+        fetch('admin_systems.php?' + params.toString(), {
+
+            method: 'GET',
+
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+
+        })
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+
+                return response.text();
+
+            })
+
+            .then(html => {
+
+                // فقط محتوای جدول عوض می‌شود
+                tbody.innerHTML = html;
+
+                tbody.style.opacity = '1';
+                tbody.style.pointerEvents = 'auto';
+
+                // شماره ردیف‌ها
+                updateTableRowNumbers();
+
+                // آدرس مرورگر بدون Refresh آپدیت شود
+                const url = new URL(window.location.href);
+
+                url.search = '';
+
+                params.delete('ajax');
+
+                url.search = params.toString();
+
+                window.history.replaceState({}, '', url);
+
+            })
+
+            .catch(error => {
+
+                console.error('Search error:', error);
+
+                tbody.style.opacity = '1';
+                tbody.style.pointerEvents = 'auto';
+
+                Swal.fire({
+                    title: 'خطا!',
+                    text: 'مشکلی در دریافت اطلاعات رخ داد.',
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+
+            });
+    }
+
+
+    // دکمه جستجو
     if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
-            const params = new URLSearchParams();
 
-            const computerCode = document.getElementById('search_computer_code')?.value;
-            const name = document.getElementById('search_name')?.value;
-            const department = document.getElementById('search_department')?.value;
+        searchBtn.addEventListener('click', function () {
 
-            if (computerCode) params.set('computer_code', computerCode);
-            if (name) params.set('name', name);
-            if (department) params.set('department', department);
+            searchSystems(false);
 
-            window.location.href = 'admin_systems.php?' + params.toString();
         });
+
     }
 
+
+    // دکمه پاک کردن فیلترها
     if (resetBtn) {
-        resetBtn.addEventListener('click', function() {
-            window.location.href = 'admin_systems.php';
+
+        resetBtn.addEventListener('click', function () {
+
+            // پاک کردن فیلدها
+            const computerCode =
+                document.getElementById('search_computer_code');
+
+            const name =
+                document.getElementById('search_name');
+
+            const department =
+                document.getElementById('search_department');
+
+
+            if (computerCode) {
+                computerCode.value = '';
+            }
+
+            if (name) {
+                name.value = '';
+            }
+
+            if (department) {
+                department.value = '';
+            }
+
+
+            // دریافت مجدد لیست بدون فیلتر
+            searchSystems(true);
+
         });
+
     }
+
+}
+// ============================================
+// مرتب‌سازی جدول سیستم‌ها
+// ============================================
+
+let currentSort = 'id';
+let currentDirection = 'desc';
+
+function initTableSort() {
+
+    const headers = document.querySelectorAll(
+        '.systems-table thead th.sortable'
+    );
+
+    headers.forEach(header => {
+
+        // جلوگیری از اضافه شدن چندباره Event
+        if (header.dataset.sortInitialized === '1') {
+            return;
+        }
+
+        header.dataset.sortInitialized = '1';
+
+        header.addEventListener('click', function () {
+
+            const sort = this.dataset.sort;
+
+            if (currentSort === sort) {
+
+                // تغییر صعودی / نزولی
+                currentDirection =
+                    currentDirection === 'asc'
+                        ? 'desc'
+                        : 'asc';
+
+            } else {
+
+                currentSort = sort;
+
+                // اولین کلیک صعودی
+                currentDirection = 'asc';
+
+            }
+
+            updateSortArrows();
+
+            loadSortedSystems();
+
+        });
+
+    });
+
+    updateSortArrows();
 }
 
+
+function updateSortArrows() {
+
+    document
+        .querySelectorAll('.systems-table thead th.sortable')
+        .forEach(header => {
+
+            const arrow = header.querySelector('.sort-arrow');
+
+            if (!arrow) return;
+
+            header.classList.remove('active');
+
+            arrow.textContent = '↕';
+
+            if (header.dataset.sort === currentSort) {
+
+                header.classList.add('active');
+
+                arrow.textContent =
+                    currentDirection === 'asc'
+                        ? '↑'
+                        : '↓';
+
+            }
+
+        });
+
+}
+
+
+function loadSortedSystems() {
+
+    const params = new URLSearchParams();
+
+    // =========================
+    // فیلترهای فعلی
+    // =========================
+
+    const computerCode =
+        document.getElementById('search_computer_code')
+            ?.value.trim();
+
+    const name =
+        document.getElementById('search_name')
+            ?.value.trim();
+
+    const department =
+        document.getElementById('search_department')
+            ?.value;
+
+    const ip =
+        document.getElementById('search_ip')
+            ?.value.trim();
+
+
+    if (computerCode) {
+        params.set('computer_code', computerCode);
+    }
+
+    if (name) {
+        params.set('name', name);
+    }
+
+    if (department) {
+        params.set('department', department);
+    }
+
+    if (ip) {
+        params.set('ip', ip);
+    }
+
+
+    // =========================
+    // مرتب‌سازی
+    // =========================
+
+    params.set('sort', currentSort);
+    params.set('direction', currentDirection);
+    params.set('ajax', '1');
+
+
+    const tbody =
+        document.querySelector('.systems-table tbody');
+
+    if (!tbody) return;
+
+
+    tbody.style.opacity = '0.5';
+    tbody.style.pointerEvents = 'none';
+
+
+    fetch('admin_systems.php?' + params.toString(), {
+
+        method: 'GET',
+
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+
+    })
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    'HTTP ' + response.status
+                );
+            }
+
+            return response.text();
+
+        })
+
+        .then(html => {
+
+            tbody.innerHTML = html;
+
+            tbody.style.opacity = '1';
+            tbody.style.pointerEvents = 'auto';
+
+            updateTableRowNumbers();
+
+            // URL بدون Refresh
+            const url =
+                new URL(window.location.href);
+
+            url.search = '';
+
+            params.delete('ajax');
+
+            url.search = params.toString();
+
+            window.history.replaceState(
+                {},
+                '',
+                url
+            );
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            tbody.style.opacity = '1';
+            tbody.style.pointerEvents = 'auto';
+
+            Swal.fire({
+                title: 'خطا!',
+                text: 'خطا در مرتب‌سازی اطلاعات.',
+                icon: 'error',
+                confirmButtonColor: '#dc3545'
+            });
+
+        });
+
+}
 // ============================================
 // تابع عمومی دریافت داده از سرور
 // ============================================
@@ -1483,7 +1828,7 @@ function closeModal(modalId) {
 document.addEventListener('DOMContentLoaded', function () {
 
     initSearch();
-
+    initTableSort();
     const editForm = document.getElementById("editForm");
 
     if (editForm) {

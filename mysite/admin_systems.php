@@ -423,38 +423,84 @@ if (isset($_POST['add_system']) && canEditSystems()) {
 // ============================================
 // گرفتن لیست سیستم‌ها با فیلتر
 // ============================================
-
+$isAjax = isset($_GET['ajax']) && $_GET['ajax'] === '1';
 $where = [];
 $params = [];
 
-if (isset($_GET['computer_code']) && !empty($_GET['computer_code'])) {
+if (!empty($_GET['computer_code'])) {
     $where[] = "s.computer_code LIKE :computer_code";
-    $params[':computer_code'] = '%' . $_GET['computer_code'] . '%';
-}
-if (isset($_GET['name']) && !empty($_GET['name'])) {
-    $where[] = "s.name LIKE :name";
-    $params[':name'] = '%' . $_GET['name'] . '%';
-}
-if (isset($_GET['department']) && !empty($_GET['department'])) {
-    $where[] = "s.department_id = :department";
-    $params[':department'] = filter_var($_GET['department'], FILTER_VALIDATE_INT);
-}
-if (isset($_GET['cpu']) && !empty($_GET['cpu'])) {
-    $where[] = "s.cpu_id = :cpu";
-    $params[':cpu'] = filter_var($_GET['cpu'], FILTER_VALIDATE_INT);
-}
-if (isset($_GET['motherboard']) && !empty($_GET['motherboard'])) {
-    $where[] = "s.motherboard_id = :motherboard";
-    $params[':motherboard'] = filter_var($_GET['motherboard'], FILTER_VALIDATE_INT);
-}
-if ($date_from != '') {
-    $where[] = "s.created_at >= :from";
-    $params[':from'] = $date_from;
+    $params[':computer_code'] = '%' . trim($_GET['computer_code']) . '%';
 }
 
-if ($date_to != '') {
-    $where[] = "s.created_at <= :to";
-    $params[':to'] = $date_to;
+if (!empty($_GET['name'])) {
+    $where[] = "s.name LIKE :name";
+    $params[':name'] = '%' . trim($_GET['name']) . '%';
+}
+
+if (!empty($_GET['department'])) {
+    $where[] = "s.department_id = :department";
+    $params[':department'] = (int)$_GET['department'];
+}
+
+if (!empty($_GET['cpu'])) {
+    $where[] = "s.cpu_id = :cpu";
+    $params[':cpu'] = (int)$_GET['cpu'];
+}
+
+if (!empty($_GET['motherboard'])) {
+    $where[] = "s.motherboard_id = :motherboard";
+    $params[':motherboard'] = (int)$_GET['motherboard'];
+}
+
+if (!empty($date_from)) {
+    $where[] = "s.created_at >= :date_from";
+    $params[':date_from'] = $date_from;
+}
+
+if (!empty($date_to)) {
+    $where[] = "s.created_at <= :date_to";
+    $params[':date_to'] = $date_to;
+}
+// ============================================
+// مرتب‌سازی جدول
+// ============================================
+
+$allowedSorts = [
+
+    'computer_code' => 's.computer_code',
+
+    'name' => 's.name',
+
+    'department' => 'd.name',
+
+    'cpu' => 'cpu_b.name',
+
+    'motherboard' => 'mb_b.name',
+
+    'power' => 'p_b.name',
+
+    'monitor' => 'mon_b.name',
+
+    'date' => 's.created_at',
+
+];
+
+$sort = $_GET['sort'] ?? 'id';
+
+$direction = strtolower($_GET['direction'] ?? 'desc');
+
+if (!in_array($direction, ['asc', 'desc'], true)) {
+    $direction = 'desc';
+}
+
+if (isset($allowedSorts[$sort])) {
+
+    $orderBy = $allowedSorts[$sort];
+
+} else {
+
+    $orderBy = 's.id';
+
 }
 
 $sql = "
@@ -479,35 +525,51 @@ SELECT
 
 FROM systems s
 
-LEFT JOIN departments d ON s.department_id = d.id
+LEFT JOIN departments d
+    ON s.department_id = d.id
 
-LEFT JOIN cpus cpu ON s.cpu_id = cpu.id
-LEFT JOIN models cpu_m ON cpu.model_id = cpu_m.id
-LEFT JOIN brands cpu_b ON cpu_m.brand_id = cpu_b.id
+LEFT JOIN cpus cpu
+    ON s.cpu_id = cpu.id
+LEFT JOIN models cpu_m
+    ON cpu.model_id = cpu_m.id
+LEFT JOIN brands cpu_b
+    ON cpu_m.brand_id = cpu_b.id
 
-LEFT JOIN motherboards mb ON s.motherboard_id = mb.id
-LEFT JOIN models mb_m ON mb.model_id = mb_m.id
-LEFT JOIN brands mb_b ON mb_m.brand_id = mb_b.id
+LEFT JOIN motherboards mb
+    ON s.motherboard_id = mb.id
+LEFT JOIN models mb_m
+    ON mb.model_id = mb_m.id
+LEFT JOIN brands mb_b
+    ON mb_m.brand_id = mb_b.id
 
-LEFT JOIN powers p ON s.power_id = p.id
-LEFT JOIN models p_m ON p.model_id = p_m.id
-LEFT JOIN brands p_b ON p_m.brand_id = p_b.id
+LEFT JOIN powers p
+    ON s.power_id = p.id
+LEFT JOIN models p_m
+    ON p.model_id = p_m.id
+LEFT JOIN brands p_b
+    ON p_m.brand_id = p_b.id
 
-LEFT JOIN monitors mon ON s.monitor_id = mon.id
-LEFT JOIN models mon_m ON mon.model_id = mon_m.id
-LEFT JOIN brands mon_b ON mon_m.brand_id = mon_b.id
+LEFT JOIN monitors mon
+    ON s.monitor_id = mon.id
+LEFT JOIN models mon_m
+    ON mon.model_id = mon_m.id
+LEFT JOIN brands mon_b
+    ON mon_m.brand_id = mon_b.id
 
-LEFT JOIN users u ON s.created_by = u.id
+LEFT JOIN users u
+    ON s.created_by = u.id
 ";
-if($where){
-    $sql .= " WHERE ".implode(" AND ",$where);
+
+if (!empty($where)) {
+    $sql .= " WHERE " . implode(" AND ", $where);
 }
 
-$sql .= "ORDER BY s.id DESC";
+$sql .= " ORDER BY {$orderBy} {$direction}";
 
-$stmt=$db->prepare($sql);
+$stmt = $db->prepare($sql);
 $stmt->execute($params);
-$systems=$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$systems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 foreach ($systems as $key => $system) {
@@ -591,14 +653,12 @@ if ($isAjax) {
     <?php endif; ?>
 
     <?php
-    $table = ob_get_clean();
 
-    header('Content-Type: application/json; charset=utf-8');
+    $html = ob_get_clean();
 
-    echo json_encode([
-        'success' => true,
-        'table'   => $table
-    ], JSON_UNESCAPED_UNICODE);
+    header('Content-Type: text/html; charset=UTF-8');
+
+    echo $html;
 
     exit;
 }
@@ -1166,6 +1226,10 @@ if ($isAjax) {
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>IP</label>
+                        <input type="text" id="search_ip" >
+                    </div>
                 </div>
                 <div class="search-row">
                     <div class="search-group search-actions">
@@ -1184,18 +1248,67 @@ if ($isAjax) {
                 <thead>
                 <tr>
                     <th>ردیف</th>
-                    <th>کد رایانه</th>
-                    <th>نام سیستم</th>
-                    <th>بخش</th>
-                    <th>CPU</th>
-                    <th>مادربرد</th>
-                    <th>پاور</th>
-                    <th>مانیتور</th>
-                    <th>رم</th>
-                    <th>هارد</th>
-                    <th>IP</th>
-                    <th>تجهیزات</th>
-                    <th>تاریخ</th>
+
+                    <th class="sortable" data-sort="computer_code">
+                        کد رایانه
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="name">
+                        نام سیستم
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="department">
+                        بخش
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="cpu">
+                        CPU
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="motherboard">
+                        مادربرد
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="power">
+                        پاور
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="monitor">
+                        مانیتور
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="ram">
+                        رم
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="storage">
+                        هارد
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="ip">
+                        IP
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="peripheral">
+                        تجهیزات
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="date">
+                        تاریخ
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
                     <th>عملیات</th>
                 </tr>
                 </thead>
