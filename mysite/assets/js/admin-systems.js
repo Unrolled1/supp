@@ -1,279 +1,31 @@
 // ============================================
-// فایل مدیریت سیستم‌ها
-// ============================================
-// جستجو با AJAX
-// ============================================
-
-function initSearch() {
-
-    const searchBtn = document.getElementById('search_btn');
-    const resetBtn = document.getElementById('reset_btn');
-
-    function searchSystems(reset = false) {
-
-        const params = new URLSearchParams();
-
-        if (!reset) {
-
-            const computerCode =
-                document.getElementById('search_computer_code')?.value.trim();
-
-            const name =
-                document.getElementById('search_name')?.value.trim();
-
-            const department =
-                document.getElementById('search_department')?.value;
-            const ip =
-                document.getElementById('search_ip')?.value.trim();
-
-            if (ip) {
-                params.set('ip', ip);
-            }
-
-            if (computerCode) {
-                params.set('computer_code', computerCode);
-            }
-
-            if (name) {
-                params.set('name', name);
-            }
-
-            if (department) {
-                params.set('department', department);
-            }
-        }
-
-        // مشخص می‌کند درخواست AJAX است
-        params.set('ajax', '1');
-
-        const tbody =
-            document.querySelector('.systems-table tbody');
-
-        if (!tbody) return;
-
-        // حالت لودینگ
-        tbody.style.opacity = '0.5';
-        tbody.style.pointerEvents = 'none';
-
-        fetch('admin_systems.php?' + params.toString(), {
-
-            method: 'GET',
-
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-
-        })
-
-            .then(response => {
-
-                if (!response.ok) {
-                    throw new Error('HTTP ' + response.status);
-                }
-
-                return response.text();
-
-            })
-
-            .then(html => {
-
-                // فقط محتوای جدول عوض می‌شود
-                tbody.innerHTML = html;
-
-                tbody.style.opacity = '1';
-                tbody.style.pointerEvents = 'auto';
-
-                // شماره ردیف‌ها
-                updateTableRowNumbers();
-
-                // آدرس مرورگر بدون Refresh آپدیت شود
-                const url = new URL(window.location.href);
-
-                url.search = '';
-
-                params.delete('ajax');
-
-                url.search = params.toString();
-
-                window.history.replaceState({}, '', url);
-
-            })
-
-            .catch(error => {
-
-                console.error('Search error:', error);
-
-                tbody.style.opacity = '1';
-                tbody.style.pointerEvents = 'auto';
-
-                Swal.fire({
-                    title: 'خطا!',
-                    text: 'مشکلی در دریافت اطلاعات رخ داد.',
-                    icon: 'error',
-                    confirmButtonColor: '#dc3545'
-                });
-
-            });
-    }
-
-
-    // دکمه جستجو
-    if (searchBtn) {
-
-        searchBtn.addEventListener('click', function () {
-
-            searchSystems(false);
-
-        });
-
-    }
-
-
-    // دکمه پاک کردن فیلترها
-    if (resetBtn) {
-
-        resetBtn.addEventListener('click', function () {
-
-            // پاک کردن فیلدها
-            const computerCode =
-                document.getElementById('search_computer_code');
-
-            const name =
-                document.getElementById('search_name');
-
-            const department =
-                document.getElementById('search_department');
-
-
-            if (computerCode) {
-                computerCode.value = '';
-            }
-
-            if (name) {
-                name.value = '';
-            }
-
-            if (department) {
-                department.value = '';
-            }
-
-
-            // دریافت مجدد لیست بدون فیلتر
-            searchSystems(true);
-
-        });
-
-    }
-
-}
-// ============================================
-// مرتب‌سازی جدول سیستم‌ها
+// مدیریت سیستم‌ها - جستجو، مرتب‌سازی و Pagination
 // ============================================
 
 let currentSort = 'id';
 let currentDirection = 'desc';
-
-function initTableSort() {
-
-    const headers = document.querySelectorAll(
-        '.systems-table thead th.sortable'
-    );
-
-    headers.forEach(header => {
-
-        // جلوگیری از اضافه شدن چندباره Event
-        if (header.dataset.sortInitialized === '1') {
-            return;
-        }
-
-        header.dataset.sortInitialized = '1';
-
-        header.addEventListener('click', function () {
-
-            const sort = this.dataset.sort;
-
-            if (currentSort === sort) {
-
-                // تغییر صعودی / نزولی
-                currentDirection =
-                    currentDirection === 'asc'
-                        ? 'desc'
-                        : 'asc';
-
-            } else {
-
-                currentSort = sort;
-
-                // اولین کلیک صعودی
-                currentDirection = 'asc';
-
-            }
-
-            updateSortArrows();
-
-            loadSortedSystems();
-
-        });
-
-    });
-
-    updateSortArrows();
-}
+let currentPage = 1;
 
 
-function updateSortArrows() {
+// ============================================
+// ساخت پارامترهای فعلی
+// ============================================
 
-    document
-        .querySelectorAll('.systems-table thead th.sortable')
-        .forEach(header => {
-
-            const arrow = header.querySelector('.sort-arrow');
-
-            if (!arrow) return;
-
-            header.classList.remove('active');
-
-            arrow.textContent = '↕';
-
-            if (header.dataset.sort === currentSort) {
-
-                header.classList.add('active');
-
-                arrow.textContent =
-                    currentDirection === 'asc'
-                        ? '↑'
-                        : '↓';
-
-            }
-
-        });
-
-}
-
-
-function loadSortedSystems() {
+function getSystemParams(page = 1) {
 
     const params = new URLSearchParams();
 
-    // =========================
-    // فیلترهای فعلی
-    // =========================
-
     const computerCode =
-        document.getElementById('search_computer_code')
-            ?.value.trim();
+        document.getElementById('search_computer_code')?.value.trim();
 
     const name =
-        document.getElementById('search_name')
-            ?.value.trim();
+        document.getElementById('search_name')?.value.trim();
 
     const department =
-        document.getElementById('search_department')
-            ?.value;
+        document.getElementById('search_department')?.value;
 
     const ip =
-        document.getElementById('search_ip')
-            ?.value.trim();
+        document.getElementById('search_ip')?.value.trim();
 
 
     if (computerCode) {
@@ -293,24 +45,39 @@ function loadSortedSystems() {
     }
 
 
-    // =========================
     // مرتب‌سازی
-    // =========================
-
     params.set('sort', currentSort);
     params.set('direction', currentDirection);
+
+    // صفحه
+    params.set('page', page);
+
+    // AJAX
     params.set('ajax', '1');
 
+
+    return params;
+}
+
+
+// ============================================
+// دریافت لیست سیستم‌ها
+// ============================================
+
+function loadSystems(page = 1) {
 
     const tbody =
         document.querySelector('.systems-table tbody');
 
     if (!tbody) return;
 
+    currentPage = page;
 
+    // حالت Loading
     tbody.style.opacity = '0.5';
     tbody.style.pointerEvents = 'none';
 
+    const params = getSystemParams(page);
 
     fetch('admin_systems.php?' + params.toString(), {
 
@@ -325,29 +92,70 @@ function loadSortedSystems() {
         .then(response => {
 
             if (!response.ok) {
-                throw new Error(
-                    'HTTP ' + response.status
-                );
+                throw new Error('HTTP ' + response.status);
             }
 
-            return response.text();
+            return response.json();
 
         })
 
-        .then(html => {
+        .then(data => {
 
-            tbody.innerHTML = html;
+            if (!data.success) {
+                throw new Error('Server returned success=false');
+            }
+
+            // -------------------------
+            // جدول
+            // -------------------------
+
+            tbody.innerHTML = data.html;
+
+// رفتن به بالای جدول بعد از تغییر صفحه
+            const table = document.querySelector('.systems-table');
+
+            if (table) {
+                setTimeout(function () {
+                    table.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 50);
+            }
+
+
+            // -------------------------
+            // Pagination
+            // -------------------------
+
+            const pagination =
+                document.getElementById('pagination_container');
+
+            if (pagination) {
+                pagination.innerHTML = data.pagination;
+            }
+
+
+            // -------------------------
+            // حالت عادی
+            // -------------------------
 
             tbody.style.opacity = '1';
             tbody.style.pointerEvents = 'auto';
 
-            updateTableRowNumbers();
 
-            // URL بدون Refresh
+            // -------------------------
+            // فلش مرتب‌سازی
+            // -------------------------
+
+            updateSortArrows();
+
+            // -------------------------
+            // URL مرورگر
+            // -------------------------
+
             const url =
                 new URL(window.location.href);
-
-            url.search = '';
 
             params.delete('ajax');
 
@@ -363,14 +171,14 @@ function loadSortedSystems() {
 
         .catch(error => {
 
-            console.error(error);
+            console.error('Load systems error:', error);
 
             tbody.style.opacity = '1';
             tbody.style.pointerEvents = 'auto';
 
             Swal.fire({
                 title: 'خطا!',
-                text: 'خطا در مرتب‌سازی اطلاعات.',
+                text: 'مشکلی در دریافت اطلاعات رخ داد.',
                 icon: 'error',
                 confirmButtonColor: '#dc3545'
             });
@@ -378,6 +186,355 @@ function loadSortedSystems() {
         });
 
 }
+
+
+// ============================================
+// جستجو
+// ============================================
+
+function initSearch() {
+
+    const searchBtn =
+        document.getElementById('search_btn');
+
+    const resetBtn =
+        document.getElementById('reset_btn');
+
+
+    // -------------------------
+    // IP - جستجوی لحظه‌ای
+    // -------------------------
+
+    const ipInput =
+        document.getElementById('search_ip');
+
+    let ipSearchTimer;
+
+
+    if (ipInput) {
+
+        ipInput.addEventListener('input', function () {
+
+            clearTimeout(ipSearchTimer);
+
+            ipSearchTimer = setTimeout(function () {
+
+                loadSystems(1);
+
+            }, 300);
+
+        });
+
+    }
+
+
+    // -------------------------
+    // دکمه جستجو
+    // -------------------------
+
+    if (searchBtn) {
+
+        searchBtn.addEventListener('click', function () {
+
+            loadSystems(1);
+
+        });
+
+    }
+    // -------------------------
+    // Enter در فیلدها
+    // -------------------------
+
+    [
+        'search_computer_code',
+        'search_name'
+    ].forEach(id => {
+
+        const input =
+            document.getElementById(id);
+
+        if (!input) return;
+
+
+        input.addEventListener('keydown', function (e) {
+
+            if (e.key === 'Enter') {
+
+                e.preventDefault();
+
+                loadSystems(1);
+
+            }
+
+        });
+
+    });
+
+
+    // -------------------------
+    // تغییر دپارتمان
+    // -------------------------
+
+    const department =
+        document.getElementById('search_department');
+
+    if (department) {
+
+        department.addEventListener('change', function () {
+
+            loadSystems(1);
+
+        });
+
+    }
+
+
+    // -------------------------
+    // پاک کردن
+    // -------------------------
+
+    if (resetBtn) {
+
+        resetBtn.addEventListener('click', function () {
+
+            const computerCode =
+                document.getElementById(
+                    'search_computer_code'
+                );
+
+            const name =
+                document.getElementById(
+                    'search_name'
+                );
+
+            const department =
+                document.getElementById(
+                    'search_department'
+                );
+
+            const ip =
+                document.getElementById(
+                    'search_ip'
+                );
+
+
+            if (computerCode) {
+                computerCode.value = '';
+            }
+
+            if (name) {
+                name.value = '';
+            }
+
+            if (department) {
+                department.value = '';
+            }
+
+            if (ip) {
+                ip.value = '';
+            }
+
+
+            // بازگشت مرتب‌سازی به حالت پیش‌فرض
+
+            currentSort = 'id';
+            currentDirection = 'desc';
+
+            updateSortArrows();
+
+
+            // صفحه اول
+
+            loadSystems(1);
+
+        });
+
+    }
+
+}
+
+
+// ============================================
+// مرتب‌سازی
+// ============================================
+
+function initTableSort() {
+
+    const headers =
+        document.querySelectorAll(
+            '.systems-table thead th.sortable'
+        );
+
+
+    headers.forEach(header => {
+
+        if (header.dataset.sortInitialized === '1') {
+            return;
+        }
+
+
+        header.dataset.sortInitialized = '1';
+
+
+        header.addEventListener('click', function () {
+
+            const sort =
+                this.dataset.sort;
+
+
+            if (currentSort === sort) {
+
+                currentDirection =
+                    currentDirection === 'asc'
+                        ? 'desc'
+                        : 'asc';
+
+            } else {
+
+                currentSort = sort;
+
+                currentDirection = 'asc';
+
+            }
+
+
+            currentPage = 1;
+
+
+            updateSortArrows();
+
+            loadSystems(1);
+
+        });
+
+    });
+
+
+    updateSortArrows();
+
+}
+
+
+// ============================================
+// فلش مرتب‌سازی
+// ============================================
+
+function updateSortArrows() {
+
+    document
+        .querySelectorAll(
+            '.systems-table thead th.sortable'
+        )
+        .forEach(header => {
+
+            const arrow =
+                header.querySelector('.sort-arrow');
+
+            if (!arrow) return;
+
+
+            header.classList.remove('active');
+
+            arrow.textContent = '↕';
+
+
+            if (
+                header.dataset.sort ===
+                currentSort
+            ) {
+
+                header.classList.add('active');
+
+
+                arrow.textContent =
+                    currentDirection === 'asc'
+                        ? '↑'
+                        : '↓';
+
+            }
+
+        });
+
+}
+// ============================================
+// Pagination
+// ============================================
+
+document.addEventListener('click', function (e) {
+
+    const button = e.target.closest(
+        '#pagination_container .pagination-btn'
+    );
+
+    if (!button) {
+        return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const page = parseInt(
+        button.dataset.page,
+        10
+    );
+
+    if (!page || page < 1) {
+        return;
+    }
+
+    loadSystems(page);
+
+});
+
+// ============================================
+// شماره ردیف‌ها
+// ============================================
+
+function updateTableRowNumbers(page = currentPage) {
+
+    const rows =
+        document.querySelectorAll(
+            '.systems-table tbody tr'
+        );
+
+
+    let counter =
+        ((page - 1) * 50) + 1;
+
+
+    rows.forEach(row => {
+
+        const firstCell =
+            row.querySelector('td:first-child');
+
+
+        if (!firstCell) return;
+
+
+        // ردیف "موردی یافت نشد"
+        if (
+            row.querySelector(
+                'td[colspan]'
+            )
+        ) {
+            return;
+        }
+
+
+        firstCell.textContent =
+            fa_number(counter);
+
+
+        counter++;
+
+    });
+
+}
+
+
+
+
+
 // ============================================
 // تابع عمومی دریافت داده از سرور
 // ============================================
@@ -1762,7 +1919,8 @@ function confirmDelete(id, name) {
                         const row = document.querySelector(`tr:has(button[onclick*="confirmDelete(${id}, "])`);
                         if (row) {
                             row.remove();
-                            updateTableRowNumbers();
+                            loadSystems(currentPage);
+
                         }
                         Swal.fire({
                             title: 'حذف شد!',
@@ -1785,17 +1943,7 @@ function confirmDelete(id, name) {
     });
 }
 
-function updateTableRowNumbers() {
-    const rows = document.querySelectorAll('.systems-table tbody tr:not(:first-child)');
-    let counter = 1;
-    rows.forEach(row => {
-        const firstCell = row.querySelector('td:first-child');
-        if (firstCell) {
-            firstCell.textContent = fa_number(counter);
-            counter++;
-        }
-    });
-}
+
 
 function updateSystemRow(id){
 
@@ -1821,33 +1969,116 @@ function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+
+    const scrollBtn =
+        document.getElementById('scrollToBottomBtn');
+
+    if (!scrollBtn) return;
+
+    function updateScrollButton() {
+
+        const scrollTop =
+            window.scrollY ||
+            document.documentElement.scrollTop;
+
+        const windowHeight =
+            window.innerHeight;
+
+        const documentHeight =
+            document.documentElement.scrollHeight;
+
+        const distanceFromBottom =
+            documentHeight - (scrollTop + windowHeight);
+
+        // اگر پایین صفحه نیستیم، دکمه نمایش داده شود
+        if (distanceFromBottom > 300) {
+            scrollBtn.classList.add('show');
+        } else {
+            scrollBtn.classList.remove('show');
+        }
+    }
+
+    window.addEventListener(
+        'scroll',
+        updateScrollButton
+    );
+
+    window.addEventListener(
+        'resize',
+        updateScrollButton
+    );
+
+    scrollBtn.addEventListener('click', function () {
+
+        const pagination =
+            document.getElementById('pagination_container');
+
+        if (pagination) {
+
+            pagination.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end'
+            });
+
+        }
+
+    });
+
+    updateScrollButton();
+
+});
+
 // ============================================
 // راه‌اندازی اولیه
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
 
-    initSearch();
-    initTableSort();
-    const editForm = document.getElementById("editForm");
+        initSearch();
 
-    if (editForm) {
+        initTableSort();
 
-        editForm.addEventListener("submit", function (e) {
 
-            e.preventDefault();
 
-            saveEditSystem();
+        const editForm =
+            document.getElementById(
+                'editForm'
+            );
 
-        });
+
+        if (editForm) {
+
+            editForm.addEventListener(
+                'submit',
+                function (e) {
+
+                    e.preventDefault();
+
+                    saveEditSystem();
+
+                }
+            );
+        }
+        // بستن مودال
+
+        window.onclick =
+            function (event) {
+
+                if (
+                    event.target.classList.contains(
+                        'modal'
+                    )
+                ) {
+
+                    event.target.style.display =
+                        'none';
+
+                }
+
+            };
 
     }
-
-    // بستن مودال
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    };
-
-});
+);

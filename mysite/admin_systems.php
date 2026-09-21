@@ -41,7 +41,21 @@ $date_to       = $_POST['date_to'] ?? '';
 // ============================================
 // گرفتن لیست‌های مورد نیاز برای فرم‌ها
 // ============================================
-
+function enToFaNumbers($str)
+{
+    return strtr($str, [
+        '0' => '۰',
+        '1' => '۱',
+        '2' => '۲',
+        '3' => '۳',
+        '4' => '۴',
+        '5' => '۵',
+        '6' => '۶',
+        '7' => '۷',
+        '8' => '۸',
+        '9' => '۹'
+    ]);
+}
 // بخش‌ها
 $departments = $db->query("SELECT id, name FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
 // برندها
@@ -426,6 +440,19 @@ if (isset($_POST['add_system']) && canEditSystems()) {
 $isAjax = isset($_GET['ajax']) && $_GET['ajax'] === '1';
 $where = [];
 $params = [];
+// ============================================
+// Pagination
+// ============================================
+$perPage = 50;
+
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+if ($page < 1) {
+    $page = 1;
+}
+
+$offset = ($page - 1) * $perPage;
+
 
 if (!empty($_GET['computer_code'])) {
     $where[] = "s.computer_code LIKE :computer_code";
@@ -440,6 +467,22 @@ if (!empty($_GET['name'])) {
 if (!empty($_GET['department'])) {
     $where[] = "s.department_id = :department";
     $params[':department'] = (int)$_GET['department'];
+}
+
+
+if (!empty($_GET['ip'])) {
+    $ipSearch = enToFaNumbers(trim($_GET['ip']));
+
+    $where[] = "
+        EXISTS (
+            SELECT 1
+            FROM system_ips sip
+            WHERE sip.system_id = s.id
+            AND sip.ip_address LIKE :ip
+        )
+    ";
+
+    $params[':ip'] = '%' . $ipSearch . '%';
 }
 
 if (!empty($_GET['cpu'])) {
@@ -501,6 +544,28 @@ if (isset($allowedSorts[$sort])) {
 
     $orderBy = 's.id';
 
+}
+// ============================================
+// تعداد کل نتایج فیلتر شده
+// ============================================
+
+$countSql = "SELECT COUNT(*) FROM systems s";
+
+if (!empty($where)) {
+    $countSql .= " WHERE " . implode(" AND ", $where);
+}
+
+$countStmt = $db->prepare($countSql);
+$countStmt->execute($params);
+
+$totalSystems = (int)$countStmt->fetchColumn();
+
+$totalPages = max(1, (int)ceil($totalSystems / $perPage));
+
+// اگر صفحه بیشتر از تعداد صفحات بود
+if ($page > $totalPages) {
+    $page = $totalPages;
+    $offset = ($page - 1) * $perPage;
 }
 
 $sql = "
@@ -564,7 +629,8 @@ if (!empty($where)) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
 
-$sql .= " ORDER BY {$orderBy} {$direction}";
+$sql .= " ORDER BY {$orderBy} {$direction}, s.id DESC";
+$sql .= " LIMIT {$perPage} OFFSET {$offset}";
 
 $stmt = $db->prepare($sql);
 $stmt->execute($params);
@@ -633,32 +699,104 @@ foreach ($systems as $key => $system) {
 if ($isAjax) {
     ob_start();
     ?>
-
     <?php if (empty($systems)): ?>
-
         <tr>
-            <td colspan="11">موردی یافت نشد</td>
+            <td colspan="14" style="text-align:center; padding:40px;">
+                💻 موردی یافت نشد
+            </td>
         </tr>
-
     <?php else: ?>
-
         <?php
-        $rownum = 1;
+        $rownum = $offset + 1;
+
         foreach ($systems as $rowData) {
             include "assets/includes/system_row.php";
             $rownum++;
         }
         ?>
+    <?php endif; ?>
+    <?php
+    $html = ob_get_clean();
+    // ============================================
+    // ساخت Pagination
+    // ============================================
+    ob_start();
+    ?>
+    <?php if ($totalPages > 1): ?>
+        <div class="pagination">
+            <?php if ($page > 1): ?>
+                <button
+                        type="button"
+                        class="pagination-btn"
+                        data-page="<?php echo $page - 1; ?>">
+                    قبلی
+                </button>
+            <?php endif; ?>
+            <?php
+            $startPage = max(1, $page - 2);
+            $endPage   = min($totalPages, $page + 2);
+            if ($startPage > 1):
+                ?>
+                <button type="button"
+                        class="pagination-btn"
+                        data-page="1">
+                    1
+                </button>
+                <?php if ($startPage > 2): ?>
+                <span class="pagination-dots">...</span>
+            <?php endif; ?>
+            <?php endif; ?>
+            <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                <button type="button" class="pagination-btn <?php echo $i == $page ? 'active' : ''; ?>"
+                        data-page="<?php echo $i; ?>">
+                    <?php echo fa_number($i); ?>
+                </button>
+            <?php endfor; ?>
+
+
+            <?php if ($endPage < $totalPages): ?>
+
+                <?php if ($endPage < $totalPages - 1): ?>
+                    <span class="pagination-dots">...</span>
+                <?php endif; ?>
+
+                <button
+                        type="button"
+                        class="pagination-btn"
+                        data-page="<?php echo $totalPages; ?>">
+                    <?php echo fa_number($totalPages); ?>
+                </button>
+
+            <?php endif; ?>
+
+
+            <?php if ($page < $totalPages): ?>
+                <button
+                        type="button"
+                        class="pagination-btn"
+                        data-page="<?php echo $page + 1; ?>">
+                    بعدی
+                </button>
+            <?php endif; ?>
+
+        </div>
 
     <?php endif; ?>
 
     <?php
 
-    $html = ob_get_clean();
+    $paginationHtml = ob_get_clean();
 
-    header('Content-Type: text/html; charset=UTF-8');
+    header('Content-Type: application/json; charset=UTF-8');
 
-    echo $html;
+    echo json_encode([
+        'success' => true,
+        'html' => $html,
+        'pagination' => $paginationHtml,
+        'total' => $totalSystems,
+        'page' => $page,
+        'total_pages' => $totalPages
+    ], JSON_UNESCAPED_UNICODE);
 
     exit;
 }
@@ -1320,19 +1458,108 @@ if ($isAjax) {
                         <td colspan="14" style="text-align: center; padding: 40px;">💻 هیچ سیستمی ثبت نشده است</td>
                     </tr>
                 <?php else: ?>
-                    <?php $rownum = 1; foreach ($systems as $rowData): ?>
-                        <?php
+                    <?php
+                    $rownum = $offset + 1;
 
+                    foreach ($systems as $rowData):
                         include "assets/includes/system_row.php";
-
-                        ?>
-                        <?php $rownum ++; ?>
-                    <?php endforeach; ?>
-
+                        $rownum++;
+                    endforeach;
+                    ?>
                 <?php endif; ?>
                 </tbody>
             </table>
         </div>
+
+        <div id="pagination_container" class="pagination-container">
+
+            <?php if ($totalPages > 1): ?>
+
+                <div class="pagination">
+
+                    <?php if ($page > 1): ?>
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="<?php echo $page - 1; ?>">
+                            قبلی
+                        </button>
+                    <?php endif; ?>
+
+
+                    <?php
+                    $startPage = max(1, $page - 2);
+                    $endPage   = min($totalPages, $page + 2);
+                    ?>
+
+
+                    <?php if ($startPage > 1): ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="1">
+                            <?php echo fa_number(1); ?>
+                        </button>
+
+                        <?php if ($startPage > 2): ?>
+                            <span class="pagination-dots">...</span>
+                        <?php endif; ?>
+
+                    <?php endif; ?>
+
+
+                    <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn <?php echo $i == $page ? 'active' : ''; ?>"
+                                data-page="<?php echo $i; ?>">
+                            <?php echo fa_number($i); ?>
+                        </button>
+
+                    <?php endfor; ?>
+
+
+                    <?php if ($endPage < $totalPages): ?>
+
+                        <?php if ($endPage < $totalPages - 1): ?>
+                            <span class="pagination-dots">...</span>
+                        <?php endif; ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="<?php echo $totalPages; ?>">
+                            <?php echo fa_number($totalPages); ?>
+                        </button>
+
+                    <?php endif; ?>
+
+
+                    <?php if ($page < $totalPages): ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="<?php echo $page + 1; ?>">
+                            بعدی
+                        </button>
+
+                    <?php endif; ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <div class="pagination-info">
+                تعداد نتایج:
+                <strong><?php echo fa_number($totalSystems); ?></strong>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
@@ -1477,5 +1704,12 @@ if ($isAjax) {
          </form>
     </div>
 </div>
+<button
+        type="button"
+        id="scrollToBottomBtn"
+        class="scroll-to-bottom"
+        title="رفتن به انتهای صفحه">
+    ↓
+</button>
 </body>
 </html>

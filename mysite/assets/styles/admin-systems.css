@@ -364,3 +364,194 @@
     opacity: 1;
     font-weight: bold;
 }
+
+/* ============================================
+   Pagination
+============================================ */
+
+.pagination-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 30px;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    direction: rtl;
+}
+
+.pagination-btn {
+    min-width: 42px;
+    height: 40px;
+    padding: 0 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #374151;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.15s ease,
+            box-shadow 0.2s ease;
+}
+
+.pagination-btn:hover {
+    background: #f3f6fa;
+    border-color: #b8c2d1;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
+.pagination-btn:active {
+    transform: translateY(0);
+}
+
+.pagination-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+}
+
+.pagination-btn.active:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.pagination-dots {
+    min-width: 30px;
+    height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #6b7280;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.pagination-info strong {
+    color: #374151;
+    font-weight: 700;
+}
+
+
+/* قبلی و بعدی */
+.pagination-btn[data-page]:first-child {
+    /* بدون تغییر خاص */
+}
+
+
+/* موبایل */
+@media (max-width: 600px) {
+
+    .pagination {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 9px;
+        font-size: 13px;
+        border-radius: 7px;
+    }
+
+    .pagination-dots {
+        height: 36px;
+        min-width: 24px;
+    }
+}
+/* ============================================
+   دکمه شناور رفتن به انتهای صفحه
+============================================ */
+
+.scroll-to-bottom {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+
+    z-index: 9999;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+
+    transition:
+            opacity 0.2s ease,
+            visibility 0.2s ease,
+            transform 0.2s ease,
+            background-color 0.2s ease;
+}
+
+.scroll-to-bottom.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-to-bottom:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.scroll-to-bottom:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+    .scroll-to-bottom {
+        left: 16px;
+        bottom: 16px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+}
