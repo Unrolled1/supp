@@ -19,11 +19,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. دکمه پرینت گزارش
     // ============================================
     const printBtn = document.querySelector('.btn-pdf');
+
     if (printBtn) {
         printBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
             printReport();
-        });
+
+            return false;
+        }, true);
     }
 
     // ============================================
@@ -37,19 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ============================================
-    // 4. پرینت خودکار با Ctrl+P
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+P یا Cmd+P
-        if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-            // اگر در صفحه گزارش هستیم
-            if (window.location.pathname.includes('admin_servicerep.php')) {
-                e.preventDefault();
-                printReport();
-            }
-        }
-    });
 
     // ============================================
     // 5. تغییر خودکار در تاریخ‌ها (اختیاری)
@@ -131,53 +124,50 @@ function searchReport() {
 // ============================================
 function printReport() {
     const form = document.getElementById("filterform");
+
     if (!form) {
         console.error('فرم filterform پیدا نشد');
         return;
     }
 
+    // ساخت فرم موقت برای پرینت
+    const printForm = document.createElement('form');
+
+    printForm.method = 'POST';
+
+    // فقط همین آدرس
+    printForm.action = 'assets/print_report.php?type=service';
+
+    printForm.target = '_blank';
+
+    // کپی فیلدهای فرم
     const formData = new FormData(form);
 
-    // اطلاعات چاپ
-    formData.append("print", "1");
-    formData.append("type", window.reportConfig?.type || "service");
+    formData.forEach((value, key) => {
+        const input = document.createElement('input');
 
-    const printUrl = window.reportConfig?.printUrl || "assets/print_servicerep.php";
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
 
-    showLoading('در حال آماده‌سازی گزارش برای چاپ...');
+        printForm.appendChild(input);
+    });
 
-    fetch(printUrl, {
-        method: "POST",
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('خطا در دریافت گزارش');
-            }
-            return response.text();
-        })
-        .then(html => {
-            const win = window.open('', '_blank', 'width=1000,height=800,scrollbars=yes');
+    // ارسال type به صورت POST هم برای اطمینان
+    const typeInput = document.createElement('input');
 
-            if (!win) {
-                showError('لطفاً پنجره‌های بازشو را فعال کنید');
-                return;
-            }
+    typeInput.type = 'hidden';
+    typeInput.name = 'type';
+    typeInput.value = 'service';
 
-            win.document.write(html);
-            win.document.close();
+    printForm.appendChild(typeInput);
 
-            win.onload = function() {
-                setTimeout(function() {
-                    win.focus();
-                    win.print();
-                }, 500);
-            };
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('خطا در چاپ گزارش: ' + error.message);
-        });
+    // ارسال
+    document.body.appendChild(printForm);
+    printForm.submit();
+
+    // حذف فرم
+    printForm.remove();
 }
 
 // ============================================

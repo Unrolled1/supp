@@ -46,7 +46,7 @@
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
-    <!-- جدول تیکت‌ها -->
+
     <div class="table-wrapper">
     <table class="data-table">
             <thead>
@@ -82,39 +82,64 @@
 </div>
 
 <script>
-function savePDF(){
+    function savePDF() {
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'export_pdf.php';
+        const tableWrapper = document.querySelector('.table-wrapper');
+        const titleElement = document.querySelector('.print-header h1');
+        const filterElement = document.querySelector('.filters-info');
 
-    function createHidden(name, value){
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value;
-        return input;
+        if (!tableWrapper) {
+            alert('جدول گزارش پیدا نشد');
+            return;
+        }
+
+        const form = document.createElement('form');
+
+        form.method = 'POST';
+        form.action = 'export_pdf.php';
+        form.target = '_self';
+
+        function addInput(name, value) {
+
+            const input = document.createElement('input');
+
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value ?? '';
+
+            form.appendChild(input);
+        }
+
+        // جدول
+        addInput(
+            'html',
+            tableWrapper.outerHTML
+        );
+
+        // عنوان
+        addInput(
+            'title',
+            titleElement
+                ? titleElement.innerText
+                : 'گزارش'
+        );
+
+        // فیلتر
+        addInput(
+            'filter',
+            filterElement
+                ? filterElement.innerHTML
+                : ''
+        );
+
+        document.body.appendChild(form);
+
+        form.submit();
+
+        setTimeout(() => {
+            form.remove();
+        }, 1000);
     }
-
-    form.appendChild(createHidden(
-        "html",
-        document.querySelector('.table-wrapper').innerHTML
-    ));
-
-    form.appendChild(createHidden(
-        "title",
-        document.querySelector('.print-header h1').innerText
-    ));
-
-    form.appendChild(createHidden(
-        "filter",
-        document.querySelector('.filters-info').innerHTML
-    ));
-
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
-}
 </script>
 
 </body>
