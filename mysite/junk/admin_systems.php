@@ -1,0 +1,1740 @@
+<?php
+session_start();
+require_once __DIR__ . '/assets/includes/autoload.php';
+
+date_default_timezone_set('Asia/Tehran');
+
+// مدیریت پیام‌ها
+$successMessage = '';
+$errorMessage = '';
+
+if (isset($_SESSION['success_message'])) {
+    $successMessage = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $errorMessage = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
+// بررسی لاگین
+if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
+if (!isAdmin() || !canViewSystems()) {
+    header('Location: requests.php');
+    exit;
+}
+
+$db = getDB();
+
+$isAjax = isset($_POST['ajax']);
+
+$computer_code = $_POST['computer_code'] ?? '';
+$name          = $_POST['name'] ?? '';
+$department    = $_POST['department'] ?? '';
+$created_at = $_POST['created_at'] ?? '';
+$date_from     = $_POST['date_from'] ?? '';
+$date_to       = $_POST['date_to'] ?? '';
+// ============================================
+// گرفتن لیست‌های مورد نیاز برای فرم‌ها
+// ============================================
+function enToFaNumbers($str)
+{
+    return strtr($str, [
+        '0' => '۰',
+        '1' => '۱',
+        '2' => '۲',
+        '3' => '۳',
+        '4' => '۴',
+        '5' => '۵',
+        '6' => '۶',
+        '7' => '۷',
+        '8' => '۸',
+        '9' => '۹'
+    ]);
+}
+// تبدیل اعداد فارسی/عربی به انگلیسی (برای نرمال‌سازی MAC)
+function faToEnNumbers($str)
+{
+    return strtr($str, [
+        '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
+        '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+        '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+        '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9'
+    ]);
+}
+// بخش‌ها
+$departments = $db->query("SELECT id, name FROM departments WHERE status = 'active' ORDER BY name ASC")->fetchAll();
+// برندها
+$brands = $db->query("SELECT id, name FROM brands ORDER BY name ASC")->fetchAll();
+// مدل‌ها
+$models = $db->query("SELECT id, name FROM models ORDER BY name ASC")->fetchAll();
+
+// CPUها
+$cpus = $db->query("
+    SELECT c.*, m.name AS model_name, b.name AS brand_name
+    FROM cpus c
+    INNER JOIN models m ON c.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
+
+// مادربردها
+$motherboards = $db->query("
+    SELECT mb.*, m.name as model_name, b.name as brand_name 
+    FROM motherboards mb
+    INNER JOIN models m ON mb.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
+
+// رم‌ها
+$rams = $db->query("
+    SELECT r.*, m.name as model_name, b.name as brand_name 
+    FROM rams r
+    INNER JOIN models m ON r.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
+
+// هاردها
+$storages = $db->query("
+    SELECT s.*, m.name as model_name, b.name as brand_name 
+    FROM storages s
+    INNER JOIN models m ON s.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
+
+// پاورها
+$powers = $db->query("
+    SELECT p.*, m.name as model_name, b.name as brand_name 
+    FROM powers p
+    INNER JOIN models m ON p.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
+
+// مانیتورها
+$monitors = $db->query("
+    SELECT mon.*, m.name as model_name, b.name as brand_name 
+    FROM monitors mon
+    INNER JOIN models m ON mon.model_id = m.id
+    INNER JOIN brands b ON m.brand_id = b.id
+    ORDER BY b.name, m.name
+")->fetchAll();
+
+// انواع تجهیزات جانبی
+$peripheralTypes = $db->query("SELECT * FROM peripheral_types ORDER BY sort_order")->fetchAll();
+
+// ============================================
+// پردازش فرم حذف
+// ============================================
+
+if (isset($_POST['delete_system']) && canDeleteSystems()) {
+    $system_id = filter_var($_POST['system_id'], FILTER_VALIDATE_INT);
+
+    if ($system_id) {
+        $deleteStmt = $db->prepare("DELETE FROM systems WHERE id = :id");
+        $deleteStmt->execute([':id' => $system_id]);
+
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            ob_clean();
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'id' => $system_id]);
+            exit;
+        }
+    }
+    header('Location: admin_systems.php');
+    exit;
+}
+// ============================================
+// پردازش افزودن قطعه جدید (AJAX)
+// ============================================
+
+if (isset($_POST['add_component']) && canEditSystems()) {
+    $componentType = $_POST['component_type'];
+    $brand_id = filter_var($_POST['brand_id'], FILTER_VALIDATE_INT);
+    $model_id = filter_var($_POST['model_id'], FILTER_VALIDATE_INT);
+    $jalaliDate = jdate('Y-m-d');
+
+    $tableMap = [
+        'cpu' => 'cpus',
+        'motherboard' => 'motherboards',
+        'ram' => 'rams',
+        'storage' => 'storages',
+        'power' => 'powers',
+        'monitor' => 'monitors'
+    ];
+
+    $table = $tableMap[$componentType];
+
+    // فیلدهای پایه
+    $fields = ['brand_id', 'model_id',  'created_at'];
+    $values = [
+        ':brand_id' => $brand_id,
+        ':model_id' => $model_id,
+        ':created_at' => $jalaliDate
+    ];
+
+    // فیلدهای اختصاصی
+    switch ($componentType) {
+        case 'ram':
+            $fields[] = 'type';
+            $fields[] = 'capacity';
+            $values[':type'] = htmlspecialchars(trim($_POST['ram_type'] ?? ''));
+            $values[':capacity'] = htmlspecialchars(trim($_POST['ram_capacity'] ?? ''));
+            break;
+
+        case 'storage':
+            $fields[] = 'type';
+            $fields[] = 'capacity';
+            $values[':type'] = htmlspecialchars(trim($_POST['storage_type'] ?? ''));
+            $values[':capacity'] = htmlspecialchars(trim($_POST['storage_capacity'] ?? ''));
+            break;
+
+        case 'monitor':
+            $fields[] = 'property_code';
+            $values[':property_code'] = htmlspecialchars(trim($_POST['monitor_property_code'] ?? ''));
+            break;
+
+    }
+
+    // ساخت کوئری
+    $fieldList = implode(', ', $fields);
+    $valueList = implode(', ', array_keys($values));
+
+    $stmt = $db->prepare("INSERT INTO $table ($fieldList) VALUES ($valueList)");
+    $stmt->execute($values);
+
+    $component_id = $db->lastInsertId();
+
+    // دریافت اطلاعات برند و مدل
+    $infoStmt = $db->prepare("
+        SELECT b.name as brand_name, m.name as model_name 
+        FROM brands b, models m 
+        WHERE b.id = :brand_id AND m.id = :model_id
+    ");
+    $infoStmt->execute([':brand_id' => $brand_id, ':model_id' => $model_id]);
+    $info = $infoStmt->fetch();
+
+    $displayName = $info['brand_name'] . ' ' . $info['model_name'];
+
+    // اطلاعات اضافی برای رم و هارد
+    if ($componentType === 'ram') {
+        $displayName .= ' (' . ($_POST['ram_capacity'] ?? '') . ' ' . ($_POST['ram_type'] ?? '') . ')';
+    } elseif ($componentType === 'storage') {
+        $displayName .= ' (' . ($_POST['storage_capacity'] ?? '') . ' ' . ($_POST['storage_type'] ?? '') . ')';
+    } elseif ($componentType === 'monitor' && !empty($_POST['monitor_property_code'])) {
+        $displayName .= ' (' . $_POST['monitor_property_code'] . ')';
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => true,
+        'id' => $component_id,
+        'display_name' => $displayName
+    ]);
+    exit;
+}
+// ============================================
+// پردازش افزودن تجهیز جانبی جدید (AJAX)
+// ============================================
+
+if (isset($_POST['add_peripheral']) && canEditSystems()) {
+    $type_id = filter_var($_POST['type_id'], FILTER_VALIDATE_INT);
+    $brand_id = !empty($_POST['brand_id']) ? filter_var($_POST['brand_id'], FILTER_VALIDATE_INT) : null;
+    $model_id = !empty($_POST['model_id']) ? filter_var($_POST['model_id'], FILTER_VALIDATE_INT) : null;
+    $computer_code = htmlspecialchars(trim($_POST['computer_code'] ?? ''));
+    $property_code = htmlspecialchars(trim($_POST['property_code'] ?? ''));
+    $connection_type = htmlspecialchars(trim($_POST['connection_type'] ?? 'USB'));
+    $jalaliDate = jdate('Y-m-d');
+
+    // ثبت در جدول peripherals (بدون serial_number و description)
+    $stmt = $db->prepare("
+        INSERT INTO peripherals (
+            type_id, brand_id, model_id, computer_code, property_code, connection_type, created_at, created_by
+        ) VALUES (
+            :type_id, :brand_id, :model_id, :computer_code, :property_code, :connection_type, :created_at, :created_by
+        )
+    ");
+
+    $stmt->execute([
+        ':type_id' => $type_id,
+        ':brand_id' => $brand_id,
+        ':model_id' => $model_id,
+        ':computer_code' => $computer_code,
+        ':property_code' => $property_code,
+        ':connection_type' => $connection_type,
+        ':created_at' => $jalaliDate,
+        ':created_by' => $_SESSION['user_id']
+    ]);
+
+    $peripheral_id = $db->lastInsertId();
+
+    // دریافت نام برای نمایش
+    $infoStmt = $db->prepare("
+        SELECT pt.name as type_name,  b.name as brand_name, m.name as model_name
+        FROM peripherals p
+        INNER JOIN peripheral_types pt ON p.type_id = pt.id
+        INNER JOIN brands b ON p.brand_id = b.id
+        INNER JOIN models m ON p.model_id = m.id
+        WHERE p.id = :id
+    ");
+    $infoStmt->execute([':id' => $peripheral_id]);
+    $info = $infoStmt->fetch();
+
+    $displayName = trim(($info['brand_name'] ?? '') . ' ' . ($info['model_name'] ?? ''));
+
+    if (!empty($property_code)) {
+        $displayName .= " - {$property_code}";
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => true,
+        'id' => $peripheral_id,
+        'display_name' => $displayName
+    ]);
+    exit;
+}
+
+// ============================================
+// پردازش فرم افزودن سیستم
+// ============================================
+
+if (isset($_POST['add_system']) && canEditSystems()) {
+    try {
+        $db->beginTransaction();
+
+        $computer_code = htmlspecialchars(trim($_POST['computer_code']));
+        $property_code = htmlspecialchars(trim($_POST['property_code']));
+        $name = htmlspecialchars(trim($_POST['name']));
+        $department_id = !empty($_POST['department_id']) ? filter_var($_POST['department_id'], FILTER_VALIDATE_INT) : null;
+        $cpu_id = !empty($_POST['cpu_id']) ? filter_var($_POST['cpu_id'], FILTER_VALIDATE_INT) : null;
+        $motherboard_id = !empty($_POST['motherboard_id']) ? filter_var($_POST['motherboard_id'], FILTER_VALIDATE_INT) : null;
+        $power_id = !empty($_POST['power_id']) ? filter_var($_POST['power_id'], FILTER_VALIDATE_INT) : null;
+        $monitor_id = !empty($_POST['monitor_id']) ? filter_var($_POST['monitor_id'], FILTER_VALIDATE_INT) : null;
+        $jalaliDate = jdate('Y/m/d');
+
+        // ثبت سیستم
+        $insertStmt = $db->prepare("
+            INSERT INTO systems (
+                computer_code, property_code, name, department_id,cpu_id, motherboard_id, power_id, monitor_id,
+                 created_at, created_by
+            ) VALUES (
+                :computer_code, :property_code, :name, :department_id,
+                :cpu_id, :motherboard_id, :power_id, :monitor_id,
+                 :created_at, :created_by
+            )
+        ");
+
+        $insertStmt->execute([
+            ':computer_code' => $computer_code,
+            ':property_code' => $property_code,
+            ':name' => $name,
+            ':department_id' => $department_id,
+            ':cpu_id' => $cpu_id,
+            ':motherboard_id' => $motherboard_id,
+            ':power_id' => $power_id,
+            ':monitor_id' => $monitor_id,
+            ':created_at' => $jalaliDate,
+            ':created_by' => $_SESSION['user_id']
+        ]);
+
+        $system_id = $db->lastInsertId();
+
+        // ذخیره رم‌ها
+        $ramIndex = 0;
+        while (isset($_POST["ram_id_$ramIndex"])) {
+            $ram_id = filter_var($_POST["ram_id_$ramIndex"], FILTER_VALIDATE_INT);
+            if ($ram_id) {
+
+                $ramStmt = $db->prepare("
+                    INSERT INTO system_rams (system_id, ram_id,  created_at, created_by)
+                    VALUES (:system_id, :ram_id,  :created_at, :created_by)
+                ");
+                $ramStmt->execute([
+                    ':system_id' => $system_id,
+                    ':ram_id' => $ram_id,
+                    ':created_at' => $jalaliDate,
+                    ':created_by' => $_SESSION['user_id']
+                ]);
+            }
+            $ramIndex++;
+        }
+
+        // ذخیره هاردها
+        $storageIndex = 0;
+        while (isset($_POST["storage_id_$storageIndex"])) {
+            $storage_id = filter_var($_POST["storage_id_$storageIndex"], FILTER_VALIDATE_INT);
+            if ($storage_id) {
+
+                $storageStmt = $db->prepare("
+                    INSERT INTO system_storages (system_id, storage_id,  created_at, created_by)
+                    VALUES (:system_id, :storage_id,  :created_at, :created_by)
+                ");
+                $storageStmt->execute([
+                    ':system_id' => $system_id,
+                    ':storage_id' => $storage_id,
+                    ':created_at' => $jalaliDate,
+                    ':created_by' => $_SESSION['user_id']
+                ]);
+            }
+            $storageIndex++;
+        }
+
+        // ذخیره IPها
+        $ipIndex = 0;
+        while (isset($_POST["ip_address_$ipIndex"])) {
+            $ip_address = trim($_POST["ip_address_$ipIndex"]);
+            if (!empty($ip_address)) {
+                $network_type = $_POST["ip_network_$ipIndex"] ?? 'LAN';
+
+                $ip_description = htmlspecialchars(trim($_POST["ip_description_$ipIndex"] ?? ''));
+
+                // نرمال‌سازی MAC: تبدیل ارقام فارسی به انگلیسی + حروف بزرگ
+                $mac_address = strtoupper(faToEnNumbers(trim($_POST["ip_mac_$ipIndex"] ?? '')));
+
+                $ipStmt = $db->prepare("
+                    INSERT INTO system_ips (system_id, ip_address, mac_address, network_type,  description, created_at, created_by)
+                    VALUES (:system_id, :ip_address, :mac_address, :network_type, :description, :created_at, :created_by)
+                ");
+                $ipStmt->execute([
+                    ':system_id' => $system_id,
+                    ':ip_address' => $ip_address,
+                    ':mac_address' => $mac_address,
+                    ':network_type' => $network_type,
+                    ':description' => $ip_description,
+                    ':created_at' => $jalaliDate,
+                    ':created_by' => $_SESSION['user_id']
+                ]);
+            }
+            $ipIndex++;
+        }
+
+        // ذخیره تجهیزات جانبی
+        $periphIndex = 0;
+        while (isset($_POST["peripheral_id_$periphIndex"])) {
+            $peripheral_id = filter_var($_POST["peripheral_id_$periphIndex"], FILTER_VALIDATE_INT);
+            if ($peripheral_id) {
+
+                $periphStmt = $db->prepare("
+                    INSERT INTO system_peripherals (system_id, peripheral_id, created_at, created_by)
+                    VALUES (:system_id, :peripheral_id, :created_at, :created_by)
+                ");
+                $periphStmt->execute([
+                    ':system_id' => $system_id,
+                    ':peripheral_id' => $peripheral_id,
+                    ':created_at' => $jalaliDate,
+                    ':created_by' => $_SESSION['user_id']
+                ]);
+            }
+            $periphIndex++;
+        }
+
+        $db->commit();
+        $_SESSION['success_message'] = "✅ سیستم با موفقیت ثبت شد";
+
+    } catch (Exception $e) {
+        $db->rollBack();
+        $_SESSION['error_message'] = "❌ خطا در ثبت سیستم: " . $e->getMessage();
+    }
+
+    header('Location: admin_systems.php');
+    exit;
+}
+
+// ============================================
+// گرفتن لیست سیستم‌ها با فیلتر
+// ============================================
+$isAjax = isset($_GET['ajax']) && $_GET['ajax'] === '1';
+$where = [];
+$params = [];
+// ============================================
+// Pagination
+// ============================================
+$perPage = 50;
+
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+if ($page < 1) {
+    $page = 1;
+}
+
+$offset = ($page - 1) * $perPage;
+
+
+if (!empty($_GET['computer_code'])) {
+    $where[] = "s.computer_code LIKE :computer_code";
+    $params[':computer_code'] = '%' . trim($_GET['computer_code']) . '%';
+}
+
+if (!empty($_GET['name'])) {
+    $where[] = "s.name LIKE :name";
+    $params[':name'] = '%' . trim($_GET['name']) . '%';
+}
+
+if (!empty($_GET['department'])) {
+    $where[] = "s.department_id = :department";
+    $params[':department'] = (int)$_GET['department'];
+}
+
+
+if (!empty($_GET['ip'])) {
+    $rawInput = trim($_GET['ip']);
+    $ipSearch = enToFaNumbers($rawInput);
+
+    $where[] = "
+        EXISTS (
+            SELECT 1
+            FROM system_ips sip
+            WHERE sip.system_id = s.id
+            AND (
+                sip.ip_address LIKE :ip
+                OR sip.mac_address LIKE :mac_en
+                OR sip.mac_address LIKE :mac_fa
+            )
+        )
+    ";
+
+    $params[':ip'] = '%' . $ipSearch . '%';
+    // جستجوی MAC با ارقام انگلیسی و فارسی
+    $params[':mac_en'] = '%' . faToEnNumbers($rawInput) . '%';
+    $params[':mac_fa'] = '%' . enToFaNumbers(faToEnNumbers($rawInput)) . '%';
+}
+
+if (!empty($_GET['cpu'])) {
+    $where[] = "s.cpu_id = :cpu";
+    $params[':cpu'] = (int)$_GET['cpu'];
+}
+
+if (!empty($_GET['motherboard'])) {
+    $where[] = "s.motherboard_id = :motherboard";
+    $params[':motherboard'] = (int)$_GET['motherboard'];
+}
+
+if (!empty($date_from)) {
+    $where[] = "s.created_at >= :date_from";
+    $params[':date_from'] = $date_from;
+}
+
+if (!empty($date_to)) {
+    $where[] = "s.created_at <= :date_to";
+    $params[':date_to'] = $date_to;
+}
+// ============================================
+// مرتب‌سازی جدول
+// ============================================
+
+$allowedSorts = [
+
+    'computer_code' => 's.computer_code',
+
+    'name' => 's.name',
+
+    'department' => 'd.name',
+
+    'cpu' => 'cpu_b.name',
+
+    'motherboard' => 'mb_b.name',
+
+    'power' => 'p_b.name',
+
+    'monitor' => 'mon_b.name',
+
+    'date' => 's.created_at',
+
+];
+
+$sort = $_GET['sort'] ?? 'id';
+
+$direction = strtolower($_GET['direction'] ?? 'desc');
+
+if (!in_array($direction, ['asc', 'desc'], true)) {
+    $direction = 'desc';
+}
+
+if (isset($allowedSorts[$sort])) {
+
+    $orderBy = $allowedSorts[$sort];
+
+} else {
+
+    $orderBy = 's.id';
+
+}
+// ============================================
+// تعداد کل نتایج فیلتر شده
+// ============================================
+
+$countSql = "SELECT COUNT(*) FROM systems s";
+
+if (!empty($where)) {
+    $countSql .= " WHERE " . implode(" AND ", $where);
+}
+
+$countStmt = $db->prepare($countSql);
+$countStmt->execute($params);
+
+$totalSystems = (int)$countStmt->fetchColumn();
+
+$totalPages = max(1, (int)ceil($totalSystems / $perPage));
+
+// اگر صفحه بیشتر از تعداد صفحات بود
+if ($page > $totalPages) {
+    $page = $totalPages;
+    $offset = ($page - 1) * $perPage;
+}
+
+$sql = "
+SELECT
+    s.*,
+    d.name AS department_name,
+
+    cpu_b.name AS cpu_brand,
+    cpu_m.name AS cpu_model,
+
+    mb_b.name AS motherboard_brand,
+    mb_m.name AS motherboard_model,
+
+    p_b.name AS power_brand,
+    p_m.name AS power_model,
+
+    mon_b.name AS monitor_brand,
+    mon_m.name AS monitor_model,
+    mon.property_code AS monitor_property_code,
+
+    u.fullname AS creator_name
+
+FROM systems s
+
+LEFT JOIN departments d
+    ON s.department_id = d.id
+
+LEFT JOIN cpus cpu
+    ON s.cpu_id = cpu.id
+LEFT JOIN models cpu_m
+    ON cpu.model_id = cpu_m.id
+LEFT JOIN brands cpu_b
+    ON cpu_m.brand_id = cpu_b.id
+
+LEFT JOIN motherboards mb
+    ON s.motherboard_id = mb.id
+LEFT JOIN models mb_m
+    ON mb.model_id = mb_m.id
+LEFT JOIN brands mb_b
+    ON mb_m.brand_id = mb_b.id
+
+LEFT JOIN powers p
+    ON s.power_id = p.id
+LEFT JOIN models p_m
+    ON p.model_id = p_m.id
+LEFT JOIN brands p_b
+    ON p_m.brand_id = p_b.id
+
+LEFT JOIN monitors mon
+    ON s.monitor_id = mon.id
+LEFT JOIN models mon_m
+    ON mon.model_id = mon_m.id
+LEFT JOIN brands mon_b
+    ON mon_m.brand_id = mon_b.id
+
+LEFT JOIN users u
+    ON s.created_by = u.id
+";
+
+if (!empty($where)) {
+    $sql .= " WHERE " . implode(" AND ", $where);
+}
+
+$sql .= " ORDER BY {$orderBy} {$direction}, s.id DESC";
+$sql .= " LIMIT {$perPage} OFFSET {$offset}";
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
+
+$systems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+foreach ($systems as $key => $system) {
+
+    // رم
+    $ramStmt = $db->prepare("
+        SELECT sr.*, r.type,r.capacity,
+               rm.name model_name,
+               rb.name brand_name
+        FROM system_rams sr
+        JOIN rams r ON sr.ram_id=r.id
+        JOIN models rm ON r.model_id=rm.id
+        JOIN brands rb ON rm.brand_id=rb.id
+        WHERE sr.system_id=:id
+    ");
+    $ramStmt->execute([':id'=>$system['id']]);
+    $systems[$key]['rams']=$ramStmt->fetchAll();
+
+    // هارد
+    $storageStmt=$db->prepare("
+        SELECT ss.*,st.type,st.capacity,
+               sm.name model_name,
+               sb.name brand_name
+        FROM system_storages ss
+        JOIN storages st ON ss.storage_id=st.id
+        JOIN models sm ON st.model_id=sm.id
+        JOIN brands sb ON sm.brand_id=sb.id
+        WHERE ss.system_id=:id
+    ");
+    $storageStmt->execute([':id'=>$system['id']]);
+    $systems[$key]['storages']=$storageStmt->fetchAll();
+
+    // ip
+    $ipStmt=$db->prepare("
+        SELECT *
+        FROM system_ips
+        WHERE system_id=:id
+    ");
+    $ipStmt->execute([':id'=>$system['id']]);
+    $systems[$key]['ips']=$ipStmt->fetchAll();
+
+    // تجهیزات
+    $periphStmt=$db->prepare("
+        SELECT
+            sp.*,
+            p.property_code,
+            pt.name type_name,
+            pm.name model_name,
+            pb.name brand_name
+        FROM system_peripherals sp
+        JOIN peripherals p ON sp.peripheral_id=p.id
+        JOIN peripheral_types pt ON p.type_id=pt.id
+        JOIN models pm ON p.model_id=pm.id
+        JOIN brands pb ON pm.brand_id=pb.id
+        WHERE sp.system_id=:id
+        ORDER BY pt.sort_order
+    ");
+    $periphStmt->execute([':id'=>$system['id']]);
+    $systems[$key]['peripherals']=$periphStmt->fetchAll();
+}
+if ($isAjax) {
+    ob_start();
+    ?>
+    <?php if (empty($systems)): ?>
+        <tr>
+            <td colspan="14" style="text-align:center; padding:40px;">
+                💻 موردی یافت نشد
+            </td>
+        </tr>
+    <?php else: ?>
+        <?php
+        $rownum = $offset + 1;
+
+        foreach ($systems as $rowData) {
+            include "assets/includes/system_row.php";
+            $rownum++;
+        }
+        ?>
+    <?php endif; ?>
+    <?php
+    $html = ob_get_clean();
+    // ============================================
+    // ساخت Pagination
+    // ============================================
+    ob_start();
+    ?>
+    <?php if ($totalPages > 1): ?>
+        <div class="pagination">
+            <?php if ($page > 1): ?>
+                <button
+                        type="button"
+                        class="pagination-btn"
+                        data-page="<?php echo $page - 1; ?>">
+                    قبلی
+                </button>
+            <?php endif; ?>
+            <?php
+            $startPage = max(1, $page - 2);
+            $endPage   = min($totalPages, $page + 2);
+            if ($startPage > 1):
+                ?>
+                <button type="button"
+                        class="pagination-btn"
+                        data-page="1">
+                    1
+                </button>
+                <?php if ($startPage > 2): ?>
+                <span class="pagination-dots">...</span>
+            <?php endif; ?>
+            <?php endif; ?>
+            <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                <button type="button" class="pagination-btn <?php echo $i == $page ? 'active' : ''; ?>"
+                        data-page="<?php echo $i; ?>">
+                    <?php echo fa_number($i); ?>
+                </button>
+            <?php endfor; ?>
+
+
+            <?php if ($endPage < $totalPages): ?>
+
+                <?php if ($endPage < $totalPages - 1): ?>
+                    <span class="pagination-dots">...</span>
+                <?php endif; ?>
+
+                <button
+                        type="button"
+                        class="pagination-btn"
+                        data-page="<?php echo $totalPages; ?>">
+                    <?php echo fa_number($totalPages); ?>
+                </button>
+
+            <?php endif; ?>
+
+
+            <?php if ($page < $totalPages): ?>
+                <button
+                        type="button"
+                        class="pagination-btn"
+                        data-page="<?php echo $page + 1; ?>">
+                    بعدی
+                </button>
+            <?php endif; ?>
+
+        </div>
+
+    <?php endif; ?>
+
+    <?php
+
+    $paginationHtml = ob_get_clean();
+
+    header('Content-Type: application/json; charset=UTF-8');
+
+    echo json_encode([
+        'success' => true,
+        'html' => $html,
+        'pagination' => $paginationHtml,
+        'total' => $totalSystems,
+        'page' => $page,
+        'total_pages' => $totalPages
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>مدیریت سیستم‌ها</title>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/persian-date.min.js"></script>
+    <link rel="stylesheet" href="assets/styles/persian-datepicker.min.css">
+    <script src="assets/js/persian-datepicker.min.js"></script>
+    <?php load_assets(); ?>
+</head>
+<body>
+<div class="admin-wrapper">
+    <?php include 'sidebar.php'; ?>
+
+    <div class="main-content">
+        <div class="main-header">
+            <div class="user-info">
+                <span>👨‍💼</span>
+                <span class="user-name"><?php echo htmlspecialchars($_SESSION['fullname']); ?></span>
+            </div>
+            <div>
+                <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
+                <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
+            </div>
+        </div>
+
+        <div class="main-title">
+            <h1>💻 مدیریت سیستم‌ها</h1>
+        </div>
+
+        <?php if ($successMessage): ?>
+            <div class="alert alert-success"><?php echo $successMessage; ?></div>
+        <?php endif; ?>
+        <?php if ($errorMessage): ?>
+            <div class="alert alert-error"><?php echo $errorMessage; ?></div>
+        <?php endif; ?>
+
+        <!-- ============================================ -->
+        <!-- فرم ثبت سیستم -->
+        <!-- ============================================ -->
+        <?php if (canEditSystems()): ?>
+            <div class="add-card">
+                <h2>➕ ثبت سیستم جدید</h2>
+                <form method="post" class="systems-form" id="systemForm">
+
+                    <!-- اطلاعات اصلی -->
+                    <div class="form-row">
+
+                        <div class="pc-id">
+                            <label>کد رایانه *</label>
+                            <input type="text" name="computer_code" required>
+                        </div>
+                        <div class="property-id">
+                            <label>کد اموال</label>
+                            <input type="text" name="property_code">
+                        </div>
+                        <div class="computer-group">
+                            <label>نام سیستم *</label>
+                            <input type="text" name="name" required>
+                        </div>
+
+                        <div class="department-group">
+                            <label>بخش</label>
+                            <select name="department_id">
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($departments as $dept): ?>
+                                    <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+                            <label>CPU</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="cpu_id" id="cpu_id">
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($cpus as $cpu): ?>
+                                        <option value="<?php echo $cpu['id']; ?>">
+                                            <?php echo htmlspecialchars($cpu['brand_name'] . ' ' . $cpu['model_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('cpu')" title="افزودن CPU جدید">➕</button>
+                            </div>
+
+                        </div>
+
+                        <!-- مادربرد -->
+                        <div class="form-group">
+                            <label>مادربرد</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="motherboard_id" id="motherboard_id" style="flex: 1;">
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($motherboards as $mb): ?>
+                                        <option value="<?php echo $mb['id']; ?>">
+                                            <?php echo htmlspecialchars($mb['brand_name'] . ' ' . $mb['model_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('motherboard')" title="افزودن مادربرد جدید">➕</button>
+                            </div>
+                        </div>
+
+                        <!-- پاور -->
+                        <div class="form-group">
+                            <label>پاور</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="power_id" id="power_id" style="flex: 1;">
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($powers as $power): ?>
+                                        <option value="<?php echo $power['id']; ?>">
+                                            <?php echo htmlspecialchars($power['brand_name'] . ' ' . $power['model_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('power')" title="افزودن پاور جدید">➕</button>
+                            </div>
+                        </div>
+                        <!-- مانیتور -->
+                        <div class="form-group">
+                            <label>مانیتور</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select name="monitor_id" id="monitor_id" style="flex: 1;">
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($monitors as $monitor): ?>
+                                        <option value="<?php echo $monitor['id']; ?>">
+                                            <?php echo htmlspecialchars($monitor['brand_name'] . ' ' . $monitor['model_name']); ?>
+                                            <?php if ($monitor['property_code']): ?>
+                                                (<?php echo htmlspecialchars($monitor['property_code']); ?>)
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <button type="button" class="btn-add-quick" onclick="openComponentModal('monitor')" title="افزودن مانیتور جدید">➕</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="rhid-row">
+                        <!-- بخش رم -->
+                        <div class="ram-section">
+                            <div id="rams_container">
+                                <div class="ram-row" data-row="0">
+                                    <label class="section-label"> رم‌</label>
+                                    <div class="select-wrapper">
+                                        <select name="ram_id_0" class="ram-select">
+                                            <option value="">-- انتخاب --</option>
+                                            <?php foreach ($rams as $ram): ?>
+                                                <option value="<?php echo $ram['id']; ?>">
+                                                    <?php echo htmlspecialchars($ram['brand_name'] . ' ' . $ram['model_name'] . ' (' . $ram['capacity'] . ' ' . $ram['type'] . ')'); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <!-- دکمه افزودن سریع کنار سلکت رم -->
+                                        <button type="button" class="btn-add-quick" onclick="openComponentModal('ram')" title="افزودن رم جدید">➕</button>
+                                    </div>
+                                    <div class="row-remove">
+                                        <button type="button" class="btn-remove-ram" onclick="removeRamRow(this)" hidden="">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-add-row" onclick="addRamRow()">➕ افزودن رم</button>
+                        </div>
+
+                        <!-- بخش هارد -->
+                        <div class="hard-section">
+
+                            <div id="storages_container">
+                                <div class="storage-row" data-row="0">
+                                    <label class="section-label"> هارد</label>
+                                    <div class="select-wrapper">
+                                        <select name="storage_id_0" class="storage-select">
+                                            <option value="">-- انتخاب --</option>
+                                            <?php foreach ($storages as $storage): ?>
+                                                <option value="<?php echo $storage['id']; ?>">
+                                                    <?php echo htmlspecialchars($storage['brand_name'] . ' ' . $storage['model_name'] . ' (' . $storage['capacity'] . ' ' . $storage['type'] . ')'); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="button" class="btn-add-quick" onclick="openComponentModal('storage')" title="افزودن هارد جدید">➕</button>
+                                    </div>
+
+                                    <div class="row-remove">
+                                        <button type="button" class="btn-remove-storage" onclick="removeStorageRow(this)" hidden="">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-add-row" onclick="addStorageRow()">➕ افزودن هارد</button>
+                        </div>
+
+                        <!-- بخش IP -->
+                        <div class="ip-section">
+                            <div id="ips_container">
+                                <div class="ip-row" data-row="0">
+
+                                    <label class="section-label">IP</label>
+
+                                    <div class="select-wrapper">
+
+                                        <input type="text" name="ip_address_0" placeholder="آدرس IP" dir="ltr">
+
+                                        <input type="text" name="ip_mac_0" placeholder="MAC" dir="ltr">
+
+                                        <select name="ip_network_0">
+                                            <option value="LAN">LAN</option>
+                                            <option value="WAN">WAN</option>
+                                            <option value="VPN">VPN</option>
+                                            <option value="WiFi">WiFi</option>
+                                            <option value="Other">سایر</option>
+                                        </select>
+
+                                    </div>
+                                    <div class="row-remove">
+                                        <button type="button"
+                                                class="btn-remove-ip"
+                                                onclick="removeIpRow(this)"
+                                                hidden>
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-add-row" onclick="addIpRow()">➕ افزودن IP</button>
+                        </div>
+
+                        <!-- بخش تجهیزات جانبی -->
+                        <div class="peripheral-section">
+                            <div id="peripherals_container">
+                                <div class="peripheral-row" data-row="0">
+                                    <label class="section-label"> تجهیزات جانبی</label>
+
+                                    <div class="select-wrapper">
+                                        <select name="peripheral_id_0" class="peripheral-select">
+                                            <option value="">-- انتخاب --</option>
+                                            <?php foreach ($peripheralTypes as $type): ?>
+                                                <optgroup label="<?php echo $type['name']; ?>">
+                                                    <?php
+                                                    $periphStmt = $db->prepare("
+                                    SELECT p.*, m.name as model_name, b.name as brand_name
+                                    FROM peripherals p
+                                    INNER JOIN models m ON p.model_id = m.id
+                                    INNER JOIN brands b ON m.brand_id = b.id
+                                    WHERE p.type_id = :type_id
+                                    ORDER BY b.name, m.name
+                                ");
+                                                    $periphStmt->execute([':type_id' => $type['id']]);
+                                                    $periphs = $periphStmt->fetchAll();
+                                                    foreach ($periphs as $periph):
+                                                        ?>
+                                                        <option value="<?php echo $periph['id']; ?>">
+                                                            <?php echo htmlspecialchars($periph['brand_name'] . ' ' . $periph['model_name']); ?>
+                                                            <?php if ($periph['property_code']): ?>
+                                                                (<?php echo htmlspecialchars($periph['property_code']); ?>)
+                                                            <?php endif; ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </optgroup>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="button" class="btn-add-quick" onclick="openPeripheralModal()" title="افزودن تجهیز جانبی جدید">➕</button>
+                                    </div>
+                                    <div class="row-remove">
+                                        <button type="button" class="btn-remove-peripheral" onclick="removePeripheralRow(this)" style="display: none;">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-add-row" onclick="addPeripheralRow()">➕ افزودن تجهیز جانبی</button>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" name="add_system" class="btn-add">💾 ذخیره سیستم</button>
+                    </div>
+
+                </form>
+            </div>
+        <?php endif; ?>
+
+        <!-- ============================================ -->
+        <!-- مودال افزودن قطعه جدید -->
+        <!-- ============================================ -->
+        <div id="componentModal" class="modal">
+            <div class="modal-content" style="max-width: 550px;">
+                <h3 id="componentModalTitle">➕ افزودن قطعه جدید</h3>
+                <form id="componentForm">
+                    <input type="hidden" name="component_type" id="component_type">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>برند *</label>
+                            <select name="brand_id" id="comp_brand_id" required>
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($brands as $brand): ?>
+                                    <option value="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>مدل *</label>
+                            <select name="model_id" id="comp_model_id" required>
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($models as $model): ?>
+                                    <option value="<?php echo $model['id']; ?>"><?php echo htmlspecialchars($model['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- فیلدهای اختصاصی رم -->
+                    <div id="ram_fields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>نوع رم</label>
+                                <select name="ram_type">
+                                    <option value="">-- انتخاب --</option>
+                                    <option value="DDR3">DDR3</option>
+                                    <option value="DDR4">DDR4</option>
+                                    <option value="DDR5">DDR5</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>ظرفیت</label>
+                                <select name="ram_capacity">
+                                    <option value="">-- انتخاب --</option>
+                                    <option value="4GB">4GB</option>
+                                    <option value="8GB">8GB</option>
+                                    <option value="16GB">16GB</option>
+                                    <option value="32GB">32GB</option>
+                                    <option value="64GB">64GB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- فیلدهای اختصاصی هارد -->
+                    <div id="storage_fields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>نوع</label>
+                                <select name="storage_type">
+                                    <option value="">-- انتخاب --</option>
+                                    <option value="HDD">HDD</option>
+                                    <option value="SSD">SSD</option>
+                                    <option value="NVMe">NVMe</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>ظرفیت</label>
+                                <select name="storage_capacity">
+                                    <option value="">-- انتخاب --</option>
+                                    <option value="120GB">120GB</option>
+                                    <option value="124GB">124GB</option>
+                                    <option value="128GB">128GB</option>
+                                    <option value="240GB">240GB</option>
+                                    <option value="256GB">256GB</option>
+                                    <option value="500GB">500GB</option>
+                                    <option value="512GB">512GB</option>
+                                    <option value="750GB">750GB</option>
+                                    <option value="1TB">1TB</option>
+                                    <option value="2TB">2TB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- فیلدهای اختصاصی مانیتور -->
+                    <div id="monitor_fields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>کد اموال</label>
+                                <input type="text" name="monitor_property_code" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- فیلدهای اختصاصی تجهیزات جانبی -->
+                    <div id="peripheral_fields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>نوع تجهیز *</label>
+                                <select name="peripheral_type_id" required>
+                                    <option value="">-- انتخاب --</option>
+                                    <?php foreach ($peripheralTypes as $type): ?>
+                                        <option value="<?php echo $type['id']; ?>"><?php echo  $type['name']; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>کد رایانه</label>
+                                <input type="text" name="peripheral_computer_code" placeholder="کد رایانه">
+                            </div>
+                            <div class="form-group">
+                                <label>کد اموال</label>
+                                <input type="text" name="peripheral_property_code" placeholder="کد اموال">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>سریال</label>
+                                <input type="text" name="peripheral_serial_number" placeholder="شماره سریال">
+                            </div>
+                            <div class="form-group">
+                                <label>نوع اتصال</label>
+                                <select name="peripheral_connection_type">
+                                    <option value="USB">USB</option>
+                                    <option value="Network">Network</option>
+                                    <option value="Other">سایر</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h4 id="componentListTitle">قطعات ثبت شده</h4>
+
+                    <table class="components-table" id="componentTable">
+
+                        <thead id="componentTableHead">
+                        <tr>
+                            <th>برند</th>
+                            <th>مدل</th>
+                            <th>ظرفیت</th>
+                            <th>نوع</th>
+                            <th>عملیات</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="componentTableBody">
+
+                        </tbody>
+                    </table>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-add" onclick="saveComponent()">💾 ذخیره</button>
+                        <button type="button" class="btn-cancel" onclick="closeModal('componentModal')">لغو</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- مودال افزودن تجهیز جانبی جدید -->
+        <!-- ============================================ -->
+        <div id="peripheralModal" class="modal">
+            <div class="modal-content" style="max-width: 550px;">
+                <h3>➕ افزودن دستگاه جانبی جدید</h3>
+                <form id="peripheralForm">
+                    <input type="hidden" name="add_peripheral" value="1">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>نوع دستگاه *</label>
+                            <select name="type_id" required>
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($peripheralTypes as $type): ?>
+                                    <option value="<?php echo $type['id']; ?>"><?php echo $type['name']; ?> </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>کد اموال</label>
+                            <input type="text" name="property_code" placeholder="کد اموال">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>برند</label>
+                            <select name="brand_id">
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($brands as $brand): ?>
+                                    <option value="<?php echo $brand['id']; ?>"><?php echo htmlspecialchars($brand['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>مدل</label>
+                            <select name="model_id">
+                                <option value="">-- انتخاب --</option>
+                                <?php foreach ($models as $model): ?>
+                                    <option value="<?php echo $model['id']; ?>"><?php echo htmlspecialchars($model['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+                            <label>نوع اتصال</label>
+                            <select name="connection_type">
+                                <option value="USB">USB</option>
+                                <option value="Network">Network</option>
+                                <option value="Wireless">Wireless</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h4>تجهیزات جانبی ثبت شده</h4>
+
+                    <table class="components-table" id="peripheralTable">
+
+
+                        <thead id="peripheralTableHead">
+                        <tr>
+                            <th>نوع تجهیز</th>
+                            <th>برند</th>
+                            <th>مدل</th>
+                            <th>کد اموال</th>
+                            <th>عملیات</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="peripheralTableBody">
+
+                        </tbody>
+                    </table>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-add" onclick="savePeripheral()">💾 ذخیره</button>
+                        <button type="button" class="btn-cancel" onclick="closeModal('peripheralModal')">لغو</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <!-- ============================================ -->
+        <!-- بخش جستجو -->
+        <!-- ============================================ -->
+        <div class="search-card">
+             <h2>🔍 جستجوی سیستم‌ها</h2>
+             <div class="search-form">
+                <div class="search-row">
+                    <div class="form-group">
+                        <label>کد رایانه</label>
+                        <input type="text" id="search_computer_code" value="<?php echo htmlspecialchars($_GET['computer_code'] ?? ''); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>نام سیستم</label>
+                        <input type="text" id="search_name" value="<?php echo htmlspecialchars($_GET['name'] ?? ''); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label>بخش</label>
+                        <select id="search_department">
+                            <option value="">همه</option>
+                            <?php foreach ($departments as $dept): ?>
+                                <option value="<?php echo $dept['id']; ?>" <?php echo (isset($_GET['department']) && $_GET['department'] == $dept['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($dept['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>IP</label>
+                        <input type="text" id="search_ip" >
+                    </div>
+                </div>
+                <div class="search-row">
+                    <div class="search-group search-actions">
+                        <button type="button" id="search_btn" class="btn-search">🔍 جستجو</button>
+                        <button type="button" id="reset_btn" class="btn-reset-search">🗑️ پاک کردن</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- ============================================ -->
+         <!-- جدول سیستم‌ها -->
+        <!-- ============================================ -->
+        <div class="systems-table data-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>ردیف</th>
+
+                    <th class="sortable" data-sort="computer_code">
+                        کد رایانه
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="name">
+                        نام سیستم
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="department">
+                        بخش
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="cpu">
+                        CPU
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="motherboard">
+                        مادربرد
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="power">
+                        پاور
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="monitor">
+                        مانیتور
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="ram">
+                        رم
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="storage">
+                        هارد
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="ip">
+                        IP
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="peripheral">
+                        تجهیزات
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th class="sortable" data-sort="date">
+                        تاریخ
+                        <span class="sort-arrow">↕</span>
+                    </th>
+
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <?php if (empty($systems)): ?>
+                    <tr>
+                        <td colspan="14" style="text-align: center; padding: 40px;">💻 هیچ سیستمی ثبت نشده است</td>
+                    </tr>
+                <?php else: ?>
+                    <?php
+                    $rownum = $offset + 1;
+
+                    foreach ($systems as $rowData):
+                        include "assets/includes/system_row.php";
+                        $rownum++;
+                    endforeach;
+                    ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pagination_container" class="pagination-container">
+
+            <?php if ($totalPages > 1): ?>
+
+                <div class="pagination">
+
+                    <?php if ($page > 1): ?>
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="<?php echo $page - 1; ?>">
+                            قبلی
+                        </button>
+                    <?php endif; ?>
+
+
+                    <?php
+                    $startPage = max(1, $page - 2);
+                    $endPage   = min($totalPages, $page + 2);
+                    ?>
+
+
+                    <?php if ($startPage > 1): ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="1">
+                            <?php echo fa_number(1); ?>
+                        </button>
+
+                        <?php if ($startPage > 2): ?>
+                            <span class="pagination-dots">...</span>
+                        <?php endif; ?>
+
+                    <?php endif; ?>
+
+
+                    <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn <?php echo $i == $page ? 'active' : ''; ?>"
+                                data-page="<?php echo $i; ?>">
+                            <?php echo fa_number($i); ?>
+                        </button>
+
+                    <?php endfor; ?>
+
+
+                    <?php if ($endPage < $totalPages): ?>
+
+                        <?php if ($endPage < $totalPages - 1): ?>
+                            <span class="pagination-dots">...</span>
+                        <?php endif; ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="<?php echo $totalPages; ?>">
+                            <?php echo fa_number($totalPages); ?>
+                        </button>
+
+                    <?php endif; ?>
+
+
+                    <?php if ($page < $totalPages): ?>
+
+                        <button
+                                type="button"
+                                class="pagination-btn"
+                                data-page="<?php echo $page + 1; ?>">
+                            بعدی
+                        </button>
+
+                    <?php endif; ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <div class="pagination-info">
+                تعداد نتایج:
+                <strong><?php echo fa_number($totalSystems); ?></strong>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+   <!-- ============================================ -->
+   <!-- مودال ویرایش سیستم -->
+   <!-- ============================================ -->
+ <div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ ویرایش سیستم</h3>
+        <form method="post" id="editForm">
+            <input type="hidden" name="system_id" id="edit_system_id">
+            <input type="hidden" name="edit_system" value="1">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>کد رایانه *</label>
+                    <input type="text" name="computer_code" id="edit_computer_code" required>
+                </div>
+                <div class="form-group">
+                    <label>کد اموال</label>
+                    <input type="text" name="property_code" id="edit_property_code">
+                </div>
+                <div class="form-group">
+                    <label>نام سیستم *</label>
+                    <input type="text" name="name" id="edit_name" required>
+                </div>
+                <div class="form-group">
+                    <label>بخش</label>
+                    <select name="department_id" id="edit_department_id">
+                        <option value="">-- انتخاب --</option>
+                        <?php foreach ($departments as $dept): ?>
+                            <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>پردازنده (CPU)</label>
+                     <select name="cpu_id" id="edit_cpu_id">
+                        <option value="">-- انتخاب --</option>
+                        <?php foreach ($cpus as $cpu): ?>
+                            <option value="<?php echo $cpu['id']; ?>">
+                                <?php echo htmlspecialchars($cpu['brand_name'] . ' ' . $cpu['model_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                     <label>مادربرد</label>
+                    <select name="motherboard_id" id="edit_motherboard_id">
+                        <option value="">-- انتخاب --</option>
+                        <?php foreach ($motherboards as $mb): ?>
+                            <option value="<?php echo $mb['id']; ?>">
+                                <?php echo htmlspecialchars($mb['brand_name'] . ' ' . $mb['model_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>پاور</label>
+                    <select name="power_id" id="edit_power_id">
+                        <option value="">-- انتخاب --</option>
+                        <?php foreach ($powers as $power): ?>
+                            <option value="<?php echo $power['id']; ?>">
+                                <?php echo htmlspecialchars($power['brand_name'] . ' ' . $power['model_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>مانیتور</label>
+                    <select name="monitor_id" id="edit_monitor_id">
+                        <option value="">-- انتخاب --</option>
+                        <?php foreach ($monitors as $monitor): ?>
+                            <option value="<?php echo $monitor['id']; ?>">
+                                <?php echo htmlspecialchars($monitor['brand_name'] . ' ' . $monitor['model_name']); ?>
+                                <?php if ($monitor['property_code']): ?>
+                                    (<?php echo htmlspecialchars($monitor['property_code']); ?>)
+                                <?php endif; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <div class="rhid-row">
+
+                <div class="ram-section">
+                    <div id="edit_rams_container"></div>
+
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditRamRow()">
+                        ➕ افزودن رم
+                    </button>
+                </div>
+
+                <div class="hard-section">
+                    <div id="edit_storages_container"></div>
+
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditStorageRow()">
+                        ➕ افزودن هارد
+                    </button>
+                </div>
+
+                <div class="ip-section">
+                    <div id="edit_ips_container"></div>
+
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditIpRow()">
+                        ➕ افزودن IP
+                    </button>
+                </div>
+
+                <div class="peripheral-section">
+                    <div id="edit_peripherals_container"></div>
+
+                    <button
+                            type="button"
+                            class="btn-add-row"
+                            onclick="addEditPeripheralRow()">
+                        ➕ افزودن تجهیز جانبی
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="modal-buttons">
+                <button type="submit" class="btn-add">💾 ذخیره</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('editModal')">لغو</button>
+            </div>
+         </form>
+    </div>
+</div>
+<button
+        type="button"
+        id="scrollToBottomBtn"
+        class="scroll-to-bottom"
+        title="رفتن به انتهای صفحه">
+    ↓
+</button>
+</body>
+</html>

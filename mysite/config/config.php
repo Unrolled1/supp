@@ -6,7 +6,12 @@
 // تشخیص مسیر پایه
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $host = $_SERVER['HTTP_HOST'];
-$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\') . '/';
+$scriptDir = dirname($_SERVER['SCRIPT_NAME']);
+// اگر صفحه داخل پوشه system اجرا شود، یک پله بالاتر ریشه سایت در نظر گرفته می‌شود
+if (basename($scriptDir) === 'system') {
+    $scriptDir = dirname($scriptDir);
+}
+$basePath = rtrim($scriptDir, '/\\') . '/';
 define('BASE_URL', $protocol . $host . $basePath);
 
 // مسیر فیزیکی پوشه assets
@@ -51,7 +56,7 @@ $css_pages = [
     'admin_persons' => ['admin-persons.css'],
     'admin_printers' => ['admin-printers.css'],
     'admin_services' => ['admin-services.css'],
-    'admin_systems' => ['admin-systems.css'],
+    'admin_systems' => ['system/admin-systems.css'],
     'admin_topics' => ['admin-topics.css'],
     'admin_activities' => ['admin-activities.css'],
     'admin_kala' => ['admin-kala.css'],
@@ -75,10 +80,10 @@ $js_pages = [
     'admin_invoices' => ['admin-invoices.js'],
     'admin_printers' => ['admin-printers.js'],
     'admin_services' => ['admin-services.js'],
-    'admin_systems' => ['admin-systems.js'],
     'admin_topics' => ['admin-topics.js'],
     'admin_activities' => ['admin-activities.js'],
     'admin_servicerep'=>['admin-servicerep.js'],
+    'admin_systems' => ['system/admin-systems.js'],
     'admin_kala' => ['admin-kala.js'],
     'dashboard' => ['dashboard.js'],
     'login' => ['login.js'],
@@ -105,17 +110,23 @@ function get_file_version($path) {
 function load_css() {
     global $css_common, $css_pages, $current_page;
 
-    // بارگذاری فایل‌های عمومی
+    // فایل‌های عمومی
     foreach ($css_common as $file) {
         $version = get_file_version('styles/' . $file);
-        echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/styles/' . $file . '?v=' . $version . '">' . "\n";
+
+        echo '<link rel="stylesheet" href="' . BASE_URL .
+            'assets/styles/' . $file . '?v=' . $version . '">' . "\n";
     }
 
-    // بارگذاری فایل‌های اختصاصی صفحه
+    // فایل اختصاصی صفحه
     if (isset($css_pages[$current_page])) {
         foreach ($css_pages[$current_page] as $file) {
-            $version = get_file_version('styles/' . $file);
-            echo '<link rel="stylesheet" href="' . BASE_URL . 'assets/styles/' . $file . '?v=' . $version . '">' . "\n";
+
+            $fullPath = __DIR__ . '/../' . $file;
+            $version = file_exists($fullPath) ? filemtime($fullPath) : time();
+
+            echo '<link rel="stylesheet" href="' . BASE_URL .
+                $file . '?v=' . $version . '">' . "\n";
         }
     }
 }
@@ -126,17 +137,23 @@ function load_css() {
 function load_js() {
     global $js_common, $js_pages, $current_page;
 
-    // بارگذاری فایل‌های عمومی
+    // فایل‌های عمومی
     foreach ($js_common as $file) {
         $version = get_file_version('js/' . $file);
-        echo '<script src="' . BASE_URL . 'assets/js/' . $file . '?v=' . $version . '"></script>' . "\n";
+
+        echo '<script src="' . BASE_URL .
+            'assets/js/' . $file . '?v=' . $version . '"></script>' . "\n";
     }
 
-    // بارگذاری فایل‌های اختصاصی صفحه
+    // فایل اختصاصی صفحه
     if (isset($js_pages[$current_page])) {
         foreach ($js_pages[$current_page] as $file) {
-            $version = get_file_version('js/' . $file);
-            echo '<script src="' . BASE_URL . 'assets/js/' . $file . '?v=' . $version . '"></script>' . "\n";
+
+            $fullPath = __DIR__ . '/../' . $file;
+            $version = file_exists($fullPath) ? filemtime($fullPath) : time();
+
+            echo '<script src="' . BASE_URL .
+                $file . '?v=' . $version . '"></script>' . "\n";
         }
     }
 }

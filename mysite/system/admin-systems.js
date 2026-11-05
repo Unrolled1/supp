@@ -735,6 +735,8 @@ function removeStorageRow(button) {
 
 function addIpRow() {
 
+    const rowIndex = document.querySelectorAll('#ips_container .ip-row').length;
+
     createHtmlRow(
         "ips_container",
         "ip-row",
@@ -743,9 +745,11 @@ function addIpRow() {
 
         <div class="ip-inline">
 
-            <input type="text" name="ip_address_${document.querySelectorAll('#ips_container .ip-row').length}">
+            <input type="text" name="ip_address_${rowIndex}">
 
-            <select name="ip_network_${document.querySelectorAll('#ips_container .ip-row').length}">
+            <input type="text" name="ip_mac_${rowIndex}" placeholder="MAC" dir="ltr" style="direction: ltr; text-align: left; font-family: monospace;">
+
+            <select name="ip_network_${rowIndex}">
                 <option value="LAN">LAN</option>
                 <option value="WAN">WAN</option>
                 <option value="VPN">VPN</option>
@@ -908,7 +912,7 @@ function createEditStorageRow(index, selected = "") {
 
 }
 
-function createEditIpRow(index, ip = "", network = "LAN") {
+function createEditIpRow(index, ip = "", network = "LAN", mac = "") {
 
     return `
 <div class="ip-row" data-row="${index}">
@@ -921,6 +925,14 @@ function createEditIpRow(index, ip = "", network = "LAN") {
             type="text"
             name="edit_ip_address_${index}"
             value="${ip}">
+
+        <input
+            type="text"
+            name="edit_ip_mac_${index}"
+            value="${mac}"
+            placeholder="MAC"
+            dir="ltr"
+            style="direction: ltr; text-align: left; font-family: monospace;">
 
         <select name="edit_ip_network_${index}">
 
@@ -1056,7 +1068,8 @@ function loadEditIps(ips) {
         container.innerHTML += createEditIpRow(
             index,
             ip.ip_address,
-            ip.network_type
+            ip.network_type,
+            ip.mac_address || ""
         );
 
     });
@@ -1190,6 +1203,10 @@ function getDefaultRowHtml(type, index) {
                 <div class="form-group">
                     <label>آدرس IP</label>
                     <input type="text" name="edit_ip_address_${index}" placeholder="مثلاً: 192.168.1.100">
+                </div>
+                <div class="form-group">
+                    <label>MAC</label>
+                    <input type="text" name="edit_ip_mac_${index}" dir="ltr" style="direction: ltr; text-align: left; font-family: monospace;">
                 </div>
                 <div class="form-group">
                     <label>شبکه</label>
@@ -1394,7 +1411,7 @@ const componentTitles = {
 };
 function loadComponentList(type) {
 
-    fetch("assets/ajax/get_components.php?type=" + type)
+    fetch("../assets/ajax/get_components.php?type=" + type)
 
         .then(response => response.json())
 
@@ -1542,7 +1559,7 @@ function deleteComponent(type,id){
 
         if(!result.isConfirmed) return;
 
-        fetch("assets/ajax/delete_component.php",{
+        fetch("../assets/ajax/delete_component.php",{
 
             method:"POST",
 
@@ -1587,7 +1604,7 @@ function deleteComponent(type,id){
 }
 function refreshComponentSelect(type) {
 
-    fetch("assets/ajax/get_components.php?type=" + type)
+    fetch("../assets/ajax/get_components.php?type=" + type)
 
         .then(r => r.json())
 
@@ -1658,7 +1675,7 @@ function refreshComponentSelect(type) {
 
 function refreshPeripheralSelect() {
 
-    fetch("assets/ajax/get_components.php?type=peripheral")
+    fetch("../assets/ajax/get_components.php?type=peripheral")
 
         .then(r => r.json())
 
@@ -1862,11 +1879,17 @@ function saveEditSystem() {
     const form = document.getElementById("editForm");
     const formData = new FormData(form);
 
-    fetch("assets/ajax/edit_system.php", {
+    fetch("edit_system.php", {
         method: "POST",
         body: formData
     })
-        .then(r => r.json())
+        .then(r => r.text().then(txt => {
+            try {
+                return JSON.parse(txt);
+            } catch (e) {
+                throw new Error("پاسخ سرور JSON نبود: " + txt.substring(0, 300));
+            }
+        }))
         .then(res => {
 
             if(res.success){
@@ -1884,6 +1907,13 @@ function saveEditSystem() {
 
             }
 
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: "error",
+                title: "خطا در ذخیره ویرایش",
+                text: String(err).substring(0, 400)
+            });
         });
 
 }
@@ -1947,7 +1977,7 @@ function confirmDelete(id, name) {
 
 function updateSystemRow(id){
 
-    return fetch("assets/ajax/get_system_row.php?id=" + id)
+    return fetch("get_system_row.php?id=" + id)
         .then(r => r.text())
         .then(html => {
 

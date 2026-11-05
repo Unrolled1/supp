@@ -1,0 +1,591 @@
+/* ============================================
+   استایل‌های اختصاصی مدیریت سیستم‌ها
+   ============================================ */
+
+/* ============================================
+   فرم ثبت سیستم
+   ============================================ */
+
+.systems-form .form-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+.systems-form .full-width {
+    flex: 0 0 100%;
+    width: 100%;
+}
+.rhid-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    align-items:stretch;
+    margin-top: 10px;
+}
+
+.ram-section,
+.hard-section,
+.ip-section,
+.mac-section,
+.peripheral-section{
+    display:flex;
+    flex-direction:column;
+}
+
+/* ============================================
+   ردیف‌های چندگانه (رم، هارد، IP، تجهیزات)
+   ============================================ */
+.department-group{width: 200px;}
+
+.ram-row,
+.storage-row,
+.ip-row,
+.mac-row,
+.peripheral-row {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    border: 1px solid #4a5568;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+.ip-row .row-remove{
+    margin-top:6px;
+    display:flex;
+    justify-content:flex-end;
+}
+
+.ram-row:hover,
+.storage-row:hover,
+.ip-row:hover,
+.peripheral-row:hover {
+    border-color: #4f46e5;
+}
+
+.section-label{
+    display:block;
+    width:100%;
+    margin-bottom:6px;
+    font-weight:600;
+}
+.select-wrapper{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    width:100%;
+}
+.select-inline{
+    display:flex;
+    gap:8px;
+    width:100%;
+}
+
+.select-grow{
+    flex:1;
+    min-width:180px;
+}
+
+.btn-add-quick-small{
+    flex-shrink:0;
+    height:32px;
+    min-width:32px;
+}
+.select-wrapper select:focus,
+.select-wrapper input:focus{
+    border-color:#4f46e5;
+    outline:none;
+    box-shadow:0 0 0 2px rgba(79,70,229,.2);
+}
+.ip-inline{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+}
+
+.ip-inline input{
+    flex:1;
+}
+
+.ip-inline select{
+    width:90px;
+    flex:0 0 90px;
+}
+
+.ip-inline .btn-remove-ip{
+    flex:0 0 auto;
+}
+.ram-row input,
+.storage-row input,
+.ip-row input,
+.peripheral-row input,
+.ram-row select,
+.storage-row select,
+.ip-row select,
+.peripheral-row select {
+    padding: 5px 8px;
+    font-size: 12px;
+    height: 32px;
+}
+/* ============================================
+   دکمه افزودن
+   ============================================ */
+
+.btn-add-row {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+}
+
+.btn-add-row:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+}
+
+.item-small{
+    margin-bottom:2px;
+    border-bottom:1px solid #eee;
+}
+
+.item-small:last-child{
+    border-bottom:none;
+}
+
+.item-small strong{
+    color:#ffffff;
+    display:block;
+}
+
+.item-small small{
+    color:#777;
+}
+/* ============================================
+   آدرس IP در جدول
+   ============================================ */
+
+.ip-address {
+    direction: ltr;
+    display: inline-block;
+}
+
+/* ============================================
+   مودال ویرایش - تنظیم اندازه
+   ============================================ */
+#editModal .modal-content{
+    width:95%;
+    max-width:1300px;
+
+    max-height:90vh;
+    overflow-y:auto;
+}
+#editModal .form-group {
+    flex: 1;
+    min-width: 160px;
+}
+
+#editModal .full-width {
+    flex: 0 0 100%;
+    width: 100%;
+}
+
+/* ============================================
+   استایل سلکت‌ها در مودال ویرایش
+   ============================================ */
+
+#editModal select:focus,
+#editModal input:focus,
+#editModal textarea:focus {
+    border-color: #4f46e5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+#editModal .modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+#editModal .modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#editModal .modal-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+#editModal .modal-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ============================================
+   جدول سیستم‌ها - استایل خاص
+   ============================================ */
+
+
+.systems-table .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    margin: 1px 2px;
+}
+
+.systems-table .text-muted {
+    font-size: 11px;
+}
+/* ============================================
+   چیدمان افقی دکمه‌های عملیات
+   ============================================ */
+
+.td-actions {
+    vertical-align: middle !important;
+    text-align: center;
+}
+
+.td-actions .action-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.td-actions .action-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 4px 10px;
+}
+
+.action-buttons .edit-btn {
+    color: #1a1a1a;
+}
+
+.action-buttons .edit-btn:hover {
+    transform: scale(1.05);
+}
+
+.action-buttons .delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.action-buttons .delete-btn:hover {
+    transform: scale(1.05);
+}
+/* ============================================
+   دکمه افزودن سریع
+   ============================================ */
+
+.btn-add-quick {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 38px;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-add-quick:hover {
+    background: #059669;
+    transform: scale(1.05);
+}
+.btn-remove-ram,
+.btn-remove-storage,
+.btn-remove-ip,
+.btn-remove-peripheral,.btn-remove{
+    background:#ef4444;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:4px 12px;
+    cursor:pointer;
+    transition:all .2s ease;
+}
+
+.btn-remove-ram:hover,
+.btn-remove-storage:hover,
+.btn-remove-ip:hover,
+.btn-remove-peripheral:hover,
+.btn-remove:hover{
+    background:#dc2626;
+    transform:scale(1.05);
+}
+.components-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.components-table th,
+.components-table td {
+    border: 1px solid #cbd5e1;
+    padding: 8px 10px;
+    text-align: center;
+}
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.sortable:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-arrow {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 13px;
+    opacity: 0.5;
+    transition: 0.2s;
+}
+
+.sortable.active .sort-arrow {
+    opacity: 1;
+    font-weight: bold;
+}
+
+/* ============================================
+   Pagination
+============================================ */
+
+.pagination-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 30px;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    direction: rtl;
+}
+
+.pagination-btn {
+    min-width: 42px;
+    height: 40px;
+    padding: 0 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #374151;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.15s ease,
+            box-shadow 0.2s ease;
+}
+
+.pagination-btn:hover {
+    background: #f3f6fa;
+    border-color: #b8c2d1;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
+.pagination-btn:active {
+    transform: translateY(0);
+}
+
+.pagination-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+}
+
+.pagination-btn.active:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.pagination-dots {
+    min-width: 30px;
+    height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #6b7280;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.pagination-info strong {
+    color: #374151;
+    font-weight: 700;
+}
+
+
+/* قبلی و بعدی */
+.pagination-btn[data-page]:first-child {
+    /* بدون تغییر خاص */
+}
+
+
+/* موبایل */
+@media (max-width: 600px) {
+
+    .pagination {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 9px;
+        font-size: 13px;
+        border-radius: 7px;
+    }
+
+    .pagination-dots {
+        height: 36px;
+        min-width: 24px;
+    }
+}
+/* ============================================
+   دکمه شناور رفتن به انتهای صفحه
+============================================ */
+
+.scroll-to-bottom {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+
+    z-index: 9999;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+
+    transition:
+            opacity 0.2s ease,
+            visibility 0.2s ease,
+            transform 0.2s ease,
+            background-color 0.2s ease;
+}
+
+.scroll-to-bottom.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-to-bottom:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.scroll-to-bottom:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+    .scroll-to-bottom {
+        left: 16px;
+        bottom: 16px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+}
+/* ============================================
+   ردیف IP + MAC (فرم ثبت و مودال ویرایش)
+   چیدمان: آدرس IP + MAC + نوع شبکه در یک خط
+   ============================================ */
+
+.ip-row .select-wrapper {
+    flex-wrap: wrap;
+    row-gap: 8px;
+}
+
+.ip-row .select-wrapper input[name^="ip_address_"],
+.ip-row .select-wrapper input[name^="edit_ip_address_"] {
+    flex: 1 1 170px;
+    min-width: 140px;
+    max-width: 240px;
+}
+
+.ip-row .select-wrapper input[name^="ip_mac_"],
+.ip-row .select-wrapper input[name^="edit_ip_mac_"] {
+    flex: 1 1 170px;
+    min-width: 140px;
+    max-width: 240px;
+    direction: ltr;
+    text-align: left;
+    font-family: monospace;
+}
+
+.ip-row .select-wrapper select[name^="ip_network_"],
+.ip-row .select-wrapper select[name^="edit_ip_network_"] {
+    flex: 0 0 95px;
+    width: 95px;
+}

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/assets/includes/autoload.php';
+require_once __DIR__ . '/../assets/includes/autoload.php';
 
 date_default_timezone_set('Asia/Tehran');
 
@@ -54,6 +54,16 @@ function enToFaNumbers($str)
         '7' => '۷',
         '8' => '۸',
         '9' => '۹'
+    ]);
+}
+// تبدیل اعداد فارسی/عربی به انگلیسی (برای نرمال‌سازی MAC)
+function faToEnNumbers($str)
+{
+    return strtr($str, [
+        '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
+        '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+        '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+        '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9'
     ]);
 }
 // بخش‌ها
@@ -386,13 +396,17 @@ if (isset($_POST['add_system']) && canEditSystems()) {
 
                 $ip_description = htmlspecialchars(trim($_POST["ip_description_$ipIndex"] ?? ''));
 
+                // نرمال‌سازی MAC: تبدیل ارقام فارسی به انگلیسی + حروف بزرگ
+                $mac_address = strtoupper(faToEnNumbers(trim($_POST["ip_mac_$ipIndex"] ?? '')));
+
                 $ipStmt = $db->prepare("
-                    INSERT INTO system_ips (system_id, ip_address, network_type,  description, created_at, created_by)
-                    VALUES (:system_id, :ip_address, :network_type, :description, :created_at, :created_by)
+                    INSERT INTO system_ips (system_id, ip_address, mac_address, network_type,  description, created_at, created_by)
+                    VALUES (:system_id, :ip_address, :mac_address, :network_type, :description, :created_at, :created_by)
                 ");
                 $ipStmt->execute([
                     ':system_id' => $system_id,
                     ':ip_address' => $ip_address,
+                    ':mac_address' => $mac_address,
                     ':network_type' => $network_type,
                     ':description' => $ip_description,
                     ':created_at' => $jalaliDate,
@@ -471,18 +485,26 @@ if (!empty($_GET['department'])) {
 
 
 if (!empty($_GET['ip'])) {
-    $ipSearch = enToFaNumbers(trim($_GET['ip']));
+    $rawInput = trim($_GET['ip']);
+    $ipSearch = enToFaNumbers($rawInput);
 
     $where[] = "
         EXISTS (
             SELECT 1
             FROM system_ips sip
             WHERE sip.system_id = s.id
-            AND sip.ip_address LIKE :ip
+            AND (
+                sip.ip_address LIKE :ip
+                OR sip.mac_address LIKE :mac_en
+                OR sip.mac_address LIKE :mac_fa
+            )
         )
     ";
 
     $params[':ip'] = '%' . $ipSearch . '%';
+    // جستجوی MAC با ارقام انگلیسی و فارسی
+    $params[':mac_en'] = '%' . faToEnNumbers($rawInput) . '%';
+    $params[':mac_fa'] = '%' . enToFaNumbers(faToEnNumbers($rawInput)) . '%';
 }
 
 if (!empty($_GET['cpu'])) {
@@ -710,7 +732,7 @@ if ($isAjax) {
         $rownum = $offset + 1;
 
         foreach ($systems as $rowData) {
-            include "assets/includes/system_row.php";
+            include __DIR__ . '/system_row.php';
             $rownum++;
         }
         ?>
@@ -808,15 +830,16 @@ if ($isAjax) {
 <head>
     <meta charset="UTF-8">
     <title>مدیریت سیستم‌ها</title>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/persian-date.min.js"></script>
-    <link rel="stylesheet" href="assets/styles/persian-datepicker.min.css">
-    <script src="assets/js/persian-datepicker.min.js"></script>
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/persian-date.min.js"></script>
+    <link rel="stylesheet" href="../assets/styles/persian-datepicker.min.css">
+    <script src="../assets/js/persian-datepicker.min.js"></script>
+
     <?php load_assets(); ?>
 </head>
 <body>
 <div class="admin-wrapper">
-    <?php include 'sidebar.php'; ?>
+    <?php include __DIR__ . '/../sidebar.php'; ?>
 
     <div class="main-content">
         <div class="main-header">
@@ -1009,7 +1032,9 @@ if ($isAjax) {
 
                                     <div class="select-wrapper">
 
-                                        <input type="text" name="ip_address_0">
+                                        <input type="text" name="ip_address_0" placeholder="آدرس IP" dir="ltr">
+
+                                        <input type="text" name="ip_mac_0" placeholder="MAC" dir="ltr" style="direction: ltr; text-align: left; font-family: monospace;">
 
                                         <select name="ip_network_0">
                                             <option value="LAN">LAN</option>
@@ -1032,6 +1057,7 @@ if ($isAjax) {
                             </div>
                             <button type="button" class="btn-add-row" onclick="addIpRow()">➕ افزودن IP</button>
                         </div>
+
                         <!-- بخش تجهیزات جانبی -->
                         <div class="peripheral-section">
                             <div id="peripherals_container">
@@ -1462,7 +1488,7 @@ if ($isAjax) {
                     $rownum = $offset + 1;
 
                     foreach ($systems as $rowData):
-                        include "assets/includes/system_row.php";
+                        include __DIR__ . '/system_row.php';
                         $rownum++;
                     endforeach;
                     ?>

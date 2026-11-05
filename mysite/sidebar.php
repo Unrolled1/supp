@@ -10,7 +10,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <ul class="sidebar-nav">
 
         <li>
-            <a href="dashboard.php" class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
+            <a href="<?php echo BASE_URL; ?>dashboard.php" class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
                 <span class="icon">📊</span>
                 <span class="text">داشبورد</span>
             </a>
@@ -40,7 +40,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewActivities()): ?>
                         <li>
-                            <a href="admin_activities.php" class="<?php echo $current_page == 'admin_activities.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_activities.php" class="<?php echo $current_page == 'admin_activities.php' ? 'active' : ''; ?>">
                                 <span class="icon">📋</span>
                                 <span class="text">فعالیت</span>
                             </a>
@@ -49,7 +49,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewDepartments()): ?>
                         <li>
-                            <a href="admin_departments.php" class="<?php echo $current_page == 'admin_departments.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_departments.php" class="<?php echo $current_page == 'admin_departments.php' ? 'active' : ''; ?>">
                                 <span class="icon">🏥</span>
                                 <span class="text">بخش‌ها</span>
                             </a>
@@ -58,7 +58,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewTopics()): ?>
                         <li>
-                            <a href="admin_topics.php" class="<?php echo $current_page == 'admin_topics.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_topics.php" class="<?php echo $current_page == 'admin_topics.php' ? 'active' : ''; ?>">
                                 <span class="icon">📋</span>
                                 <span class="text">موضوعات</span>
                             </a>
@@ -67,7 +67,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewBrands()): ?>
                         <li>
-                            <a href="admin_brands.php" class="<?php echo $current_page == 'admin_brands.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_brands.php" class="<?php echo $current_page == 'admin_brands.php' ? 'active' : ''; ?>">
                                 <span class="icon">🏷️</span>
                                 <span class="text">برندها</span>
                             </a>
@@ -76,7 +76,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewModels()): ?>
                         <li>
-                            <a href="admin_models.php" class="<?php echo $current_page == 'admin_models.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_models.php" class="<?php echo $current_page == 'admin_models.php' ? 'active' : ''; ?>">
                                 <span class="icon">📦</span>
                                 <span class="text">مدل‌ها</span>
                             </a>
@@ -85,7 +85,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewProducts()): ?>
                         <li>
-                            <a href="admin_products.php" class="<?php echo $current_page == 'admin_products.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_products.php" class="<?php echo $current_page == 'admin_products.php' ? 'active' : ''; ?>">
                                 <span class="icon">📦</span>
                                 <span class="text">کالاها</span>
                             </a>
@@ -94,7 +94,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewPersons()): ?>
                         <li>
-                            <a href="admin_persons.php" class="<?php echo $current_page == 'admin_persons.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_persons.php" class="<?php echo $current_page == 'admin_persons.php' ? 'active' : ''; ?>">
                                 <span class="icon">👥</span>
                                 <span class="text">اشخاص</span>
                             </a>
@@ -103,7 +103,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewUsers()): ?>
                         <li>
-                            <a href="admin_users.php" class="<?php echo $current_page == 'admin_users.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_users.php" class="<?php echo $current_page == 'admin_users.php' ? 'active' : ''; ?>">
                                 <span class="icon">👥</span>
                                 <span class="text">کاربران</span>
                             </a>
@@ -134,7 +134,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <!-- پنل درخواست‌ها -->
                     <?php if (canViewTickets()): ?>
                         <li>
-                            <a href="requests.php" class="<?php echo $current_page == 'requests.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>requests.php" class="<?php echo $current_page == 'requests.php' ? 'active' : ''; ?>">
                                 <span class="icon">📋</span>
                                 <span class="text">درخواست‌ها</span>
                             </a>
@@ -143,7 +143,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewServices()): ?>
                         <li>
-                            <a href="admin_services.php" class="<?php echo $current_page == 'admin_services.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_services.php" class="<?php echo $current_page == 'admin_services.php' ? 'active' : ''; ?>">
                                 <span class="icon">🔧</span>
                                 <span class="text">ثبت فعالیت</span>
                             </a>
@@ -152,7 +152,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewInvoices()): ?>
                         <li>
-                            <a href="admin_invoices.php" class="<?php echo $current_page == 'admin_invoices.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_invoices.php" class="<?php echo $current_page == 'admin_invoices.php' ? 'active' : ''; ?>">
                                 <span class="icon">🧾</span>
                                 <span class="text">ثبت فاکتور</span>
                             </a>
@@ -161,7 +161,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewkala()): ?>
                         <li>
-                            <a href="admin_kala.php" class="<?php echo $current_page == 'admin_kala.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_kala.php" class="<?php echo $current_page == 'admin_kala.php' ? 'active' : ''; ?>">
                                 <span class="icon">📦</span>
                                 <span class="text">ثبت کالا</span>
                             </a>
@@ -170,7 +170,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewPrinters()): ?>
                         <li>
-                            <a href="admin_printers.php" class="<?php echo $current_page == 'admin_printers.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>admin_printers.php" class="<?php echo $current_page == 'admin_printers.php' ? 'active' : ''; ?>">
                                 <span class="icon">🖨️</span>
                                 <span class="text">ثبت پرینتر</span>
                             </a>
@@ -179,7 +179,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
                     <?php if (canViewSystems()): ?>
                         <li>
-                            <a href="admin_systems.php" class="<?php echo $current_page == 'admin_systems.php' ? 'active' : ''; ?>">
+                            <a href="<?php echo BASE_URL; ?>system/admin_systems.php" class="<?php echo $current_page == 'admin_systems.php' ? 'active' : ''; ?>">
                                 <span class="icon">💻</span>
                                 <span class="text">ثبت سیستم</span>
                             </a>
@@ -205,42 +205,42 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </a>
                 <ul class="submenu">
                     <li>
-                        <a href="admin_ticketrep.php" class="<?php echo $current_page == 'admin_ticketrep.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo BASE_URL; ?>admin_ticketrep.php" class="<?php echo $current_page == 'admin_ticketrep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش درخواست‌ها</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="admin_servicerep.php" class="<?php echo $current_page == 'admin_servicerep.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo BASE_URL; ?>admin_servicerep.php" class="<?php echo $current_page == 'admin_servicerep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش فعالیت</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="admin_invoicerep.php" class="<?php echo $current_page == 'admin_invoicerep.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo BASE_URL; ?>admin_invoicerep.php" class="<?php echo $current_page == 'admin_invoicerep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش فاکتور</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="admin_kalarep.php" class="<?php echo $current_page == 'admin_kalarep.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo BASE_URL; ?>admin_kalarep.php" class="<?php echo $current_page == 'admin_kalarep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش کالا</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="admin_printerrep.php" class="<?php echo $current_page == 'admin_printerrep.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo BASE_URL; ?>admin_printerrep.php" class="<?php echo $current_page == 'admin_printerrep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش پرینتر</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="admin_systemrep.php" class="<?php echo $current_page == 'admin_systemrep.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo BASE_URL; ?>admin_systemrep.php" class="<?php echo $current_page == 'admin_systemrep.php' ? 'active' : ''; ?>">
                             <span class="icon">📋</span>
                             <span class="text">گزارش سیستم</span>
                         </a>
@@ -253,7 +253,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <!-- پشتیبان گیری -->
         <?php if(canViewBackup()): ?>
         <li>
-            <a href="backup.php" class="<?php echo $current_page == 'backup.php' ? 'active' : ''; ?>">
+            <a href="<?php echo BASE_URL; ?>backup.php" class="<?php echo $current_page == 'backup.php' ? 'active' : ''; ?>">
                 <span class="icon">💾</span>
                 <span class="text">پشتیبان گیری</span>
             </a>

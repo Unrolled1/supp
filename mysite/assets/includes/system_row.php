@@ -110,6 +110,9 @@ if (!isset($rowData)) {
             <?php foreach ($rowData['ips'] as $ip): ?>
                 <div class="item-small">
                     <span class="ip-address"><?php echo htmlspecialchars($ip['ip_address']); ?></span>
+                    <?php if (!empty($ip['mac_address'])): ?>
+                        <br><small class="mac-address"><?php echo htmlspecialchars($ip['mac_address']); ?></small>
+                    <?php endif; ?>
                     <br><small class="text-muted"><?php echo htmlspecialchars($ip['network_type']); ?></small>
                 </div>
             <?php endforeach; ?>

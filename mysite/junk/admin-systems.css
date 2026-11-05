@@ -26,6 +26,7 @@
 .ram-section,
 .hard-section,
 .ip-section,
+.mac-section,
 .peripheral-section{
     display:flex;
     flex-direction:column;
@@ -39,6 +40,7 @@
 .ram-row,
 .storage-row,
 .ip-row,
+.mac-row,
 .peripheral-row {
     padding: 10px;
     border-radius: 10px;
@@ -554,4 +556,36 @@
         height: 42px;
         font-size: 20px;
     }
+}
+/* ============================================
+   ردیف IP + MAC (فرم ثبت و مودال ویرایش)
+   چیدمان: آدرس IP + MAC + نوع شبکه در یک خط
+   ============================================ */
+
+.ip-row .select-wrapper {
+    flex-wrap: wrap;
+    row-gap: 8px;
+}
+
+.ip-row .select-wrapper input[name^="ip_address_"],
+.ip-row .select-wrapper input[name^="edit_ip_address_"] {
+    flex: 1 1 170px;
+    min-width: 140px;
+    max-width: 240px;
+}
+
+.ip-row .select-wrapper input[name^="ip_mac_"],
+.ip-row .select-wrapper input[name^="edit_ip_mac_"] {
+    flex: 1 1 170px;
+    min-width: 140px;
+    max-width: 240px;
+    direction: ltr;
+    text-align: left;
+    font-family: monospace;
+}
+
+.ip-row .select-wrapper select[name^="ip_network_"],
+.ip-row .select-wrapper select[name^="edit_ip_network_"] {
+    flex: 0 0 95px;
+    width: 95px;
 }
