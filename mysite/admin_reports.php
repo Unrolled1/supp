@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once __DIR__ . '/assets/includes/autoload.php';
+require_once __DIR__ . '/../assets/includes/autoload.php';
 
 
 date_default_timezone_set('Asia/Tehran');
@@ -211,8 +211,7 @@ ob_start();
 </head>
 <body>
 <div class="admin-wrapper">
-    <?php include 'sidebar.php'; ?>
-
+ 
     <div class="main-content">
         <div class="main-header">
             <div class="user-info">
@@ -221,7 +220,7 @@ ob_start();
             </div>
             <div>
                 <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
-                <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
+                <a href="<?= BASE_URL ?>login/logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
 

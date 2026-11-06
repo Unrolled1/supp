@@ -1,0 +1,374 @@
+/* ============================================
+   استایل‌های داشبورد کاربر
+   ============================================ */
+
+/* پس‌زمینه صفحه */
+body.user-page {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    color: #e2e8f0;
+}
+
+/* کانتینر اصلی */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   هدر
+   ============================================ */
+
+.header {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+
+/* ============================================
+   فرم ثبت درخواست
+   ============================================ */
+
+.form-box {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 25px 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.form-box h2 {
+    color: #f7fafc;
+    font-size: 20px;
+    margin-bottom: 20px;
+    padding-right: 15px;
+    border-right: 4px solid #667eea;
+}
+
+.form-box label {
+    display: block;
+    font-weight: 500;
+    font-size: 14px;
+    color: #cbd5e0;
+    margin-bottom: 5px;
+}
+
+.form-box input,
+.form-box select,
+.form-box textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #4a5568;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    background: #1a202c;
+    color: #e2e8f0;
+}
+
+.form-box input::placeholder,
+.form-box textarea::placeholder {
+    color: #718096;
+}
+
+.form-box input:focus,
+.form-box select:focus,
+.form-box textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    background: #1a202c;
+}
+
+.form-box select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.form-box textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+.form-group{ flex:1;}
+.sub-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    margin-top: 10px;
+}
+
+.sub-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.sub-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   جدول تیکت‌ها
+   ============================================ */
+
+.tickets-table {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 20px 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow-x: auto;
+}
+
+.tickets-table h3 {
+    color: #f7fafc;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-right: 15px;
+    border-right: 4px solid #667eea;
+}
+
+.tickets-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.tickets-table th {
+    background: #1a202c;
+    color: #cbd5e0;
+    padding: 12px 10px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 2px solid #4a5568;
+}
+
+.tickets-table td {
+    padding: 10px 10px;
+    text-align: center;
+    border-bottom: 1px solid #4a5568;
+    color: #e2e8f0;
+    vertical-align: middle;
+}
+
+.tickets-table tbody tr {
+    transition: 0.2s;
+}
+
+.tickets-table tbody tr:hover {
+    background: #1a202c;
+}
+
+/* ============================================
+   وضعیت (بج)
+   ============================================ */
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-new {
+    background: #744210;
+    color: #f6e05e;
+}
+
+.status-review {
+    background: #2a4365;
+    color: #63b3ed;
+}
+
+.status-closed {
+    background: #2d3748;
+    color: #a0aec0;
+    border: 1px solid #4a5568;
+}
+
+/* ============================================
+   دکمه حذف
+   ============================================ */
+
+.delete-btn-table {
+    background: #742a2a;
+    color: #fc8181;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.delete-btn-table:hover {
+    background: #e53e3e;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* ============================================
+   پیام‌های موفقیت/خطا
+   ============================================ */
+
+.alert {
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: #22543d;
+    color: #9ae6b4;
+    border: 1px solid #2f855a;
+}
+
+.alert-error {
+    background: #742a2a;
+    color: #fc8181;
+    border: 1px solid #9b2c2c;
+}
+
+#form_message {
+    margin-bottom: 15px;
+}
+
+/* ============================================
+   ستون تاریخ
+   ============================================ */
+
+.date-ltr {
+    direction: ltr;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    font-size: 13px;
+    color: #a0aec0;
+}
+
+/* ============================================
+   ستون متن درخواست
+   ============================================ */
+
+.message-cell {
+    max-width: 200px;
+    word-wrap: break-word;
+    white-space: normal;
+    text-align: right;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #cbd5e0;
+}
+
+/* ============================================
+   ساعت زنده
+   ============================================ */
+
+.dynamic-time {
+    background: rgba(255,255,255,0.08);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-left: 10px;
+    display: inline-block;
+    color: #e2e8f0;
+}
+
+/* ============================================
+   ریسپانسیو
+   ============================================ */
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+    }
+
+    .header div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .form-box {
+        padding: 15px;
+    }
+
+    .tickets-table {
+        padding: 10px;
+    }
+
+    .tickets-table table {
+        font-size: 12px;
+    }
+
+    .tickets-table th,
+    .tickets-table td {
+        padding: 6px 4px;
+    }
+
+    .message-cell {
+        max-width: 100px;
+        font-size: 11px;
+    }
+
+    .sub-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    body.user-page {
+        padding: 10px;
+    }
+
+    .tickets-table table {
+        font-size: 10px;
+    }
+
+    .tickets-table th,
+    .tickets-table td {
+        padding: 4px 2px;
+    }
+
+    .message-cell {
+        max-width: 80px;
+        font-size: 10px;
+    }
+
+    .status-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .delete-btn-table {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}

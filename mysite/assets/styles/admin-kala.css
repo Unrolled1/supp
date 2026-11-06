@@ -7,19 +7,3 @@
 .serial-group{width: 150px;}
 .receiver-group{width: 180px;}
 .date-group{width: 120px;}
-.print-btn {
-    background: #3498db;
-    color: #fff;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.print-btn{
-    transition: 0.3s;
-}
-.print-btn:hover {
-    transform: translateY(-2px);
-box-shadow:
-        0 6px 25px rgba(79, 70, 229, 0.4);
-}

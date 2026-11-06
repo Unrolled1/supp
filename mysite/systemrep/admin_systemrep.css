@@ -1,0 +1,183 @@
+
+/* ============================================
+   کارت‌ها
+   ============================================ */
+
+.add-card, .filter-card {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 25px 30px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.3s ease;
+}
+
+.add-card,.filter-card h2 {
+    color: #f7fafc;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    border-right: 4px solid #667eea;
+}
+
+.add-card,.filter-card label {
+    font-weight: 500;
+    font-size: 14px;
+    color: #cbd5e0;
+    margin-bottom: 5px;
+}
+
+.add-card input:focus,
+.add-card select:focus,
+.add-card textarea:focus,
+.filter-card input:focus,
+.filter-card select:focus,
+.filter-card textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102,126,234,.2);
+    background: #1a202c;
+}
+
+.add-card select option,
+.filter-card select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.form-group:has(textarea) { width: 100%; }
+
+.add-card .form-row,
+.filter-card .form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    align-items: flex-end;
+}
+
+.add-card .form-row .form-group,
+.filter-card .form-row .form-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+.add-card .form-row .full-width,
+.filter-card .form-row .full-width {
+    flex: 0 0 100%;
+    width: 100%;
+}
+
+/* ============================================
+   کارت جستجو (search-card)
+   ============================================ */
+
+.search-card {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.search-card h2 {
+    color: #f7fafc;
+    font-size: 18px;
+    margin: 0 0 15px 0;
+    padding-right: 15px;
+    border-right: 4px solid #667eea;
+}
+
+.search-card label {
+    display: block;
+    font-weight: 500;
+    font-size: 13px;
+    color: #cbd5e0;
+    margin-bottom: 4px;
+}
+
+.search-card input,
+.search-card select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 2px solid #4a5568;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    background: #1a202c;
+    color: #e2e8f0;
+    box-sizing: border-box;
+}
+
+.search-card input:focus,
+.search-card select:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.search-card select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.search-card .search-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.search-card .search-row .form-group {
+
+    min-width: 150px;
+}
+
+.search-card .search-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.search-card .btn-search,.btn-filter {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.search-card .btn-search:hover,
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.search-card .btn-reset-search,.btn-reset{
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+}
+
+.search-card .btn-reset-search:hover,.btn-reset:hover {
+    background: #5a6a7e;
+    transform: translateY(-2px);
+}

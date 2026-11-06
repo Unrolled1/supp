@@ -848,7 +848,7 @@ if ($isAjax) {
             </div>
             <div>
                 <span class="clock-display" id="liveClock"><?php echo fa_number(now()); ?></span>
-                <a href="logout.php" class="logout-btn-sidebar">🚪 خروج</a>
+                <a href="<?= BASE_URL ?>login/logout.php" class="logout-btn-sidebar">🚪 خروج</a>
             </div>
         </div>
 

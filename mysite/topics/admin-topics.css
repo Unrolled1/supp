@@ -1,0 +1,66 @@
+/* ============================================
+   استایل مخصوص مدیریت موضوعات
+   ============================================ */
+
+
+
+.add-card h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-right: 4px solid #28a745;
+    padding-right: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* استایل فرم افزودن موضوع */
+.add-card form {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.add-card form .form-group {
+    flex: 1;
+    min-width: 200px;  /* جلوگیری از خیلی بلند شدن */
+    max-width: 400px;  /* حداکثر عرض */
+    margin-bottom: 0;
+}
+
+
+/* وضعیت */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-active {
+    background: #28a745;
+    color: white;
+}
+
+.status-inactive {
+    background: #dc3545;
+    color: white;
+}
+
+.topicname-group{
+    flex: 1;
+    min-width: 200px;
+    max-width: 350px;
+}
+.topics-table .date{
+    direction: ltr !important;
+    text-align: center;
+    letter-spacing: 1px;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}

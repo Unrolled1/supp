@@ -2,6 +2,19 @@
    استایل مدیریت خدمات
    ============================================ */
 
+/* ----- استایل عمومی ----- */
+.main-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.main-title h1 {
+    font-size: 28px;
+    display: inline-block;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #28a745;
+}
+
 /* ----- پیام‌های موفقیت و خطا ----- */
 .alert {
     padding: 12px 20px;
@@ -23,6 +36,33 @@
     border: 1px solid #f5c6cb;
 }
 
+/* ----- کارت افزودن سرویس ----- */
+.add-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.add-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    border-right: 4px solid #28a745;
+    padding-right: 15px;
+}
+
+/* ----- فرم سرویس ----- */
+
+.services-table {
+    border-radius: 15px;  /* این خط رو بررسی کن */
+    overflow: hidden;      /* این خط مهمه برای خمیده شدن گوشه‌ها */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 20px;
+}
+
+
+
 /*  جستجو عرض فیلدهای مختلف */
 .form-group:has(select[name="service_name"]) { width: 350px; }
 .form-group:has(select[name="department_id"]) { width: 250px; }
@@ -31,7 +71,28 @@
 .form-group:has(input[name="serial_number"]) { width: 200px; }
 .form-group:has(input[name="computer_code"]) { width: 200px; }
 .form-group:has(.date-select-group) { width: 320px; }
+.form-group:has(textarea) { width: 100%; }
 
+/* لیبل‌ها */
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #555;
+}
+
+/* اینپوت‌ها و سلکت‌ها */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    border-radius: 8px;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    font-size: 13px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
 
 .form-group input:focus,
 .form-group select:focus,
@@ -41,6 +102,11 @@
     box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
 }
 
+.form-group textarea {
+    resize: vertical;
+}
+
+
 
 .date-select-group span {
     color: #64748b;
@@ -48,6 +114,42 @@
     font-weight: bold;
 }
 
+/* ----- جدول خدمات ----- */
+
+.services-table table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+.services-table td {
+    word-wrap: break-word;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.services-table .date {
+    direction: ltr;
+    font-family: monospace;
+}
+
+/* وضعیت */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-done {
+    background: #d4edda;
+    color: #155724;
+}
 
 /* سلول توضیحات */
 .description-cell {
@@ -65,7 +167,35 @@
     flex-wrap: wrap;
 }
 
+.edit-btn {
+    background: #ffc107;
+    color: #000;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
 
+.edit-btn:hover {
+    background: #e0a800;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
 
 /* ----- مودال‌ها ----- */
 .modal {
@@ -87,7 +217,26 @@
     text-align: center;
 }
 
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+}
 
+.modal-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-cancel:hover {
+    background: #5a6268;
+}
 
 
 
@@ -96,19 +245,67 @@
     min-width: 70px;
 }
 
+/* ----- بخش جستجو ----- */
+.search-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.search-card h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    border-right: 4px solid #667eea;
+    padding-right: 12px;
+}
 
 
+.search-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: flex-end;
+    overflow-x: auto;
+}
+.search-group {
+    flex: none;  /* عدم تغییر عرض */
+}
 /* هر فیلد اندازه خودش */
 .service-name-group {
     width: 330px;
+}
+.search-card input,
+.search-card select {
+    width: 100%;
+    padding: 6px 8px;
 }
 .department-group   { width: 220px; }
 .brand-group        { width: 185px; }
 .receiver-group     { width: 250px; }
 .serial-group       { width: 200px; }
 .computer-group     { width: 150px; }
+.date-group         { width: 120px; }
 
 
+.search-group label {
+    display: block;
+    font-weight: 500;
+    color: #555;
+}
+.search-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+/* کوچک کردن سلکت انتخاب سریع */
+#quick_date_select {
+    width: 110px ;
+    padding: 6px 8px ;
+    font-size: 12px ;
+}
 .btn-search {
     background: #4f46e5;
     color: white;
@@ -119,7 +316,23 @@
     transition: all 0.3s ease;
 }
 
+.btn-search:hover {
+    background: #7c3aed;
+}
 
+.btn-reset-search {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-reset-search:hover {
+    background: #4b5563;
+}
 
 /* ----- ریسپانسیو برای موبایل ----- */
 @media (max-width: 768px) {
@@ -144,6 +357,10 @@
     }
 }
 
+/* برای فرم افزودن سرویس */
+.add-card  {
+    justify-content: flex-end;
+}
 
 
 #editModal .date-select {
@@ -186,15 +403,22 @@
     flex-wrap: nowrap !important;
 }
 
-/*#editModal .btn-add {
+
+/* دکمه‌ها در مودال */
+#editModal .modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+#editModal .btn-add {
     min-width: 120px;
 }
 
-#editModal .btn-cancel {
-    height: 42px;
+#editModal .modal-cancel {
     min-width: 100px;
-}*/
-
+}
 /* ============================================
    استایل مودال ویرایش کاربر
    ============================================ */
