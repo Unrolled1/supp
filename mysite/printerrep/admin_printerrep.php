@@ -437,7 +437,7 @@ $filterText = !empty($filters)
  <script>
     window.reportConfig = {
     url: "admin_printerrep.php",
-    printUrl: "assets/print_report.php",
+        printUrl: "../assets/includes/print_report.php",
     table: ".reports-table",
     filterInfo: true,
     type: "printer"

@@ -598,15 +598,15 @@ if ($isAjax) {
 </div>
 
 <script>
-function printKala(id) {
-    if (!id) return;
+    function printKala(id) {
+        if (!id) return;
 
-    window.open(
-        'assets/print_kala.php?id=' + encodeURIComponent(id),
-        '_blank',
-        'width=1000,height=800,scrollbars=yes,resizable=yes'
-    );
-}
+        window.open(
+            '/supp/mysite/kala/print_kala.php?id=' + encodeURIComponent(id),
+            '_blank',
+            'width=1000,height=800,scrollbars=yes,resizable=yes'
+        );
+    }
 </script>
 </body>
 </html>

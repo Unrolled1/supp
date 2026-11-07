@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?></title>
 
-    <link rel="stylesheet" href="includes/report_pdf.css?v=2">
-
+    <link rel="stylesheet" href="report_pdf.css?v=3">
 </head>
 <body>
 <div class="print-container">

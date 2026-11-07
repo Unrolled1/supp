@@ -98,6 +98,21 @@ $js_common = [
 ];
 
 // ============================================
+// فایل‌های PHP عمومی
+// ============================================
+$php_common = [
+    'numbers.php',
+    'report_queries.php'
+];
+
+// ============================================
+// فایل‌های PHP اختصاصی صفحات
+// ============================================
+$php_pages = [
+
+
+];
+// ============================================
 // فایل‌های اختصاصی CSS هر صفحه
 // مسیرها نسبت به ریشه پروژه هستند
 // ============================================
@@ -107,7 +122,7 @@ $css_pages = [
     'admin_products' => ['admin-products.css'],
     'admin_models' => ['admin-models.css'],
     'admin_brands' => ['admin-brands.css'],
-    'admin_users' => ['admin-users.css'],
+    'admin_users' => ['users/admin-users.css'],
     'admin_departments' => ['admin-departments.css'],
     'admin_invoices' => ['admin-invoices.css'],
     'admin_persons' => ['admin-persons.css'],
@@ -117,7 +132,7 @@ $css_pages = [
     'admin_systemrep'=> ['systemrep/admin_systemrep.css'],
     'admin_topics' => ['admin-topics.css'],
     'admin_activities' => ['admin-activities.css'],
-    'admin_kala' => ['admin-kala.css'],
+    'admin_kala' => ['kala/admin-kala.css'],
     'dashboard' => ['dashboard/dashboard.css'],
     'login' => ['login/login.css'],
     'user_dashboard' => ['user-dashboard.css'],
@@ -125,7 +140,8 @@ $css_pages = [
     'user_select' => ['user-select.css'],
     'backup' => ['backups/backup.css'],
     'admin_ticketrep'=> ['admin_ticketrep.css'],
-    'admin_servicerep'=> ['admin_servicerep.css']
+    'admin_servicerep'=> ['admin_servicerep.css'],
+    'admin_reports' => ['report/admin-reports.css']
 
 
 
@@ -137,29 +153,30 @@ $css_pages = [
 // ============================================
 
 $js_pages = [
-    'requests' => ['requests.js'],
-    'admin_persons' => ['admin-persons.js'],
-    'admin_products' => ['admin-products.js'],
-    'admin_models' => ['admin-models.js'],
-    'admin_brands' => ['admin-brands.js'],
-    'admin_users' => ['admin-users.js'],
-    'admin_departments' => ['admin-departments.js'],
-    'admin_invoices' => ['admin-invoices.js'],
-    'admin_printers' => ['admin-printers.js'],
-    'admin_services' => ['admin-services.js'],
-    'admin_topics' => ['admin-topics.js'],
+    'requests' => ['request/requests.js'],
+    'admin_persons' => ['persons/admin-persons.js'],
+    'admin_products' => ['products/admin-products.js'],
+    'admin_models' => ['models/admin-models.js'],
+    'admin_brands' => ['brands/admin-brands.js'],
+    'admin_users' => ['users/admin-users.js'],
+    'admin_departments' => ['departments/admin-departments.js'],
+    'admin_invoices' => ['invoice/admin-invoices.js'],
+    'admin_printers' => ['printer/admin-printers.js'],
+    'admin_services' => ['services/admin-services.js'],
+    'admin_topics' => ['topics/admin-topics.js'],
     'admin_activities' => ['activities/admin-activities.js'],
-    'admin_servicerep' => ['admin-servicerep.js'],
+    'admin_servicerep' => ['servicerep/admin-servicerep.js'],
     'admin_systems' => ['system/admin-systems.js'],
     'admin_systemrep'=> ['systemrep/admin-systemrep.js'],
-    'admin_kala' => ['admin-kala.js'],
+    'admin_kala' => ['kala/admin-kala.js'],
     'dashboard' => ['dashboard/dashboard.js'],
     'login' => ['login/login.js'],
-    'user_dashboard' => ['user-dashboard.js'],
+    'user_dashboard' => ['user_dashboard/user-dashboard.js'],
     'user_delete' => ['user-delete.js'],
     'user_select' => ['user-select.js'],
-    'backup' => ['backup.js'],
-    'admin_ticketrep'=> ['admin_ticketrep.js']
+    'backup' => ['backups/backup.js'],
+    'admin_ticketrep'=> ['ticketrep/admin-ticketrep.js'],
+        'admin_reports' => ['report/admin-reports.js']
 
 ];
 
@@ -220,6 +237,7 @@ function load_js()
 {
     global $js_common, $js_pages, $current_page;
 
+
     // فایل‌های عمومی
     foreach ($js_common as $file) {
 
@@ -253,6 +271,7 @@ function load_js()
             filemtime($sidebarJs) . '"></script>' . "\n";
     }
 }
+
 function load_sidebar()
 {
     if (file_exists(SIDEBAR_PATH)) {

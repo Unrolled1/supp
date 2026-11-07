@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once __DIR__ . '/includes/autoload.php';
+require_once __DIR__ . '/../assets/includes/autoload.php';
 
 date_default_timezone_set('Asia/Tehran');
 
@@ -80,8 +80,7 @@ $date = !empty($kala['created_at'])
 
     <title>پرینت کالا - <?= h($kala['name']) ?></title>
 
-<link rel="stylesheet" href="includes/report_pdf.css">
-</head>
+    <link rel="stylesheet" href="<?= BASE_URL ?>assets/includes/report_pdf.css"></head>
 
 <body>
 
@@ -168,7 +167,7 @@ function savePDF() {
     const form = document.createElement('form');
 
     form.method = 'POST';
-    form.action = 'export_pdf.php';
+    form.action = '<?= BASE_URL ?>assets/includes/export_pdf.php';
 
     function createHidden(name, value) {
 

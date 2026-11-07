@@ -136,7 +136,7 @@ function printReport() {
     printForm.method = 'POST';
 
     // فقط همین آدرس
-    printForm.action = 'assets/print_report.php?type=service';
+    printForm.action = '../assets/includes/print_report.php?type=service';
 
     printForm.target = '_blank';
 

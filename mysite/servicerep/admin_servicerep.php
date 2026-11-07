@@ -3,7 +3,6 @@
 session_start();
 require_once __DIR__ . '/../assets/includes/autoload.php';
 
-
 date_default_timezone_set('Asia/Tehran');
 
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true || $_SESSION['role'] !== 'admin') {
@@ -301,7 +300,7 @@ if ($isAjax) {
 <script>
     window.reportConfig = {
         url: "admin_servicerep.php",
-        printUrl: "assets/print_report.php", // تغییر مسیر
+        printUrl: "../assets/includes/print_report.php",
         table: ".reports-table",
         filterInfo: true,
         type: "service"

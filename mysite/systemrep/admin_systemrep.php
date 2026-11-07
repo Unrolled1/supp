@@ -632,7 +632,7 @@ $value = $system[$col] ?? '-';
  <script>
     window.reportConfig = {
     url: "admin_systemrep.php",
-    printUrl: "assets/print_report.php",
+        printUrl: "../assets/includes/print_report.php",
     table: ".reports-table",
     filterInfo: true,
     type: "system"

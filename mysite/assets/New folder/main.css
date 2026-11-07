@@ -1,0 +1,1174 @@
+/* ============================================
+   فونت وزیر (Vazir) - لود از داخل پروژه
+   ============================================ */
+@font-face {
+    font-family: 'Vazir';
+    src: url('fonts/Vazir.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+/* ============================================
+   استایل‌های پایه با رنگ‌های جدید
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Vazir',  sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Vazir', 'Tahoma', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    color: #e2e8f0;
+    text-align: right;
+}
+/* ============================================
+   استایل سراسری برای همه دکمه‌ها
+   ============================================ */
+
+
+
+.btn-search {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-reset-search {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+/*دکمه خروج*/
+.logout-btn-sidebar {
+    background: #ef4444;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+.logout-btn-sidebar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 25px rgba(220, 53, 69, 0.4);
+}
+
+
+.add-card .btn-add,.btn-pdf {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    margin-top: 10px;
+    padding: 10px 20px;
+}
+
+
+.add-card .btn-add:hover,.btn-pdf:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(72, 187, 120, 0.4);
+}
+
+/* دکمه های حذف و ویرایش*/
+.edit-btn{
+    background: #f59e0b ;
+    color: #333 ;
+    text-decoration: none;
+    transition: 0.3s;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 12px ;
+    font-size: 12px ;
+}
+.edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(255, 193, 7, 0.4);
+}
+.delete-btn{
+    background: #ef4444 ;
+    color: white ;
+    text-decoration: none;
+    transition: 0.3s;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 12px ;
+    font-size: 12px ;
+}
+.delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 25px rgba(220, 53, 69, 0.4);
+}
+
+.modal-buttons .btn-add {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    margin-top:  10px;
+}
+
+.modal-buttons .btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(72, 187, 120, 0.4);
+}
+
+.modal-buttons .btn-cancel {
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    margin-top: 10px;
+
+}
+
+.btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+
+}
+
+/* ============================================
+   رنگ‌های مدرن برای دکمه‌ها
+   ============================================ */
+
+/* آبی (بروزرسانی) */
+.refresh-btn {
+    background: #3b82f6 ;
+    color: white ;
+}
+.refresh-btn:hover {
+    background: #2563eb ;
+    transform: translateY(-1px);
+}
+/* آبی کم رنگ (تغییر رمز) */
+.password-btn {
+    background: #0ea5e9 ;
+    color: white ;
+    text-decoration: none;
+    transition: 0.3s;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 12px ;
+    font-size: 12px ;
+}
+.password-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 217, 0.4);
+}
+/* بنفش (تنظیم دسترسی) */
+.btn-permissions {
+    background: #8b5cf6 ;
+    color: white ;
+}
+.btn-permissions:hover {
+    background: #7c3aed !important;
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   استایل فرم‌ها
+   ============================================ */
+input:focus, select:focus, textarea:focus {
+    border-color: #4f46e5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+/* ============================================
+   هدر مشترک (در همه صفحات)
+   ============================================ */
+.header {
+    color: white;
+    border-radius: 16px;
+    /* padding: 1rem 2rem;*/
+     /*margin-bottom: 2rem;*/
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+.welcome-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.welcome-icon {
+    font-size: 28px;
+}
+.welcome-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 20px;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: 0.3s;
+    font-weight: 500;
+}
+.logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+/* ============================================
+   عنوان اصلی
+   ============================================ */
+.main-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.main-title h1 {
+    font-size: 28px;
+    color: #f1f5f9;
+    font-weight: bold;
+    display: inline-block;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #4f46e5;
+}
+/* ============================================
+   کارت‌ها
+   ============================================ */
+
+.add-card, .filter-card {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 25px 30px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.3s ease;
+}
+
+.add-card,.filter-card h2 {
+    color: #f7fafc;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    border-right: 4px solid #667eea;
+}
+
+.add-card,.filter-card label {
+    display: block;
+    font-weight: 500;
+    font-size: 14px;
+    color: #cbd5e0;
+    margin-bottom: 5px;
+}
+
+:is(.add-card, .filter-card) :is(input, select, textarea) {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #4a5568;
+    border-radius: 10px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    background: #1a202c;
+    color: #e2e8f0;
+    box-sizing: border-box;
+}
+.add-card input:focus,
+.add-card select:focus,
+.add-card textarea:focus,
+.filter-card input:focus,
+.filter-card select:focus,
+.filter-card textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102,126,234,.2);
+    background: #1a202c;
+}
+
+.add-card select option,
+.filter-card select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.form-group:has(textarea) { width: 100%; }
+
+.add-card .form-row,
+.filter-card .form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    align-items: flex-end;
+}
+
+.add-card .form-row .form-group,
+.filter-card .form-row .form-group {
+    flex: 1;
+    min-width: 180px;
+}
+
+.add-card .form-row .full-width,
+.filter-card .form-row .full-width {
+    flex: 0 0 100%;
+    width: 100%;
+}
+
+
+/* ============================================
+   کارت جستجو (search-card)
+   ============================================ */
+
+.search-card {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.search-card h2 {
+    color: #f7fafc;
+    font-size: 18px;
+    margin: 0 0 15px 0;
+    padding-right: 15px;
+    border-right: 4px solid #667eea;
+}
+
+.search-card label {
+    display: block;
+    font-weight: 500;
+    font-size: 13px;
+    color: #cbd5e0;
+    margin-bottom: 4px;
+}
+
+.search-card input,
+.search-card select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 2px solid #4a5568;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    background: #1a202c;
+    color: #e2e8f0;
+    box-sizing: border-box;
+}
+
+.search-card input:focus,
+.search-card select:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.search-card select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.search-card .search-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.search-card .search-row .form-group {
+
+    min-width: 150px;
+}
+
+.search-card .search-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.search-card .btn-search,.btn-filter {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.search-card .btn-search:hover,
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+}
+
+.search-card .btn-reset-search,.btn-reset{
+    background: #4a5568;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+}
+
+.search-card .btn-reset-search:hover,.btn-reset:hover {
+    background: #5a6a7e;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   جدول‌ها (یکسان برای همه)
+   ============================================ */
+.data-table{
+    display: block;
+    max-width: 100%;
+    min-width: 0;
+    background: #2d3748;
+    border-radius: 16px;
+    overflow-x: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 5px;
+    white-space: normal;
+    word-break: normal;
+}
+.data-table table{
+    width:  100%;
+    border-collapse:collapse;
+}
+/* هدر همه جدول‌ها */
+.data-table th {
+    background: #1a202c;
+    color: #cbd5e0;
+    padding: 15px;
+    text-align: center;
+    font-size: 14px;
+    border-bottom: 2px solid #4a5568;
+}
+/* سلول‌های همه جدول‌ها */
+.data-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #4a5568;
+    font-size: 13px;
+    vertical-align: middle;
+    color: #e2e8f0;
+}
+.data-table tr:hover{
+    background: rgba(79, 70, 229, 0.05);
+}
+
+/* ============================================
+   استایل تاریخ در همه جدول‌ها
+   ============================================ */
+
+.date {
+    direction: ltr !important;
+    text-align: center !important;
+    font-family: 'Vazir', 'Tahoma', sans-serif !important;
+    letter-spacing: 1px !important;
+    font-size: 13px !important;
+}
+/* ============================================
+   استایل باکس‌های select تاریخ
+   ============================================ */
+
+/* مخفی کردن دکمه‌های اسپینر در select */
+
+
+/* برای مرورگر فایرفاکس */
+.date-select::-ms-expand {
+    display: none;
+}
+
+.date-select:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+.date-group {
+    width: 200px;
+    direction: ltr;
+}
+/* ============================================
+   هدر در محتوای اصلی (سایدبار)
+   ============================================ */
+
+.main-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 15px 25px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.user-name {
+    font-weight: bold;
+    color: white;
+}
+
+
+/* ============================================
+   ساعت در هدر
+   ============================================ */
+
+
+.clock-display,
+#liveClock {
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    direction: ltr;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    color: white;
+}
+
+/* ============================================
+   هشدارها
+   ============================================ */
+
+.alert {
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+/* ============================================
+   رنگ‌های وضعیت (بج)
+   ============================================ */
+
+.status-active {
+    background: #10b981 !important;
+    color: white !important;
+}
+
+.status-inactive {
+    background: #ef4444 !important;
+    color: white !important;
+}
+
+.status-new {
+    background: #f59e0b !important;
+    color: #1a1a1a !important;
+}
+
+.status-review {
+    background: #0ea5e9 !important;
+    color: white !important;
+}
+
+.status-answered {
+    background: #10b981 !important;
+    color: white !important;
+}
+
+.status-closed {
+    background: #6b7280 !important;
+    color: white !important;
+}
+
+/* ============================================
+   ریسپانسیو مشترک
+   ============================================ */
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-left {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    body {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+    }
+
+    .main-title h1 {
+        font-size: 28px;
+        color: #f1f5f9;
+        font-weight: bold;
+        display: inline-block;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #4f46e5;
+    }
+}
+
+/* ============================================
+   استایل صفحه لاگین - رنگ‌ها
+   ============================================ */
+
+/* کانتینر لاگین */
+.login-container {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+}
+
+.login-container h2 {
+    color: #1e293b;
+}
+
+.login-container .subtitle {
+    color: #64748b;
+}
+
+/* فیلدهای ورود */
+.login-container input {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.login-container input:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+/* دکمه لاگین */
+.login-container button {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+}
+
+.login-container button:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* فوتر لاگین */
+.login-footer {
+    color: #94a3b8;
+    border-top-color: #e2e8f0;
+}
+
+/* اطلاعات دمو */
+.demo-credentials {
+    background: #f1f5f9;
+}
+
+.demo-credentials p {
+    color: #475569;
+}
+
+.demo-credentials strong {
+    color: #8b5cf6;
+}
+
+/* ============================================
+   استایل بخش راست هدر (ساعت و خروج)
+   ============================================ */
+
+/* کانتینر ساعت و دکمه خروج */
+.header-right,
+.main-header-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* فاصله ساعت از دکمه خروج */
+.clock-display {
+    margin-left: 0;
+}
+
+/* استایل سلکت‌های تاریخ جستجو با فونت وزیر */
+.search-date-day,
+.search-date-month,
+.search-date-year,
+.search-date-day option,
+.search-date-month option,
+.search-date-year option {
+    font-family: 'Vazir', 'Tahoma', sans-serif !important;
+    font-size: 13px !important;
+}
+/* ============================================
+   استایل مودال - تم تیره
+   ============================================ */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-content {
+    background: #2d3748;
+    border-radius: 16px;
+    padding: 30px 35px;
+    max-width: 1000px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #1a202c;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #4a5568;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #667eea;
+}
+
+.modal-content h3 {
+    color: #f7fafc;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    padding-right: 15px;
+    border-right: 4px solid #667eea;
+}
+
+.modal-content label {
+    display: block;
+    font-weight: 500;
+    font-size: 14px;
+    color: #cbd5e0;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #4a5568;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Vazir', 'Tahoma', sans-serif;
+    transition: 0.3s;
+    background: #1a202c;
+    color: #e2e8f0;
+    box-sizing: border-box;
+}
+
+
+
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    background: #1a202c;
+}
+
+.modal-content select option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+.modal-content textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-content .form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.modal-content .form-row .form-group {
+
+    min-width: 150px;
+}
+
+.modal-content .form-row .full-width {
+    flex: 0 0 100%;
+    width: 100%;
+}
+
+/* دکمه‌های مودال */
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+/* ============================================
+   مودال بزرگ (برای سیستم و ...)
+   ============================================ */
+
+.modal-content.large {
+    max-width: 850px;
+}
+
+.modal-content .full-width {
+    flex: 0 0 100%;
+    width: 100%;
+}
+
+/* ============================================
+   استایل مودال ویرایش کاربر
+   ============================================ */
+
+/* بخش ثابت اینپوت‌ها */
+.modal-fixed-fields {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 15px;
+}
+
+/* بخش اسکرول دار دسترسی‌ها */
+.access-scroll-area {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* استایل اسکرول بار */
+.access-scroll-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.access-scroll-area::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.access-scroll-area::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+
+.access-scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* عنوان دسترسی‌ها */
+.access-title {
+    margin-bottom: 10px;
+}
+
+
+
+/* ============================================
+   تنظیم سلکت‌های تاریخ برای همه صفحات
+   ============================================ */
+/* همه سلکت‌های تاریخ در کل پروژه */
+.date-select {
+    direction: ltr !important;
+    background-position: left 10px center !important;
+    padding-left: 30px !important;
+    padding-right: 10px !important;
+    width: 70px;
+    min-width: 60px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+}
+.date-select:hover,
+.search-date-day:hover,
+.search-date-month:hover,
+.search-date-year:hover {
+    border-color: #4f46e5;
+}
+/* کوچک کردن سلکت‌های تاریخ در فرم‌ها */
+.date-select-group select,
+.search-date-group select {
+    width: 80px !important;
+    min-width: 75px !important;
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+}
+
+
+
+/* استایل اسلش بین سلکت‌ها */
+.date-select-group span,
+.search-date-group span {
+    margin: 0 2px !important;
+    font-size: 12px !important;
+    color: #64748b !important;
+}
+
+/* تنظیم سلکت‌های تاریخ در مودال */
+ .date-select-group {
+    direction: ltr;
+}
+
+/* برای فرم ثبت خدمات */
+.services-form .date-select-group select,
+.invoices-form .date-select-group select {
+    width: 70px !important;
+}
+.date-select-group:hover{
+    border-color: #4f46e5;
+}
+
+/* رنگ اسلش های پنل ثبت */
+
+.date-separator {
+    margin: 0 5px !important;
+    font-size: 16px !important;
+    color: #1e293b !important;
+    font-weight: bold !important;
+    background: transparent !important;
+}
+.invoices-form select option {
+    font-family: 'Vazir', 'Tahoma', sans-serif ;
+    font-size: 13px ;
+}
+.search-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 5px;
+    gap: 10px;
+    border-top: 1px solid #eee;
+}
+/* ============================================
+   تنظیم نهایی وسط‌چین و نشانک سلکت‌های تاریخ
+   ============================================ */
+
+.search-date-group select {
+    direction: rtl !important;
+    text-align: center !important;
+    background-position: right 10px center !important;
+    padding-left: 30px !important;
+    padding-right: 10px !important;
+}
+
+/* گزینه‌های داخل سلکت */
+.search-date-group select option {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+/* ============================================
+   کارت‌های آمار
+   ============================================ */
+
+.stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.stat-box {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 15px;
+    text-align: center;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+/*گزارش*/
+/* ============================================
+   استایل صفحه گزارشات - فقط چیدمان
+   ============================================ */
+
+
+
+.filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    min-width: 250px;
+    margin-bottom: 10px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.text-center {
+    text-align: center;
+}
+.columns-box {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 12px;
+    background: #2d3748;
+    margin-bottom: 15px;
+}
+
+.checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    width: 100%;
+    min-width: 0;
+}
+
+.checkbox-grid label{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    margin:0;
+    cursor:pointer;
+    white-space:nowrap;
+}
+.checkbox-grid input[type="checkbox"]{
+    margin:0;
+}
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 2px 0;
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.main-content {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.reports-table.data-table {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.reports-table table {
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+    border-collapse: collapse;
+}

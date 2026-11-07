@@ -396,7 +396,7 @@ if ($isAjax) {
  <script>
     window.reportConfig = {
     url: "admin_kalarep.php",
-    printUrl: "assets/print_report.php",
+        printUrl: "../assets/includes/print_report.php",
     table: ".reports-table",
     filterInfo: true,
     type: "kala"

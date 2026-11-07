@@ -1,8 +1,8 @@
 <?php
 session_start();
-require_once __DIR__.'/../db.php';
-require_once __DIR__.'/../assets/jdf.php';
-require_once 'report_queries.php';
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/jdf.php';
+require_once __DIR__ . '/report_queries.php';
 
 $db = getDB();
 
@@ -17,4 +17,4 @@ if (!$data) {
 extract($data);
 
 
-require 'report_template.php';
+require_once __DIR__ . '/report_template.php';

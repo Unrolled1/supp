@@ -263,7 +263,7 @@ if ($isAjax) {
  <script>
     window.reportConfig = {
     url: "admin_invoicerep.php",
-    printUrl: "assets/print_report.php",
+        printUrl: "../assets/includes/print_report.php",
     table: ".reports-table",
     filterInfo: true,
     type: "invoice"
